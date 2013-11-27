@@ -1,0 +1,1 @@
+g++ -DINTERFACE_TEST Interface.cpp -o interface 2>&1 && ./interface

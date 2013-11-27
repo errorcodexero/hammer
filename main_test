@@ -1,0 +1,1 @@
+g++ -DMAIN_TEST main.cpp interface.cpp octocanum.cpp force.cpp force_interface.cpp posedge_trigger.cpp posedge_toggle.cpp perf_tracker.cpp bunny_launcher.cpp util.cpp countdown_timer.cpp gyro_tracker.cpp bound_tracker.cpp -o main 2>&1 && ./main

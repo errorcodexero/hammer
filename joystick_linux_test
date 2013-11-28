@@ -1,0 +1,1 @@
+g++ -Wall -Werror -DJOYSTICK_LINUX_TEST joystick_linux.cpp interface.cpp -o joystick_linux 2>&1 && ./joystick_linux

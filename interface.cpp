@@ -182,7 +182,7 @@ ostream& operator<<(ostream& o,Robot_inputs a){
 	o<<"  mode="<<a.robot_mode<<"\n";
 	o<<"  now="<<a.now<<"\n";
 	//o<<"joysticks:";
-	for(unsigned i=0;i<MAX_JOYSTICKS;i++){
+	for(unsigned i=0;i<a.JOYSTICKS;i++){
 		o<<"  "<<a.joystick[i]<<"\n";
 	}
 	o<<" dio:";

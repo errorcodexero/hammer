@@ -56,8 +56,6 @@ std::ostream& operator<<(std::ostream&,Robot_mode);
 
 typedef double Time;
 
-static const unsigned MAX_JOYSTICKS=4; //limitation of FRC coms
-
 typedef enum{DI_OUTPUT,DI_0,DI_1} Digital_in;
 std::ostream& operator<<(std::ostream&,Digital_in);
 
@@ -66,7 +64,10 @@ typedef float Volt;
 struct Robot_inputs{
 	Robot_mode robot_mode;
 	Time now;//time since boot.
-	Joystick_data joystick[MAX_JOYSTICKS];
+
+	static const unsigned JOYSTICKS=4; //limitation of FRC coms
+	Joystick_data joystick[JOYSTICKS];
+
 	Digital_in digital_io[Robot_outputs::DIGITAL_IOS];
 	
 	static const unsigned ANALOG_INPUTS=8;

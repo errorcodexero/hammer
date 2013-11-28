@@ -21,7 +21,17 @@ struct Bunnybot_goal{
 
 std::ostream& operator<<(std::ostream&,Bunnybot_goal);
 
-struct Main{
+struct Bunnybot_output{
+	Octocanum_output drive;
+	bool launch_bunny;
+	bool poop_bunny;
+
+	Bunnybot_output();
+};
+
+std::ostream& operator<<(std::ostream&,Bunnybot_output);
+
+struct Bunnybot{
 	typedef enum{
 		TELEOP,
 		AUTO_DRIVE1,
@@ -36,16 +46,23 @@ struct Main{
 	Octocanum_state octocanum;
 	Bunny_launcher bunny_launcher;
 	Bunny_launcher bunny_pooper;
-	Force_interface force;
-	Perf_tracker perf;
-	Gyro_tracker gyro;
-	//Bound_tracker bound[Joystick_data::AXES];
-	
-	Main();
-	
+
+	Bunnybot();
+
 	Bunnybot_goal autonomous(Robot_inputs);
 	Bunnybot_goal teleop(Robot_inputs);
 	Bunnybot_goal goal(Robot_inputs);
+	Bunnybot_output operator()(Robot_inputs);
+};
+
+std::ostream& operator<<(std::ostream&,Bunnybot);
+
+struct Main{
+	Force_interface force;
+	Perf_tracker perf;
+	Gyro_tracker gyro;
+	Bunnybot bunnybot;
+	
 	Robot_outputs operator()(Robot_inputs);
 };
 

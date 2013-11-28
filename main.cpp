@@ -44,9 +44,11 @@ ostream& operator<<(ostream& o,Bunnybot_goal a){
 	return o<<"Bunnybot_goal";
 }
 
-Main::Main():mode(TELEOP){}
+Bunnybot_output::Bunnybot_output():launch_bunny(0),poop_bunny(0){}
 
-Bunnybot_goal Main::autonomous(Robot_inputs in){
+Bunnybot::Bunnybot():mode(TELEOP){}
+
+Bunnybot_goal Bunnybot::autonomous(Robot_inputs in){
 	//The lack of "break" is on purpose.
 	switch(mode){
 		case TELEOP:
@@ -81,7 +83,7 @@ Bunnybot_goal Main::autonomous(Robot_inputs in){
 	}
 }
 
-Bunnybot_goal Main::teleop(Robot_inputs in){
+Bunnybot_goal Bunnybot::teleop(Robot_inputs in){
 	mode=TELEOP;
 		
 	Joystick_data main_joystick=in.joystick[0];
@@ -89,15 +91,6 @@ Bunnybot_goal Main::teleop(Robot_inputs in){
 	double x=main_joystick.axis[0];
 	double y=-main_joystick.axis[1];
 	double theta=-main_joystick.axis[2];
-	force.update(
-		main_joystick.button[0],
-		main_joystick.button[4],
-		main_joystick.button[5],
-		main_joystick.button[6],
-		main_joystick.button[1],
-		main_joystick.button[2]
-	);
-	
 	/*for(unsigned i=0;i<Joystick_data::AXES;i++){
 		bound[i].update(main_joystick.axis[i]);
 	}*/
@@ -117,7 +110,7 @@ Bunnybot_goal Main::teleop(Robot_inputs in){
 	return r;
 }
 
-Bunnybot_goal Main::goal(Robot_inputs in){
+Bunnybot_goal Bunnybot::goal(Robot_inputs in){
 	if(in.robot_mode.autonomous){
 		return autonomous(in);
 	}else{
@@ -125,24 +118,54 @@ Bunnybot_goal Main::goal(Robot_inputs in){
 	}
 }
 
-Robot_outputs Main::operator()(Robot_inputs in){
+Bunnybot_output Bunnybot::operator()(Robot_inputs in){
 	auto_timer.update(in.now,in.robot_mode.enabled);
-	gyro.update(in.now,in.analog[0]);
 	Bunnybot_goal todo=goal(in);
-	perf.update(in.now);
 	bunny_launcher.update(in.now,!in.robot_mode.enabled,todo.launch_bunny_now,0);
 	bunny_pooper.update(in.now,!in.robot_mode.enabled,todo.poop_bunny_now,0);
 	pair<Octocanum_state,Octocanum_output> p=run(octocanum,todo.drive,in.now);
 	octocanum=p.first;
-	Octocanum_output oct_out=p.second;
-	
+	Bunnybot_output r;
+	r.drive=p.second;
+	r.launch_bunny=bunny_launcher.output();
+	r.poop_bunny=bunny_pooper.output();
+	return r;
+}
+
+ostream& operator<<(ostream& o,Bunnybot a){
+	o<<"Bunnybot(";
+	o<<a.mode;
+	o<<a.auto_timer;
+	o<<"traction_mode="<<a.goal_traction_mode;
+	o<<a.octocanum;
+	o<<a.bunny_launcher;
+	o<<a.bunny_pooper;
+	return o<<")";
+}
+
+Robot_outputs Main::operator()(Robot_inputs in){
+	gyro.update(in.now,in.analog[0]);
+	perf.update(in.now);
+
+	Joystick_data main_joystick=in.joystick[0];
+	force.update(
+		main_joystick.button[0],
+		main_joystick.button[4],
+		main_joystick.button[5],
+		main_joystick.button[6],
+		main_joystick.button[1],
+		main_joystick.button[2]
+	);
+	Bunnybot_output b=bunnybot(in);
+
 	Robot_outputs r;
-	r.pwm[0]=pwm_convert(oct_out.wheels.lf);
-	r.pwm[1]=pwm_convert(oct_out.wheels.lr);
-	r.pwm[2]=pwm_convert(-oct_out.wheels.rf);
-	r.pwm[3]=pwm_convert(-oct_out.wheels.rr);
-	r.solenoid[1]=oct_out.traction_mode;
-	r.solenoid[0]=bunny_launcher.output();
+	r.pwm[0]=pwm_convert(b.drive.wheels.lf);
+	r.pwm[1]=pwm_convert(b.drive.wheels.lr);
+	r.pwm[2]=pwm_convert(-b.drive.wheels.rf);
+	r.pwm[3]=pwm_convert(-b.drive.wheels.rr);
+	r.solenoid[1]=b.drive.traction_mode;
+	r.solenoid[0]=b.launch_bunny;
+	r.solenoid[2]=b.poop_bunny;
 	r=force(r);
 	
 	static int i=0;
@@ -182,17 +205,18 @@ Robot_outputs Main::operator()(Robot_inputs in){
 
 ostream& operator<<(ostream& o,Main m){
 	o<<"Main(";
-	o<<m.auto_timer<<" ";
-	o<<"traction_mode="<<m.goal_traction_mode<<" ";
-	o<<m.octocanum<<" ";
+	//o<<m.auto_timer<<" ";
+	//o<<"traction_mode="<<m.goal_traction_mode<<" ";
+	//o<<m.octocanum<<" ";
 	o<<m.force;
 	o<<m.perf;
-	o<<m.bunny_launcher;
-	o<<m.bunny_pooper;
+	//o<<m.bunny_launcher;
+	//o<<m.bunny_pooper;
 	o<<m.gyro;
 /*	for(unsigned i=0;i<Joystick_data::AXES;i++){
 		o<<m.bound[i];
 	}*/
+	o<<m.bunnybot;
 	return o<<")";
 }
 

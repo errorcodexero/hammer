@@ -26,7 +26,7 @@ pair<Robot_inputs,int> read(Robot_mode robot_mode){
 	{
 		DriverStation *ds=DriverStation::GetInstance();
 		if(ds){
-			for(unsigned i=0;i<MAX_JOYSTICKS;i++){
+			for(unsigned i=0;i<r.JOYSTICKS;i++){
 				r.joystick[i]=read_joystick(*ds,i);
 			}
 		}else{

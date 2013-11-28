@@ -5,11 +5,11 @@
 #include "force_interface.h"
 #include "bunny_launcher.h"
 #include "gyro_tracker.h"
-#include "util/interface.h"
-#include "util/posedge_toggle.h"
-#include "util/perf_tracker.h"
-#include "util/countdown_timer.h"
-#include "util/bound_tracker.h"
+#include "../util/interface.h"
+#include "../util/posedge_toggle.h"
+#include "../util/perf_tracker.h"
+#include "../util/countdown_timer.h"
+#include "../util/bound_tracker.h"
 
 struct Bunnybot_goal{
 	Octocanum_goal drive;

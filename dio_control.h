@@ -1,7 +1,7 @@
 #ifndef DIO_CONTROL_H
 #define DIO_CONTROL_H
 
-#include "interface.h"
+#include "util/interface.h"
 class DigitalModule;
 
 DigitalModule *digital_module();

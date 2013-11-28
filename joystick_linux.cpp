@@ -1,11 +1,15 @@
 #include "joystick_linux.h"
+
+//This ifdef is here because I haven't found a good way to tell Wind River Workbench not to compile a file.
+
+#ifndef _WRS_KERNEL
 #include<fcntl.h>
 #include<string>
-#include<linux/joystick.h>
 #include<iostream>
 #include<errno.h>
 #include<sstream>
 #include<sys/types.h>
+#include<linux/joystick.h>
 #include<dirent.h>
 #include "util/util.h"
 
@@ -183,6 +187,7 @@ Joystick_data_linux const& Joystick_linux::read(){
 	}
 	return data;
 }
+#endif
 
 ostream& operator<<(ostream& o,Joystick_linux const& a){
 	//todo:FIXME

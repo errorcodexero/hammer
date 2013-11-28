@@ -1,7 +1,6 @@
 #include "WPILib.h"
 #include "DigitalModule.h"
-#include "interface.h"
-#include "main.h"
+#include "control/main.h"
 #include "dio_control.h"
 
 Joystick_data read_joystick(DriverStation& ds,int port){

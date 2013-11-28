@@ -1,7 +1,7 @@
 #ifndef GYRO_TRACKER_H
 #define GYRO_TRACKER_H
 
-#include "interface.h"
+#include "util/interface.h"
 
 class Integrator{
 	Time last;

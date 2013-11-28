@@ -1,8 +1,7 @@
-
 #ifndef FORCE_H
 #define FORCE_H
 
-#include "interface.h"
+#include "util/interface.h"
 
 struct Force{
 	Robot_outputs values;

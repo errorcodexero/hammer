@@ -2,7 +2,7 @@
 #include<iostream>
 #include<sstream>
 #include "octocanum.h"
-#include "util.h"
+#include "util/util.h"
 
 using namespace std;
 

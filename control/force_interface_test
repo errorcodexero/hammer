@@ -1,0 +1,3 @@
+set -e
+g++ -DTEST_FORCE_INTERFACE -Wall -Werror -I.. force_interface.cpp ../util/posedge_trigger.cpp force.cpp ../util/interface.cpp ../util/util.cpp -o force_interface 2>&1 | head
+./force_interface

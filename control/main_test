@@ -1,0 +1,13 @@
+g++ -DMAIN_TEST -I.. main.cpp \
+	octocanum.cpp \
+	force.cpp \
+	force_interface.cpp \
+	bunny_launcher.cpp \
+	gyro_tracker.cpp \
+	../util/interface.cpp \
+	../util/posedge_trigger.cpp \
+	../util/posedge_toggle.cpp \
+	../util/perf_tracker.cpp \
+	../util/util.cpp \
+	../util/countdown_timer.cpp \
+	../util/bound_tracker.cpp -o main 2>&1 && ./main

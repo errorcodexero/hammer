@@ -1,7 +1,7 @@
 #ifndef BUNNY_LAUNCHER
 #define BUNNY_LAUNCHER
 
-#include "interface.h"
+#include "util/interface.h"
 
 class Bunny_launcher{
 	public:

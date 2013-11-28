@@ -1,7 +1,7 @@
 #ifndef COUNTDOWN_TIMER_H
 #define COUNTDOWN_TIMER_H
 
-#include "interface.h"
+#include "util.h"
 
 class Countdown_timer{
 	Time left,last_time;

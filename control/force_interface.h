@@ -2,7 +2,7 @@
 #define FORCE_INTERFACE_H
 
 #include<iosfwd>
-#include "posedge_trigger.h"
+#include "util/posedge_trigger.h"
 #include "force.h"
 
 class Force_interface{

@@ -1,6 +1,6 @@
 #include "force_interface.h"
 #include<iostream>
-#include "util.h"
+#include "util/util.h"
 
 using namespace std;
 

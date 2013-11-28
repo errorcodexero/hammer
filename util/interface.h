@@ -3,6 +3,7 @@
 
 #include<iosfwd>
 
+typedef double Time;
 typedef unsigned char Pwm_output;
 typedef bool Solenoid_output;
 
@@ -53,8 +54,6 @@ struct Robot_mode{
 };
 
 std::ostream& operator<<(std::ostream&,Robot_mode);
-
-typedef double Time;
 
 typedef enum{DI_OUTPUT,DI_0,DI_1} Digital_in;
 std::ostream& operator<<(std::ostream&,Digital_in);

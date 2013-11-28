@@ -4,7 +4,7 @@
 #include<map>
 #include<string>
 #include<vector>
-#include "interface.h"
+#include "util/interface.h"
 
 struct Joystick_data_linux{
 	std::string name;

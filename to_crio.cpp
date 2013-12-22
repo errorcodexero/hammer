@@ -115,13 +115,15 @@ public:
 			if(solenoid_module==-1){
 				solenoid[i]=NULL;
 			}else{
-				solenoid[i]=new Solenoid(solenoid_module-1,i+1);
+				solenoid[i]=new Solenoid(solenoid_module+1,i+1);
+				//solenoid[i]=new Solenoid(i+1);
 				if(!solenoid[i]) error_code|=8;
 			}
 		}
 		
 		for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
-			digital_io[i].set_channel(i);
+			int r=digital_io[i].set_channel(i);
+			if(r) error_code|=256;
 		}
 	}
 
@@ -147,16 +149,17 @@ public:
 			if(r) error_code|=32;
 		}
 		for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
-			digital_io[i].set(out.digital_io[i]);
+			int r=digital_io[i].set(out.digital_io[i]);
+			if(r) error_code|=512;
 		}
 		
 		//rate limiting the output  
 		if(skipped==0){
 			//cerr<<"Ran "<<mode<<"\r\n";
 			/*cerr<<in<<"\r\n";
-			cerr<<main<<"\r\n";
+			cerr<<main<<"\r\n";*/
 			cerr<<"errorcode="<<error_code<<"\n";
-			cerr.flush();*/
+			cerr.flush();
 			//cerr<<out<<"\r\n";
 			/*cerr<<"Going to start task\r\n";
 			int priority=Task::kDefaultPriority;
@@ -172,6 +175,13 @@ public:
 	void run(Robot_inputs in){
 		Robot_outputs out=main(in);
 		set_outputs(out);
+		static int i=0;
+		if(!i){
+			for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
+				cerr<<"dio"<<i<<":"<<digital_io[i]<<"\n";
+			}
+		}
+		i=(i+1)%100;
 	}
 	
 	void run(Robot_mode mode){

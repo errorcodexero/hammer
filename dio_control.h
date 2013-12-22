@@ -7,7 +7,10 @@ class DigitalModule;
 DigitalModule *digital_module();
 
 class DIO_control{
+	public:
 	typedef enum{IN,OUT,FREE} Mode;
+	
+	private:
 	Mode mode;
 	int channel;
 
@@ -23,6 +26,10 @@ class DIO_control{
 	private:
 	int set_mode(Mode);
 	int free();
+	
+	friend std::ostream& operator<<(std::ostream&,DIO_control const&);
 };
+
+std::ostream& operator<<(std::ostream&,DIO_control const&);
 
 #endif

@@ -191,7 +191,7 @@ ostream& operator<<(ostream& o,Robot_inputs a){
 	}
 	o<<" analog:";
 	for(unsigned i=0;i<a.ANALOG_INPUTS;i++){
-		o<<a.analog[i]<<' ';
+		o<<(i+1)<<" "<<a.analog[i]<<' ';
 	}
 	return o<<")";
 }

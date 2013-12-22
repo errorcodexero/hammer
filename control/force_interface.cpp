@@ -83,7 +83,7 @@ int Force_interface::solenoid(unsigned location,int value){
 	}else{
 		force.solenoid[location]=1;
 		if(value==3) return 2;
-		force.values.pwm[location]=value;
+		force.values.solenoid[location]=value;
 	}
 	return 0;
 }

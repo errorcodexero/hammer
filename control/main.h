@@ -55,6 +55,7 @@ struct Bunnybot{
 	Bunnybot_output operator()(Robot_inputs);
 };
 
+std::ostream& operator<<(std::ostream&,Bunnybot::Mode);
 std::ostream& operator<<(std::ostream&,Bunnybot);
 
 struct Main{

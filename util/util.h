@@ -4,6 +4,7 @@
 #include<string>
 #include<map>
 #include<iostream>
+#include<vector>
 #include "interface.h"
 
 Pwm_output pwm_convert(double);
@@ -23,6 +24,21 @@ std::ostream& operator<<(std::ostream& o,std::map<K,V> const& m){
 		o<<*at;
 	}
 	return o<<"}";
+}
+
+template<typename T>
+std::vector<T>& operator|=(std::vector<T>& v,T t){
+	v.push_back(t);
+	return v;
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o,std::vector<T> const& v){
+	o<<"[";
+	for(typename std::vector<T>::const_iterator at=v.begin();at!=v.end();++at){
+		o<<' '<<*at;
+	}
+	return o<<" ]";
 }
 
 #endif

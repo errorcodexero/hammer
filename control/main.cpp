@@ -132,6 +132,19 @@ Bunnybot_output Bunnybot::operator()(Robot_inputs in){
 	return r;
 }
 
+ostream& operator<<(ostream& o,Bunnybot::Mode a){
+	switch(a){
+		#define X(name) case Bunnybot::name: return o<<""#name;
+		X(TELEOP)
+		X(AUTO_DRIVE1)
+		X(AUTO_SHOOT)
+		X(AUTO_DRIVE2)
+		X(AUTO_DONE)
+		#undef X
+		default: return o<<"error";
+	}
+}
+
 ostream& operator<<(ostream& o,Bunnybot a){
 	o<<"Bunnybot(";
 	o<<a.mode;

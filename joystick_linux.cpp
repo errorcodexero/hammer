@@ -15,21 +15,6 @@
 
 using namespace std;
 
-template<typename T>
-vector<T>& operator|=(vector<T>& v,T t){
-	v.push_back(t);
-	return v;
-}
-
-template<typename T>
-ostream& operator<<(ostream& o,vector<T> const& v){
-	o<<"[";
-	for(typename vector<T>::const_iterator at=v.begin();at!=v.end();++at){
-		o<<' '<<*at;
-	}
-	return o<<" ]";
-}
-
 //list of the names in a directory.
 vector<string> dir(string name){
 	DIR *d=opendir(name.c_str());

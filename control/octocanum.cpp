@@ -108,7 +108,16 @@ std::ostream& operator<<(std::ostream& o,Octocanum_mode m){
 	}
 }
 
+double portion_done(Octocanum_mode mode,bool goal_traction,Time elapsed){
+	switch(mode){
+		case TO_TRACTION: return elapsed/.5;
+		case TO_MECH: return elapsed/.75;
+		default: return 1;
+	}
+}
+
 Octocanum_mode next_mode(Octocanum_mode mode,bool goal_traction,Time elapsed){
+	bool done=portion_done(mode,goal_traction,elapsed)>=1;
 	switch(mode){
 		default:
 		case TRACTION:
@@ -117,7 +126,7 @@ Octocanum_mode next_mode(Octocanum_mode mode,bool goal_traction,Time elapsed){
 			return goal_traction?TO_TRACTION:MECH;
 		case TO_TRACTION:
 			if(goal_traction){
-				return (elapsed>.5)?TRACTION:TO_TRACTION;
+				return done?TRACTION:TO_TRACTION;
 			}else{
 				return TO_MECH;
 			}
@@ -125,7 +134,7 @@ Octocanum_mode next_mode(Octocanum_mode mode,bool goal_traction,Time elapsed){
 			if(goal_traction){
 				return TO_TRACTION;
 			}else{
-				return (elapsed>.75)?MECH:TO_MECH;
+				return done?MECH:TO_MECH;
 			}
 	}
 }
@@ -147,6 +156,13 @@ Octocanum_state::Octocanum_state():mode(TRACTION),last_change_time(0){}
 
 std::ostream& operator<<(std::ostream& o,Octocanum_state a){
 	return o<<"Octocanum_state("<<a.mode<<" "<<a.last_change_time<<")";
+}
+
+//not tested yet.
+double linear_to_sine(double x){
+	if(x<0) return 0;
+	if(x>1) return 1;
+	return 1-(cos(M_PI*x)+1)/2;
 }
 
 std::pair<Octocanum_state,Octocanum_output> run(Octocanum_state state,Octocanum_goal goal,Time now){

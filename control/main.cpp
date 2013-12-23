@@ -308,12 +308,12 @@ enum WallCommand{
 	OFF,RIGHT,LEFT,FRONT
 };
 
-WallCommand wallstop(double x,double y){
+/*WallCommand wallstop(double x,double y){
 	if(x>=-0.2&&x<=0.2&&y>=-0.2&&y<=0.2){
 		return OFF;
 	}
 	else if() 
-	
+*/	
 	
 
 

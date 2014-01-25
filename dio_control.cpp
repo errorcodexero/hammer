@@ -35,6 +35,7 @@ int DIO_control::set(Digital_out d){
 }
 
 Digital_in DIO_control::get()const{
+	//return DI_0;
 	if(mode!=IN){
 		cerr<<"Mode is actually: "<<mode<<"\n";
 		return DI_OUTPUT;

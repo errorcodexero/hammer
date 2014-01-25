@@ -3,8 +3,25 @@
 #include<sstream>
 #include "octocanum.h"
 #include "../util/util.h"
+#include <math.h>
 
 using namespace std;
+
+struct Drive_motors {
+	double a,b,c;
+};
+Drive_motors func(double x, double y, double theta){
+	
+	Drive_motors r;
+	r.a=-double(1)/3* theta- double(1)/3* x -(double(1)/sqrt(3))*y;
+	r.b=-double(1)/3* theta- double(1)/3* x +(double(1)/sqrt(3))*y;
+	r.c=(-(double(1)/3)* theta) + ((double(2)/3)* x);
+	return r;
+}
+
+ostream& operator<<(ostream& o, Drive_motors d){
+	return o<<"dm("<<d.a<<","<<d.b<<","<<d.c<<")";
+}
 
 unsigned interpret_10_turn_pot(Volt v){
 	/*measured values, measured on the Fall 2013 mecanum base:
@@ -123,10 +140,10 @@ Bunnybot_output Bunnybot::operator()(Robot_inputs in){
 	Bunnybot_goal todo=goal(in);
 	bunny_launcher.update(in.now,!in.robot_mode.enabled,todo.launch_bunny_now,0);
 	bunny_pooper.update(in.now,!in.robot_mode.enabled,todo.poop_bunny_now,0);
-	pair<Octocanum_state,Octocanum_output> p=run(octocanum,todo.drive,in.now);
-	octocanum=p.first;
+	//pair<Octocanum_state,Octocanum_output> p=run(octocanum,todo.drive,in.now);
+	//octocanum=p.first;
 	Bunnybot_output r;
-	r.drive=p.second;
+	//r.drive=p.second;
 	r.launch_bunny=bunny_launcher.output();
 	r.poop_bunny=bunny_pooper.output();
 	return r;
@@ -159,16 +176,23 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	Bunnybot_output b=bunnybot(in);
 
 	Robot_outputs r;
-	r.pwm[0]=pwm_convert(b.drive.wheels.lf);
+	/*r.pwm[0]=pwm_convert(b.drive.wheels.lf);
 	r.pwm[1]=pwm_convert(b.drive.wheels.lr);
 	r.pwm[2]=pwm_convert(-b.drive.wheels.rf);
-	r.pwm[3]=pwm_convert(-b.drive.wheels.rr);
+	r.pwm[3]=pwm_convert(-b.drive.wheels.rr);*/
+	ball_collecter.update(main_joystick.button[5]);
 	r.solenoid[1]=b.drive.traction_mode;
 	r.solenoid[0]=b.launch_bunny;
 	r.solenoid[2]=b.poop_bunny;
+	Drive_motors d=func ( in.joystick[0].axis[0], -in.joystick[0].axis[1], in.joystick[0].axis[3]);
+			r.pwm[0]=pwm_convert(d.a);
+			r.pwm[1]=pwm_convert(d.b);
+			r.pwm[2]=pwm_convert(d.c);
 	
 	//todo: double check that this is right.
 	r.relay[0]=(in.digital_io[0]==DI_1)?RELAY_00:RELAY_10;
+	r.pwm[3]=(ball_collecter.get());
+	//r.pwm[3] = main_joystick.button[5]?1:(main_joystick.button[6?-1:0]);
 	
 	r=force(r);
 	
@@ -295,18 +319,17 @@ enum WallCommand{
 	OFF,RIGHT,LEFT,FRONT
 };
 
-WallCommand wallstop(double x,double y){
+/*WallCommand wallstop(double x,double y){
 	if(x>=-0.2&&x<=0.2&&y>=-0.2&&y<=0.2){
 		return OFF;
 	}
 	else if() 
 	
-	
-
+	*/
 
 #ifdef MAIN_TEST
 int main(){
-	Main m;
+	/*Main m;
 	cout<<m<<"\n";
 	cout<<m(Robot_inputs())<<"\n";
 	cout<<m<<"\n";
@@ -315,12 +338,22 @@ int main(){
 	for(float i = 0.26; i <= 3; i = i+0.5){
 		cout<<i << " \n"; 
 		getDistance(i);
-	}
+	}*/
 	/*cout<<timetowall(2.5,1)<<"\n";
 	cout<<newdistance(.2,3,.7,2,.5)<<"\n";
 	for(float input=0;input<3;input=input+0.1){
 		a=converttodistance(input);
 		cout<<input<<"	"<<a<<"\n";
 	}*/
+	cout<<func(0, 1, 0);
+	cout<<func(0, -1, 0);
+	cout<<func(0, 0, 1);
+	cout<<func(0, 0, -1);
+	cout<<func(1, 0, 0);
+	cout<<func(-1, 0, 0);
+	cout<<func(0, 0, 0);
+	
+	
+	
 }
 #endif

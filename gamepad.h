@@ -13,6 +13,8 @@ struct Gamepad{
 	static const unsigned BUTTONS=12;
 	bool button[BUTTONS];
 	
+	static const unsigned A=0,B=1,X=2,Y=3,L_SHOULDER=4,R_SHOULDER=5;
+	
 	Gamepad();
 };
 

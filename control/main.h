@@ -41,7 +41,7 @@ struct Bunnybot{
 	} Mode;
 	Mode mode;
 	Countdown_timer auto_timer;
-	
+	Posedge_toggle ball_collecter;
 	Posedge_toggle goal_traction_mode;
 	Octocanum_state octocanum;
 	Bunny_launcher bunny_launcher;
@@ -62,6 +62,7 @@ struct Main{
 	Perf_tracker perf;
 	Gyro_tracker gyro;
 	Bunnybot bunnybot;
+	Posedge_toggle ball_collecter;
 	
 	Robot_outputs operator()(Robot_inputs);
 };

@@ -102,7 +102,7 @@ class To_crio
 {
 	Solenoid *solenoid[Robot_outputs::SOLENOIDS];
 	DIO_control digital_io[Robot_outputs::DIGITAL_IOS];
-	
+	//DigitalInput *digital_in[Robot_outputs::DIGITAL_IOS];
 	int error_code;
 	USER_CODE main;
 	int skipped;
@@ -124,6 +124,7 @@ public:
 		for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
 			int r=digital_io[i].set_channel(i);
 			if(r) error_code|=256;
+			//digital_in[i]=new DigitalInput(i+1);
 		}
 	}
 
@@ -210,6 +211,9 @@ public:
 		pair<Robot_inputs,int> in1=read(mode);
 		Robot_inputs in=in1.first;
 		error_code|=in1.second;
+		for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
+			in.digital_io[i]=digital_io[i].get();
+		}
 		run(in);
 	}
 };
@@ -425,12 +429,16 @@ int low_level(...){
 		if(p.second){
 			cerr<<"Error code "<<p.second<<"\n";
 		}
+		//TODO: Make this work before we re-enable this mode.
+	//	for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
+		//	p.first.digital_in[i]=digital_io[i].get();
+		//}
 		m.run(p.first);
 	}
 	return 0;
 }
 
-extern "C"{
+/*extern "C"{
 	INT32 FRC_UserProgram_StartupLibraryInit(){
 		cerr<<"started the low level thing!\n";
 		int stack_size=64000;//copied from Task
@@ -440,6 +448,6 @@ extern "C"{
 		cerr<<"end starter\n";
 		return 0;
 	}
-}
+}*/
 
-//START_ROBOT_CLASS(Robot_adapter<Main>);
+START_ROBOT_CLASS(Robot_adapter<Main>);

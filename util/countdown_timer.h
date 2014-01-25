@@ -14,6 +14,9 @@ class Countdown_timer{
 	bool done()const;
 	
 	friend std::ostream& operator<<(std::ostream&,Countdown_timer);
+
+	template<typename Func>
+	friend void traverse(Countdown_timer,Func&);
 };
 
 std::ostream& operator<<(std::ostream&,Countdown_timer);

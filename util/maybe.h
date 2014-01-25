@@ -9,7 +9,9 @@ class Maybe{
 
 	public:
 	Maybe():t(NULL){}
-	explicit Maybe(T const&);
+
+	explicit Maybe(T const& t1):t(new T(t1)){}
+
 	Maybe& operator=(Maybe const&);
 
 	operator bool()const{ return !!t; }

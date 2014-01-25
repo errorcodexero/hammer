@@ -9,7 +9,6 @@ class Force_interface{
 	public:
 	typedef enum{PWM,SOLENOID,RELAY,DIO,B0,B1,BUTTONS} Button;
 
-	private:
 	static const unsigned LOCATION_BITS=4;
 	static const unsigned VALUE_BITS=2;
 	static const unsigned LEN=1+LOCATION_BITS+VALUE_BITS;
@@ -32,6 +31,7 @@ class Force_interface{
 	friend std::ostream& operator<<(std::ostream&,Force_interface const&);
 };
 
+std::ostream& operator<<(std::ostream&,Force_interface::Button);
 std::ostream& operator<<(std::ostream&,Force_interface const&);
 
 #endif

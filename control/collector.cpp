@@ -1,10 +1,10 @@
+#include "collector.h"
 #include <iostream>
 #include <stdio.h>
 
 using namespace std;
 
-enum Collector_Mode{ON, OFF, REVERSE};
-Collector_Mode collecting(Collector_Mode state,bool press_on, bool press_reverse, bool release_reverse) {
+Collector_mode collecting(Collector_mode state,bool press_on, bool press_reverse, bool release_reverse) {
 	if (press_on && state == OFF) {
 		return ON;
 	}
@@ -30,7 +30,7 @@ Collector_Mode collecting(Collector_Mode state,bool press_on, bool press_reverse
 }
 
 
-ostream& operator << (ostream& o, Collector_Mode c) {
+ostream& operator << (ostream& o, Collector_mode c) {
 	if (c == ON) {
 		o << "ON\n";
 	}
@@ -45,7 +45,12 @@ ostream& operator << (ostream& o, Collector_Mode c) {
 	return o;
 }
 
-int main() {
+Collector::Collector() {
+	mode=OFF;
+}
+
+#ifdef STATE_MACHINE_TEST
+int state_machine_test() {
 	for(int j=0;j<2;j++){
 		for(int k=0;k<2;k++){
 			for(int i=0;i<2;i++){
@@ -61,4 +66,9 @@ int main() {
 		}
 	}
 	return 0;
+}
+#endif
+
+int main() {
+	Collector testvar;
 }

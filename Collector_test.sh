@@ -1,1 +1,0 @@
-g++ -DCOLLECTOR_TEST -Wall collector.cpp -o collector && ./collector

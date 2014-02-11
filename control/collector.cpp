@@ -49,7 +49,7 @@ Collector::Collector() {
 	mode=OFF;
 }
 
-#ifdef STATE_MACHINE_TEST
+#ifdef COLLECTOR_TEST
 int state_machine_test() {
 	for(int j=0;j<2;j++){
 		for(int k=0;k<2;k++){
@@ -67,8 +67,8 @@ int state_machine_test() {
 	}
 	return 0;
 }
-#endif
 
 int main() {
 	Collector testvar;
 }
+#endif

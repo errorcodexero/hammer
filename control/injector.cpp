@@ -30,6 +30,7 @@ namespace Injector{
 		switch(g){
 			case START: return o<<"START";
 			case WAIT: return o<<"WAIT";
+			case X: return o<<"X";
 			default: assert(0);
 		}
 	}
@@ -79,18 +80,22 @@ namespace Injector{
 		}
 	}
 
-	//I'm not sure that this function should be part of the class.
-	Status Estimator::status()const{
+	Status location_to_status(Estimator::Location location){
 		switch(location){
-			case GOING_UP:
-			case UP:
+			case Estimator::GOING_UP:
+			case Estimator::UP:
 				return SHOOTING;
-			case GOING_DOWN:
+			case Estimator::GOING_DOWN:
 				return RECOVERY;
-			case DOWN:
+			case Estimator::DOWN:
 				return IDLE;
 			default: assert(0);
 		}
+	}
+
+	//I'm not sure that this function should be part of the class.
+	Status Estimator::status()const{
+		return location_to_status(location);
 	}
 
 	void Estimator::out(ostream& o)const{
@@ -139,7 +144,7 @@ int main(){
 	e.update(0,OUTPUT_UP);
 	assert(e.status()==SHOOTING);
 	static const vector<Estimator::Location> LOCATIONS{Estimator::GOING_UP,Estimator::UP,Estimator::GOING_DOWN,Estimator::DOWN};
-	static const vector<Goal> GOALS{START,WAIT};
+	static const vector<Goal> GOALS{START,WAIT,X};
 	for(auto loc:LOCATIONS){
 		for(auto goal:GOALS){
 			cout<<loc<<"\t"<<goal<<"\t"<<control(loc,goal)<<"\n";

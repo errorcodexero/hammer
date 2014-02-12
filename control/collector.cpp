@@ -32,13 +32,13 @@ Collector_mode collecting(Collector_mode state,bool press_on, bool press_reverse
 
 ostream& operator << (ostream& o, Collector_mode c) {
 	if (c == ON) {
-		o << "ON\n";
+		o << "ON";
 	}
 	else if (c == OFF) {
-		o << "OFF\n";
+		o << "OFF";
 	}
 	if (c == REVERSE) {
-		o << "REVERSE\n";
+		o << "REVERSE";
 	}
 	
 	

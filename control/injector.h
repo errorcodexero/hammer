@@ -10,7 +10,7 @@ namespace Injector{
 	enum Output{OUTPUT_UP,OUTPUT_DOWN};
 	std::ostream& operator<<(std::ostream&,Output);
 
-	enum Goal{START,WAIT};
+	enum Goal{START,WAIT,X};
 	std::ostream& operator<<(std::ostream&,Goal);
 
 	class Estimator{

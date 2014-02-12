@@ -18,6 +18,12 @@ namespace Shooter_wheels{
 		}
 	}
 
+	Status::Status():top(0),bottom(0){}
+
+	ostream& operator<<(ostream& o,Status s){
+		return o<<"Shooter_wheels::Status("<<s.top<<","<<s.bottom<<")";
+	}
+
 	RPM target_speed_top(Goal g){
 		//this stuff eventually should come out of a config file.
 		switch(g){

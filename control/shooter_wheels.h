@@ -8,8 +8,16 @@ namespace Shooter_wheels{
 	std::ostream& operator<<(std::ostream&,Goal);
 
 	typedef int RPM;
+
+	struct Status{
+		Status();
+		RPM top,bottom;
+	};
+	std::ostream& operator<<(std::ostream&,Status);
+
 	RPM target_speed_top(Goal);
 	RPM target_speed_bottom(Goal);
+
 	bool ready(Goal,RPM top_speed,RPM bottom_speed);
 }
 

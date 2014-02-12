@@ -1,0 +1,1 @@
+g++ -Wall -Werror -DBIST_TEST bist.cpp ../util/countup_timer.cpp toplevel.cpp shooter_wheels.cpp collector_tilt.cpp injector.cpp injector_arms.cpp collector.cpp ../util/posedge_trigger.cpp ../util/negedge_trigger.cpp -o bist 2>&1 && ./bist

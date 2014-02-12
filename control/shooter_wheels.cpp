@@ -1,6 +1,7 @@
 #include "shooter_wheels.h"
 #include<iostream>
 #include<cassert>
+#include<stdlib.h>
 
 using namespace std;
 

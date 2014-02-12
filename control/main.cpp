@@ -7,15 +7,35 @@
 
 using namespace std;
 
+double max(double a,double b,double c){
+	return max(max(a,b),c);
+}
+
 struct Drive_motors {
 	double a,b,c;
 };
-Drive_motors func(double x, double y, double theta){
-	
+
+Drive_motors func_inner(double x, double y, double theta){	
 	Drive_motors r;
 	r.a=-double(1)/3* theta- double(1)/3* x -(double(1)/sqrt(3))*y;
 	r.b=-double(1)/3* theta- double(1)/3* x +(double(1)/sqrt(3))*y;
 	r.c=(-(double(1)/3)* theta) + ((double(2)/3)* x);
+	return r;
+}
+
+Drive_motors func(double x,double y,double theta){
+	//This function exists in order to pull the full power out of the drivetrain.  It makes some of the areas of the x/y/theta space have funny edges/non-smooth areas, but I think this is an acceptable tradeoff.
+	Drive_motors r=func_inner(x,y,theta);
+	const double s=sqrt(3);
+	r.a*=s;
+	r.b*=s;
+	r.c*=s;
+	const double m=max(fabs(r.a),fabs(r.b),fabs(r.c));
+	if(m>1){
+		r.a/=m;
+		r.b/=m;
+		r.c/=m;
+	}
 	return r;
 }
 
@@ -359,15 +379,12 @@ int main(){
 		a=converttodistance(input);
 		cout<<input<<"	"<<a<<"\n";
 	}*/
-	cout<<func(0, 1, 0);
-	cout<<func(0, -1, 0);
-	cout<<func(0, 0, 1);
-	cout<<func(0, 0, -1);
-	cout<<func(1, 0, 0);
-	cout<<func(-1, 0, 0);
-	cout<<func(0, 0, 0);
-	
-	
-	
+	cout<<func(0, 1, 0)<<"\n";
+	cout<<func(0, -1, 0)<<"\n";
+	cout<<func(0, 0, 1)<<"\n";
+	cout<<func(0, 0, -1)<<"\n";
+	cout<<func(1, 0, 0)<<"\n";
+	cout<<func(-1, 0, 0)<<"\n";
+	cout<<func(0, 0, 0)<<"\n";
 }
 #endif

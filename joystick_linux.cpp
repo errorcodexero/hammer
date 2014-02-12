@@ -185,7 +185,7 @@ int main(){
 	cout<<joysticks()<<"\n";
 	try{
 		Joystick_linux a("/dev/input/js0");
-		for(unsigned i=0;i<10;i++){
+		for(unsigned i=0;1 || i<10;i++){
 			cout<<a.read()<<"\n";
 			usleep(1000*100);
 		}

@@ -101,6 +101,14 @@ namespace Collector_tilt{
 			default: assert(0);
 		}
 	}
+
+	bool ready(Status status,Goal goal){
+		switch(goal){
+			case GOAL_UP: return status==STATUS_UP;
+			case GOAL_DOWN: return status==STATUS_DOWN;
+			default: assert(0);
+		}
+	}
 }
 
 #ifdef COLLECTOR_TILT_TEST
@@ -119,6 +127,13 @@ int main(){
 	static const vector<Goal> GOALS{GOAL_UP,GOAL_DOWN};
 	for(auto goal:GOALS){
 		cout<<goal<<":"<<control(goal)<<"\n";
+	}
+	static const vector<Status> STATUS_LIST{STATUS_UP,STATUS_DOWN,STATUS_RAISING,STATUS_LOWERING};
+	cout<<"\n";
+	for(auto status:STATUS_LIST){
+		for(auto goal:GOALS){
+			cout<<status<<" "<<goal<<" "<<ready(status,goal)<<"\n";
+		}
 	}
 }
 #endif

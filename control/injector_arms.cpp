@@ -106,6 +106,15 @@ namespace Injector_arms{
 			default: assert(0);
 		}
 	}
+
+	bool ready(Status status,Goal goal){
+		switch(goal){
+			case GOAL_OPEN: return status==STATUS_OPEN;
+			case GOAL_CLOSE: return status==STATUS_CLOSED;
+			case GOAL_X: return 1;
+			default: assert(0);
+		}
+	}
 }
 
 #ifdef INJECTOR_ARMS_TEST
@@ -128,7 +137,7 @@ int main(){
 	static const vector<Goal> GOALS{GOAL_OPEN,GOAL_CLOSE,GOAL_X};
 	for(auto status:STATUS_OPTIONS){
 		for(auto goal:GOALS){
-			cout<<status<<"\t"<<goal<<"\t"<<control(status,goal)<<"\n";
+			cout<<status<<"\t"<<goal<<"\t"<<control(status,goal)<<"\t"<<ready(status,goal)<<"\n";
 		}
 	}
 }

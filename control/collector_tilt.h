@@ -27,6 +27,7 @@ namespace Collector_tilt{
 	std::ostream& operator<<(std::ostream&,Estimator);
 
 	Output control(Goal);
+	bool ready(Status,Goal);
 }
 
 #endif

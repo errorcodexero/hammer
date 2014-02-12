@@ -51,6 +51,13 @@ namespace Shooter_wheels{
 		}
 	}
 
+	Output control(Goal g){
+		Output r;
+		r.top=target_speed_top(g);
+		r.bottom=target_speed_bottom(g);
+		return r;
+	}
+
 	bool ready(Goal g,RPM top_speed,RPM bottom_speed){
 		RPM error_top=top_speed-target_speed_top(g);
 		RPM error_bot=bottom_speed-target_speed_bottom(g);
@@ -66,6 +73,10 @@ namespace Shooter_wheels{
 			default:
 				return 0;
 		}
+	}
+
+	bool ready(Status status,Goal goal){
+		return ready(goal,status.top,status.bottom);
 	}
 }
 

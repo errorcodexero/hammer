@@ -8,6 +8,18 @@
 #include "shooter_wheels.h"
 
 namespace Toplevel{
+	struct Output{
+		Output();
+
+		Collector_mode collector;
+		Collector_tilt::Output collector_tilt;
+		Injector::Output injector;
+		Injector_arms::Output injector_arms;
+		Injector::Output ejector;
+		Shooter_wheels::Output shooter_wheels;
+	};
+	std::ostream& operator<<(std::ostream&,Output);
+
 	struct Subgoals{
 		Subgoals();
 
@@ -33,6 +45,25 @@ namespace Toplevel{
 	};
 	std::ostream& operator<<(std::ostream& o,Status);
 
+	class Estimator{
+		//no estimate for collector
+		Collector_tilt::Estimator collector_tilt;
+		Injector::Estimator injector;
+		Injector_arms::Estimator injector_arms;
+		Injector::Estimator ejector;
+		//no estimates for shooter wheels yet.
+
+		public:
+		void update(Time,Output);
+		Status estimate()const;
+		void out(std::ostream&)const;
+	};
+	std::ostream& operator<<(std::ostream& o,Estimator);
+
+	Output control(Status,Subgoals);
+	bool ready(Status,Subgoals);
+
+	//all this mode stuff really belongs elsewhere
 	enum Mode{
 		DRIVE_WO_BALL,DRIVE_W_BALL,
 		COLLECT,

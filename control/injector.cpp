@@ -119,6 +119,8 @@ namespace Injector{
 		return o;
 	}
 
+	/*
+	should do the same thing as below
 	Output control(Estimator::Location loc,Goal g){
 		switch(loc){
 			case Estimator::Location::GOING_UP:
@@ -130,6 +132,19 @@ namespace Injector{
 				return (g==START)?OUTPUT_UP:OUTPUT_DOWN;
 			default: assert(0);
 		}
+	}*/
+
+	Output control(Status status,Goal goal){
+		switch(status){
+			case IDLE: return (goal==START)?OUTPUT_UP:OUTPUT_DOWN;
+			case SHOOTING: return OUTPUT_UP;
+			case RECOVERY: return OUTPUT_DOWN;
+			default: assert(0);
+		}
+	}
+
+	bool ready(Status status,Goal goal){
+		return goal==X || status==IDLE;
 	}
 }
 
@@ -144,10 +159,18 @@ int main(){
 	e.update(0,OUTPUT_UP);
 	assert(e.status()==SHOOTING);
 	static const vector<Estimator::Location> LOCATIONS{Estimator::GOING_UP,Estimator::UP,Estimator::GOING_DOWN,Estimator::DOWN};
+	static const vector<Status> STATUS_LIST{IDLE,SHOOTING,RECOVERY};
 	static const vector<Goal> GOALS{START,WAIT,X};
-	for(auto loc:LOCATIONS){
+	cout<<"Control outputs:\n";
+	for(auto status:STATUS_LIST){
 		for(auto goal:GOALS){
-			cout<<loc<<"\t"<<goal<<"\t"<<control(loc,goal)<<"\n";
+			cout<<status<<"\t"<<goal<<"\t"<<control(status,goal)<<"\n";
+		}
+	}
+	cout<<"Ready states:\n";
+	for(auto status:STATUS_LIST){
+		for(auto goal:GOALS){
+			cout<<status<<"\t"<<goal<<"\t"<<ready(status,goal)<<"\n";
 		}
 	}
 }

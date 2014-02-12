@@ -18,7 +18,11 @@ namespace Shooter_wheels{
 	RPM target_speed_top(Goal);
 	RPM target_speed_bottom(Goal);
 
+	typedef Status Output;
+	Output control(Goal);
+
 	bool ready(Goal,RPM top_speed,RPM bottom_speed);
+	bool ready(Status,Goal);
 }
 
 #endif

@@ -7,6 +7,7 @@
 #include "injector_arms.h"
 #include "shooter_wheels.h"
 #include "ejector.h"
+#include "pump.h"
 
 namespace Toplevel{
 	struct Output{
@@ -18,6 +19,7 @@ namespace Toplevel{
 		Injector_arms::Output injector_arms;
 		Ejector::Output ejector;
 		Shooter_wheels::Output shooter_wheels;
+		Pump::Output pump;
 	};
 	std::ostream& operator<<(std::ostream&,Output);
 
@@ -31,6 +33,7 @@ namespace Toplevel{
 		Ejector::Goal ejector;
 		Shooter_wheels::Goal shooter_wheels;
 		//todo: add drivebase stuff here.
+		//pump omitted because it currently only has one goal.
 	};
 	std::ostream& operator<<(std::ostream&,Subgoals);
 
@@ -43,6 +46,7 @@ namespace Toplevel{
 		Injector_arms::Status injector_arms;
 		Ejector::Estimator::Location ejector;
 		Shooter_wheels::Status shooter_wheels;
+		Pump::Status pump;
 	};
 	std::ostream& operator<<(std::ostream& o,Status);
 
@@ -53,9 +57,11 @@ namespace Toplevel{
 		Injector_arms::Estimator injector_arms;
 		Ejector::Estimator ejector;
 		//no estimates for shooter wheels yet.
+		Pump::Status pump;//for now just taking the sensor's measurement as gospel.
 
 		public:
-		void update(Time,Output);
+		Estimator();
+		void update(Time,Output,Pump::Status);
 		Status estimate()const;
 		void out(std::ostream&)const;
 	};

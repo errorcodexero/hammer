@@ -10,22 +10,19 @@ namespace Toplevel{
 		collector_tilt(Collector_tilt::OUTPUT_UP),
 		injector(Injector::OUTPUT_DOWN),
 		injector_arms(Injector_arms::OUTPUT_CLOSE),
-		ejector(Ejector::OUTPUT_DOWN)
+		ejector(Ejector::OUTPUT_DOWN),
+		pump(Pump::ON)
 	{}
 
-	template<typename T>
-	void out(ostream& o,T g){
+	ostream& operator<<(ostream& o,Output g){
+		o<<"Output(";
 		o<<"collect:"<<g.collector;
 		o<<" colct_tlt:"<<g.collector_tilt;
 		o<<" inject:"<<g.injector;
 		o<<" inj arm:"<<g.injector_arms;
 		o<<" eject:"<<g.ejector;
 		o<<" shoot:"<<g.shooter_wheels;
-	}
-
-	ostream& operator<<(ostream& o,Output a){
-		o<<"Output(";
-		out(o,a);
+		o<<" pump:"<<g.pump;
 		return o<<")";
 	}
 
@@ -40,7 +37,12 @@ namespace Toplevel{
 
 	ostream& operator<<(ostream& o,Subgoals g){
 		o<<"Toplevel::Subgoals(";
-		out(o,g);
+		o<<"collect:"<<g.collector;
+		o<<" colct_tlt:"<<g.collector_tilt;
+		o<<" inject:"<<g.injector;
+		o<<" inj arm:"<<g.injector_arms;
+		o<<" eject:"<<g.ejector;
+		o<<" shoot:"<<g.shooter_wheels;
 		return o<<")";
 	}
 
@@ -48,7 +50,8 @@ namespace Toplevel{
 		collector_tilt(Collector_tilt::STATUS_LOWERING),
 		injector(Injector::Estimator::GOING_DOWN),
 		injector_arms(Injector_arms::STATUS_CLOSING),
-		ejector(Ejector::Estimator::GOING_DOWN)
+		ejector(Ejector::Estimator::GOING_DOWN),
+		pump(Pump::NOT_FULL)
 	{}
 
 	ostream& operator<<(ostream& o,Status s){
@@ -58,14 +61,18 @@ namespace Toplevel{
 		o<<" inj arm:"<<s.injector_arms;
 		o<<" eject:"<<s.ejector;
 		o<<" shoot:"<<s.shooter_wheels;
+		o<<" pump:"<<s.pump;
 		return o<<")";
 	}
 
-	void Estimator::update(Time time,Output out){
+	Estimator::Estimator():pump(Pump::NOT_FULL){}
+
+	void Estimator::update(Time time,Output out,Pump::Status pump_status){
 		collector_tilt.update(time,out.collector_tilt);
 		injector.update(time,out.injector);
 		injector_arms.update(time,out.injector_arms);
 		ejector.update(time,out.ejector);
+		pump=pump_status;
 	}
 
 	Status Estimator::estimate()const{
@@ -74,6 +81,7 @@ namespace Toplevel{
 		r.injector=injector.estimate();
 		r.injector_arms=injector_arms.estimate();
 		r.ejector=ejector.estimate();
+		r.pump=pump;
 		return r;
 	}
 
@@ -84,6 +92,7 @@ namespace Toplevel{
 		o<<" inj arm:"<<injector_arms;
 		o<<" eject:"<<ejector;
 		//o<<" shoot:"<<e.shoot;
+		o<<" pump:"<<pump;
 		o<<")";
 	}
 
@@ -100,6 +109,7 @@ namespace Toplevel{
 		r.injector_arms=control(status.injector_arms,g.injector_arms);
 		r.ejector=control(status.ejector,g.ejector);
 		r.shooter_wheels=control(g.shooter_wheels);
+		r.pump=control(status.pump);
 		return r;
 	}
 
@@ -211,8 +221,9 @@ int main(){
 	Estimator est;
 	cout<<est<<"\n";
 	cout<<est.estimate()<<"\n";
-	est.update(0,Output());
-	est.update(10,Output());
+	Pump::Status ps=Pump::FULL;
+	est.update(0,Output(),ps);
+	est.update(10,Output(),ps);
 	cout<<est.estimate()<<"\n";
 	/*
 	if we choose one of the modes and use all the built-in controls then we should after some time get to a status where we're ready.  

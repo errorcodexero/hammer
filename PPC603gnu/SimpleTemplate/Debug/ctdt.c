@@ -7,6 +7,8 @@
 /*       -fdollars-in-identifiers flag.                   */
 
 
+void _GLOBAL__I__Z10collecting14Collector_modebbb();
+
 void _GLOBAL__I__Z11pwm_convertd();
 
 void _GLOBAL__I__Z13read_joystickR13DriverStationi();
@@ -15,7 +17,7 @@ void _GLOBAL__I__Z14digital_modulev();
 
 void _GLOBAL__I__Z18combinedthermostati();
 
-void _GLOBAL__I__Z4funcddd();
+void _GLOBAL__I__Z4max3ddd();
 
 void _GLOBAL__I__ZN10IntegratorC2Ev();
 
@@ -23,17 +25,33 @@ void _GLOBAL__I__ZN12Perf_trackerC2Ev();
 
 void _GLOBAL__I__ZN13Bound_trackerC2Ev();
 
+void _GLOBAL__I__ZN13Countup_timerC2Ev();
+
+void _GLOBAL__I__ZN13Injector_armslsERSoNS_4GoalE();
+
 void _GLOBAL__I__ZN14Bunny_launcherC2Ev();
+
+void _GLOBAL__I__ZN14Collector_tiltlsERSoNS_4GoalE();
 
 void _GLOBAL__I__ZN14Posedge_toggleC2Ev();
 
+void _GLOBAL__I__ZN14Shooter_wheelslsERSoNS_4GoalE();
+
 void _GLOBAL__I__ZN15Countdown_timerC2Ev();
 
+void _GLOBAL__I__ZN15Cyborg_joystickC2Ev();
+
 void _GLOBAL__I__ZN15Force_interfaceC2Ev();
+
+void _GLOBAL__I__ZN15Negedge_triggerC2Ev();
 
 void _GLOBAL__I__ZN15Posedge_triggerC2Ev();
 
 void _GLOBAL__I__ZN5ForceC2Ev();
+
+void _GLOBAL__I__ZN8InjectorlsERSoNS_6StatusE();
+
+void _GLOBAL__I__ZN8Toplevel6OutputC2Ev();
 
 void _GLOBAL__I__ZlsRSo11Digital_out();
 
@@ -94,20 +112,29 @@ void _GLOBAL__I__ZN11StringArray19STRING_ARRAY_RAW_IDE();
 extern void (*_ctors[])();
 void (*_ctors[])() =
     {
+    _GLOBAL__I__Z10collecting14Collector_modebbb,
     _GLOBAL__I__Z11pwm_convertd,
     _GLOBAL__I__Z13read_joystickR13DriverStationi,
     _GLOBAL__I__Z14digital_modulev,
     _GLOBAL__I__Z18combinedthermostati,
-    _GLOBAL__I__Z4funcddd,
+    _GLOBAL__I__Z4max3ddd,
     _GLOBAL__I__ZN10IntegratorC2Ev,
     _GLOBAL__I__ZN12Perf_trackerC2Ev,
     _GLOBAL__I__ZN13Bound_trackerC2Ev,
+    _GLOBAL__I__ZN13Countup_timerC2Ev,
+    _GLOBAL__I__ZN13Injector_armslsERSoNS_4GoalE,
     _GLOBAL__I__ZN14Bunny_launcherC2Ev,
+    _GLOBAL__I__ZN14Collector_tiltlsERSoNS_4GoalE,
     _GLOBAL__I__ZN14Posedge_toggleC2Ev,
+    _GLOBAL__I__ZN14Shooter_wheelslsERSoNS_4GoalE,
     _GLOBAL__I__ZN15Countdown_timerC2Ev,
+    _GLOBAL__I__ZN15Cyborg_joystickC2Ev,
     _GLOBAL__I__ZN15Force_interfaceC2Ev,
+    _GLOBAL__I__ZN15Negedge_triggerC2Ev,
     _GLOBAL__I__ZN15Posedge_triggerC2Ev,
     _GLOBAL__I__ZN5ForceC2Ev,
+    _GLOBAL__I__ZN8InjectorlsERSoNS_6StatusE,
+    _GLOBAL__I__ZN8Toplevel6OutputC2Ev,
     _GLOBAL__I__ZlsRSo11Digital_out,
     _GLOBAL__I__ZlsRSo15Traction_output,
     _GLOBAL__I__ZN12PrintCommandC2EPKc,
@@ -139,6 +166,8 @@ void (*_ctors[])() =
     0
     };
 
+void _GLOBAL__D__Z10collecting14Collector_modebbb();
+
 void _GLOBAL__D__Z11pwm_convertd();
 
 void _GLOBAL__D__Z13read_joystickR13DriverStationi();
@@ -147,7 +176,7 @@ void _GLOBAL__D__Z14digital_modulev();
 
 void _GLOBAL__D__Z18combinedthermostati();
 
-void _GLOBAL__D__Z4funcddd();
+void _GLOBAL__D__Z4max3ddd();
 
 void _GLOBAL__D__ZN10IntegratorC2Ev();
 
@@ -155,17 +184,33 @@ void _GLOBAL__D__ZN12Perf_trackerC2Ev();
 
 void _GLOBAL__D__ZN13Bound_trackerC2Ev();
 
+void _GLOBAL__D__ZN13Countup_timerC2Ev();
+
+void _GLOBAL__D__ZN13Injector_armslsERSoNS_4GoalE();
+
 void _GLOBAL__D__ZN14Bunny_launcherC2Ev();
+
+void _GLOBAL__D__ZN14Collector_tiltlsERSoNS_4GoalE();
 
 void _GLOBAL__D__ZN14Posedge_toggleC2Ev();
 
+void _GLOBAL__D__ZN14Shooter_wheelslsERSoNS_4GoalE();
+
 void _GLOBAL__D__ZN15Countdown_timerC2Ev();
 
+void _GLOBAL__D__ZN15Cyborg_joystickC2Ev();
+
 void _GLOBAL__D__ZN15Force_interfaceC2Ev();
+
+void _GLOBAL__D__ZN15Negedge_triggerC2Ev();
 
 void _GLOBAL__D__ZN15Posedge_triggerC2Ev();
 
 void _GLOBAL__D__ZN5ForceC2Ev();
+
+void _GLOBAL__D__ZN8InjectorlsERSoNS_6StatusE();
+
+void _GLOBAL__D__ZN8Toplevel6OutputC2Ev();
 
 void _GLOBAL__D__ZlsRSo11Digital_out();
 
@@ -216,20 +261,29 @@ void _GLOBAL__D__ZN11StringArray19STRING_ARRAY_RAW_IDE();
 extern void (*_dtors[])();
 void (*_dtors[])() =
     {
+    _GLOBAL__D__Z10collecting14Collector_modebbb,
     _GLOBAL__D__Z11pwm_convertd,
     _GLOBAL__D__Z13read_joystickR13DriverStationi,
     _GLOBAL__D__Z14digital_modulev,
     _GLOBAL__D__Z18combinedthermostati,
-    _GLOBAL__D__Z4funcddd,
+    _GLOBAL__D__Z4max3ddd,
     _GLOBAL__D__ZN10IntegratorC2Ev,
     _GLOBAL__D__ZN12Perf_trackerC2Ev,
     _GLOBAL__D__ZN13Bound_trackerC2Ev,
+    _GLOBAL__D__ZN13Countup_timerC2Ev,
+    _GLOBAL__D__ZN13Injector_armslsERSoNS_4GoalE,
     _GLOBAL__D__ZN14Bunny_launcherC2Ev,
+    _GLOBAL__D__ZN14Collector_tiltlsERSoNS_4GoalE,
     _GLOBAL__D__ZN14Posedge_toggleC2Ev,
+    _GLOBAL__D__ZN14Shooter_wheelslsERSoNS_4GoalE,
     _GLOBAL__D__ZN15Countdown_timerC2Ev,
+    _GLOBAL__D__ZN15Cyborg_joystickC2Ev,
     _GLOBAL__D__ZN15Force_interfaceC2Ev,
+    _GLOBAL__D__ZN15Negedge_triggerC2Ev,
     _GLOBAL__D__ZN15Posedge_triggerC2Ev,
     _GLOBAL__D__ZN5ForceC2Ev,
+    _GLOBAL__D__ZN8InjectorlsERSoNS_6StatusE,
+    _GLOBAL__D__ZN8Toplevel6OutputC2Ev,
     _GLOBAL__D__ZlsRSo11Digital_out,
     _GLOBAL__D__ZlsRSo15Traction_output,
     _GLOBAL__D__ZN9Scheduler9_instanceE,

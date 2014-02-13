@@ -157,7 +157,9 @@ Octocanum_state::Octocanum_state():mode(TRACTION),last_change_time(0){}
 std::ostream& operator<<(std::ostream& o,Octocanum_state a){
 	return o<<"Octocanum_state("<<a.mode<<" "<<a.last_change_time<<")";
 }
-
+#ifndef M_PI
+#define M_PI 3.1415
+#endif
 //not tested yet.
 double linear_to_sine(double x){
 	if(x<0) return 0;

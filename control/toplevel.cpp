@@ -124,7 +124,7 @@ namespace Toplevel{
 		#undef X
 		assert(0);
 	}
-
+	
 	Subgoals subgoals(Mode m){
 		Subgoals r;
 		switch(m){

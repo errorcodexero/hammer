@@ -7,12 +7,15 @@
 
 using namespace std;
 
-double max(double a,double b,double c){
+double max3(double a,double b,double c){
 	return max(max(a,b),c);
 }
 
 struct Drive_motors {
 	double a,b,c;
+//Outputs to motors; 
+//a = frontLeft, b = frontRight, c = back;
+//+value = clockwise
 };
 
 Drive_motors func_inner(double x, double y, double theta){	
@@ -30,7 +33,7 @@ Drive_motors func(double x,double y,double theta){
 	r.a*=s;
 	r.b*=s;
 	r.c*=s;
-	const double m=max(fabs(r.a),fabs(r.b),fabs(r.c));
+	const double m=max3(fabs(r.a),fabs(r.b),fabs(r.c));
 	if(m>1){
 		r.a/=m;
 		r.b/=m;
@@ -217,10 +220,15 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	r.solenoid[1]=b.drive.traction_mode;
 	r.solenoid[0]=b.launch_bunny;
 	r.solenoid[2]=b.poop_bunny;
-	Drive_motors d=func ( in.joystick[0].axis[0], -in.joystick[0].axis[1], in.joystick[0].axis[3]);
-			r.pwm[0]=pwm_convert(d.a);
-			r.pwm[1]=pwm_convert(d.b);
-			r.pwm[2]=pwm_convert(d.c);
+	double throttle = (1 - in.joystick[0].axis[5]) / 2; 
+	//Since the throttle axis ranges from -1 to 1, need to make all values positive   
+	//Also, (1 - Throttle) ranges from 0 to 2, so need to divide the values in half to range form 0 to 1
+	//This means that by default the robot will run at 0.5x max speed when throttle is not pressed
+	//This is how the robot has driven for the last few seasons
+	Drive_motors d=func ( in.joystick[0].axis[0] * throttle, -in.joystick[0].axis[1] * throttle, in.joystick[0].axis[3] * throttle);
+	r.pwm[0]=pwm_convert(d.a);
+	r.pwm[1]=pwm_convert(d.b);
+	r.pwm[2]=pwm_convert(d.c);
 	
 	//todo: double check that this is right.
 	r.relay[0]=(in.digital_io[0]==DI_1)?RELAY_00:RELAY_10;

@@ -7,7 +7,7 @@ namespace Injector{
 	enum Status{IDLE,SHOOTING,RECOVERY};
 	std::ostream& operator<<(std::ostream&,Status);
 
-	enum Output{OUTPUT_UP,OUTPUT_DOWN};
+	enum Output{OUTPUT_UP,OUTPUT_DOWN,OUTPUT_VENT};
 	std::ostream& operator<<(std::ostream&,Output);
 
 	enum Goal{START,WAIT,X};
@@ -15,7 +15,7 @@ namespace Injector{
 
 	class Estimator{
 		public:
-		enum Location{GOING_UP,UP,GOING_DOWN,DOWN};
+		enum Location{GOING_UP,UP,GOING_DOWN,DOWN_VENT,DOWN_IDLE,X};
 
 		private:
 		Location location;
@@ -31,7 +31,9 @@ namespace Injector{
 	std::ostream& operator<<(std::ostream&,Estimator::Location);
 	std::ostream& operator<<(std::ostream&,Estimator);
 
-	Output control(Status,Goal);
+	Output control(Estimator::Location,Goal);
+
+	bool ready(Estimator::Location,Goal);
 	bool ready(Status,Goal);
 }
 

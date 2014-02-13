@@ -39,7 +39,7 @@ namespace Toplevel{
 
 		//collector has no state
 		Collector_tilt::Status collector_tilt;
-		Injector::Status injector;
+		Injector::Estimator::Location injector;
 		Injector_arms::Status injector_arms;
 		Ejector::Status ejector;
 		Shooter_wheels::Status shooter_wheels;

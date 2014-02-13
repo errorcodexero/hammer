@@ -1,6 +1,7 @@
 #include "injector.h"
 #include<iostream>
 #include<cassert>
+#include "../util/util.h"
 
 using namespace std;
 
@@ -21,6 +22,7 @@ namespace Injector{
 			#define X(name) case OUTPUT_##name: return o<<""#name;
 			X(UP)
 			X(DOWN)
+			X(VENT)
 			#undef X
 			default: assert(0);
 		}
@@ -37,47 +39,77 @@ namespace Injector{
 
 	Estimator::Estimator():location(GOING_DOWN){} //might want to change this to assume that it starts down.
 
-	void Estimator::update(Time time,Output out){
-		switch(location){
-			case GOING_UP:
+	pair<Estimator::Location,bool> next(Estimator::Location loc,Time elapsed,Output out){
+		switch(loc){
+			case Estimator::GOING_UP:
 				if(out==OUTPUT_DOWN){
-					location=GOING_DOWN;
-					timer.update(time,1);
-				}else{
-					timer.update(time,0);
-					static const Time RISE_TIME=2.5;
-					if(timer.elapsed()>RISE_TIME){
-						location=UP;
-					}
+					return make_pair(Estimator::GOING_DOWN,0);
 				}
-				break;
-			case UP:
-				if(out==OUTPUT_DOWN){
-					location=GOING_DOWN;
-					timer.update(time,1);
-				}
-				break;
-			case GOING_DOWN:
-				if(out==OUTPUT_DOWN){
-					timer.update(time,0);
-					static const Time LOWER_TIME=1.6;
-					if(timer.elapsed()>LOWER_TIME){
-						location=DOWN;
-					}
-				}else{
-					location=GOING_UP;
-					timer.update(time,1);
-				}
-				break;
-			case DOWN:
 				if(out==OUTPUT_UP){
-					location=GOING_UP;
-					timer.update(time,1);
+					static const Time RISE_TIME=2.5;
+					if(elapsed>RISE_TIME){
+						return make_pair(Estimator::UP,0);
+					}
+					return make_pair(Estimator::GOING_UP,0);
+				}
+				return make_pair(Estimator::X,0);
+			case Estimator::UP:
+				switch(out){
+					case OUTPUT_UP: return make_pair(Estimator::UP,0);
+					case OUTPUT_DOWN: return make_pair(Estimator::GOING_DOWN,0);
+					case OUTPUT_VENT: return make_pair(Estimator::X,0);
+					default: assert(0);
+				}
+			case Estimator::GOING_DOWN:
+				if(out==OUTPUT_DOWN){
+					static const Time LOWER_TIME=1.6;
+					if(elapsed>LOWER_TIME){
+						return make_pair(Estimator::DOWN_VENT,0);
+					}
+					return make_pair(Estimator::GOING_DOWN,0);
+				}
+				if(out==OUTPUT_UP){
+					return make_pair(Estimator::GOING_UP,0);
+				}
+				//vent
+				return make_pair(Estimator::X,0);
+			case Estimator::DOWN_VENT:
+				switch(out){
+					case OUTPUT_UP: return make_pair(Estimator::GOING_UP,0);
+					case OUTPUT_DOWN: return make_pair(Estimator::DOWN_VENT,1);
+					case OUTPUT_VENT:
+						static const Time VENT_TIME=1;//this is probably a little high.
+						if(elapsed>VENT_TIME){
+							return make_pair(Estimator::DOWN_IDLE,0);
+						}
+						return make_pair(Estimator::DOWN_VENT,0);
+					default: assert(0);//should get test here
+				}
+			case Estimator::DOWN_IDLE:
+				switch(out){
+					case OUTPUT_UP: return make_pair(Estimator::GOING_UP,0);
+					case OUTPUT_DOWN: return make_pair(Estimator::DOWN_VENT,0);
+					case OUTPUT_VENT: return make_pair(Estimator::DOWN_IDLE,0);
+					default: assert(0);
 				}
 				break;
+			case Estimator::X:
+				switch(out){
+					case OUTPUT_UP: return make_pair(Estimator::GOING_UP,0);
+					case OUTPUT_DOWN: return make_pair(Estimator::GOING_DOWN,0);
+					case OUTPUT_VENT: return make_pair(Estimator::X,0);
+					default: assert(0);
+				}
 			default:
 				assert(0);
 		}
+	}
+
+	void Estimator::update(Time time,Output out){
+		timer.update(time,0);
+		pair<Location,bool> n=next(location,timer.elapsed(),out);
+		if(n.second || n.first!=location) timer.update(time,1);
+		location=n.first;
 	}
 
 	Status location_to_status(Estimator::Location location){
@@ -87,11 +119,15 @@ namespace Injector{
 				return SHOOTING;
 			case Estimator::GOING_DOWN:
 				return RECOVERY;
-			case Estimator::DOWN:
+			case Estimator::DOWN_VENT:
+				return RECOVERY;
+			case Estimator::DOWN_IDLE:
 				return IDLE;
 			default: assert(0);
 		}
 	}
+
+	Estimator::Location Estimator::estimate()const{ return location; }
 
 	//I'm not sure that this function should be part of the class.
 	Status Estimator::status()const{
@@ -104,12 +140,14 @@ namespace Injector{
 
 	ostream& operator<<(ostream& o,Estimator::Location a){
 		switch(a){
-			#define X(name) case Estimator::name: return o<<""#name;
-			X(GOING_UP)
-			X(UP)
-			X(GOING_DOWN)
-			X(DOWN)
-			#undef X
+			#define X1(name) case Estimator::name: return o<<""#name;
+			X1(GOING_UP)
+			X1(UP)
+			X1(GOING_DOWN)
+			X1(DOWN_VENT)
+			X1(DOWN_IDLE)
+			X1(X)
+			#undef X1
 			default: assert(0);
 		}
 	}
@@ -119,8 +157,6 @@ namespace Injector{
 		return o;
 	}
 
-	/*
-	should do the same thing as below
 	Output control(Estimator::Location loc,Goal g){
 		switch(loc){
 			case Estimator::Location::GOING_UP:
@@ -128,19 +164,18 @@ namespace Injector{
 			case Estimator::Location::UP:
 			case Estimator::Location::GOING_DOWN:
 				return OUTPUT_DOWN;
-			case Estimator::Location::DOWN:
+			case Estimator::DOWN_VENT:
+				return OUTPUT_VENT;
+			case Estimator::Location::DOWN_IDLE:
 				return (g==START)?OUTPUT_UP:OUTPUT_DOWN;
+			case Estimator::Location::X:
+				return OUTPUT_DOWN;
 			default: assert(0);
 		}
-	}*/
+	}
 
-	Output control(Status status,Goal goal){
-		switch(status){
-			case IDLE: return (goal==START)?OUTPUT_UP:OUTPUT_DOWN;
-			case SHOOTING: return OUTPUT_UP;
-			case RECOVERY: return OUTPUT_DOWN;
-			default: assert(0);
-		}
+	bool ready(Estimator::Location loc,Goal goal){
+		return ready(location_to_status(loc),goal);
 	}
 
 	bool ready(Status status,Goal goal){
@@ -158,19 +193,41 @@ int main(){
 	assert(e.status()==RECOVERY);
 	e.update(0,OUTPUT_UP);
 	assert(e.status()==SHOOTING);
-	static const vector<Estimator::Location> LOCATIONS{Estimator::GOING_UP,Estimator::UP,Estimator::GOING_DOWN,Estimator::DOWN};
+	static const vector<Estimator::Location> LOCATIONS{Estimator::GOING_UP,Estimator::UP,Estimator::GOING_DOWN,Estimator::DOWN_VENT,Estimator::DOWN_IDLE,Estimator::X};
+	//This doesn't actually est all transitions
+	Status last=e.status();
+	for(unsigned i=0;i<100;i++){
+		Time now=i/10.0;
+		Output out=control(e.estimate(),START);
+		e.update(now,out);
+		if(e.status()!=last || 1){
+			cout<<"location="<<e.estimate()<<" ";
+			cout<<"status="<<e.status()<<"\n";
+			last=e.status();
+		}
+	}
+
 	static const vector<Status> STATUS_LIST{IDLE,SHOOTING,RECOVERY};
 	static const vector<Goal> GOALS{START,WAIT,X};
 	cout<<"Control outputs:\n";
-	for(auto status:STATUS_LIST){
+	for(auto location:LOCATIONS){
 		for(auto goal:GOALS){
-			cout<<status<<"\t"<<goal<<"\t"<<control(status,goal)<<"\n";
+			cout<<location<<"\t"<<goal<<"\t"<<control(location,goal)<<"\n";
 		}
 	}
 	cout<<"Ready states:\n";
 	for(auto status:STATUS_LIST){
 		for(auto goal:GOALS){
 			cout<<status<<"\t"<<goal<<"\t"<<ready(status,goal)<<"\n";
+		}
+	}
+	cout<<"State transitions:\n";
+	static const vector<Output> OUTPUTS{OUTPUT_UP,OUTPUT_DOWN,OUTPUT_VENT};
+	for(auto location:LOCATIONS){
+		for(auto out:OUTPUTS){
+			for(float elapsed:{0,3}){
+				cout<<location<<" "<<out<<" "<<elapsed<<" "<<next(location,elapsed,out)<<"\n";
+			}
 		}
 	}
 }

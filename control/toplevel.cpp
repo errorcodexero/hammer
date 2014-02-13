@@ -46,7 +46,7 @@ namespace Toplevel{
 
 	Status::Status():
 		collector_tilt(Collector_tilt::STATUS_LOWERING),
-		injector(Injector::RECOVERY),
+		injector(Injector::Estimator::GOING_DOWN),
 		injector_arms(Injector_arms::STATUS_CLOSING),
 		ejector(Ejector::RECOVERY)
 	{}
@@ -71,7 +71,7 @@ namespace Toplevel{
 	Status Estimator::estimate()const{
 		Status r;
 		r.collector_tilt=collector_tilt.estimate();
-		r.injector=injector.status();
+		r.injector=injector.estimate();
 		r.injector_arms=injector_arms.estimate();
 		r.ejector=ejector.status();
 		return r;

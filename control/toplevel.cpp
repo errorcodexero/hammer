@@ -10,7 +10,7 @@ namespace Toplevel{
 		collector_tilt(Collector_tilt::OUTPUT_UP),
 		injector(Injector::OUTPUT_DOWN),
 		injector_arms(Injector_arms::OUTPUT_CLOSE),
-		ejector(Injector::OUTPUT_DOWN)
+		ejector(Ejector::OUTPUT_DOWN)
 	{}
 
 	template<typename T>
@@ -34,7 +34,7 @@ namespace Toplevel{
 		collector_tilt(Collector_tilt::GOAL_UP),
 		injector(Injector::WAIT),
 		injector_arms(Injector_arms::GOAL_X),
-		ejector(Injector::WAIT),
+		ejector(Ejector::WAIT),
 		shooter_wheels(Shooter_wheels::X)
 	{}
 
@@ -48,7 +48,7 @@ namespace Toplevel{
 		collector_tilt(Collector_tilt::STATUS_LOWERING),
 		injector(Injector::RECOVERY),
 		injector_arms(Injector_arms::STATUS_CLOSING),
-		ejector(Injector::RECOVERY)
+		ejector(Ejector::RECOVERY)
 	{}
 
 	ostream& operator<<(ostream& o,Status s){
@@ -170,7 +170,7 @@ namespace Toplevel{
 			case EJECT:
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_OPEN;
-				if(m==EJECT) r.ejector=Injector::START;
+				if(m==EJECT) r.ejector=Ejector::START;
 				break;
 			case CATCH:
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;

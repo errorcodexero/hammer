@@ -6,6 +6,7 @@
 #include "injector.h"
 #include "injector_arms.h"
 #include "shooter_wheels.h"
+#include "ejector.h"
 
 namespace Toplevel{
 	struct Output{
@@ -15,7 +16,7 @@ namespace Toplevel{
 		Collector_tilt::Output collector_tilt;
 		Injector::Output injector;
 		Injector_arms::Output injector_arms;
-		Injector::Output ejector;
+		Ejector::Output ejector;
 		Shooter_wheels::Output shooter_wheels;
 	};
 	std::ostream& operator<<(std::ostream&,Output);
@@ -27,7 +28,7 @@ namespace Toplevel{
 		Collector_tilt::Goal collector_tilt;
 		Injector::Goal injector;
 		Injector_arms::Goal injector_arms;
-		Injector::Goal ejector;
+		Ejector::Goal ejector;
 		Shooter_wheels::Goal shooter_wheels;
 		//todo: add drivebase stuff here.
 	};
@@ -40,7 +41,7 @@ namespace Toplevel{
 		Collector_tilt::Status collector_tilt;
 		Injector::Status injector;
 		Injector_arms::Status injector_arms;
-		Injector::Status ejector;
+		Ejector::Status ejector;
 		Shooter_wheels::Status shooter_wheels;
 	};
 	std::ostream& operator<<(std::ostream& o,Status);
@@ -50,7 +51,7 @@ namespace Toplevel{
 		Collector_tilt::Estimator collector_tilt;
 		Injector::Estimator injector;
 		Injector_arms::Estimator injector_arms;
-		Injector::Estimator ejector;
+		Ejector::Estimator ejector;
 		//no estimates for shooter wheels yet.
 
 		public:

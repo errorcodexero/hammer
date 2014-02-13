@@ -41,7 +41,7 @@ namespace Toplevel{
 		Collector_tilt::Status collector_tilt;
 		Injector::Estimator::Location injector;
 		Injector_arms::Status injector_arms;
-		Ejector::Status ejector;
+		Ejector::Estimator::Location ejector;
 		Shooter_wheels::Status shooter_wheels;
 	};
 	std::ostream& operator<<(std::ostream& o,Status);

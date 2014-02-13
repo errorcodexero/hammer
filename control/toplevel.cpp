@@ -48,7 +48,7 @@ namespace Toplevel{
 		collector_tilt(Collector_tilt::STATUS_LOWERING),
 		injector(Injector::Estimator::GOING_DOWN),
 		injector_arms(Injector_arms::STATUS_CLOSING),
-		ejector(Ejector::RECOVERY)
+		ejector(Ejector::Estimator::GOING_DOWN)
 	{}
 
 	ostream& operator<<(ostream& o,Status s){
@@ -73,7 +73,7 @@ namespace Toplevel{
 		r.collector_tilt=collector_tilt.estimate();
 		r.injector=injector.estimate();
 		r.injector_arms=injector_arms.estimate();
-		r.ejector=ejector.status();
+		r.ejector=ejector.estimate();
 		return r;
 	}
 

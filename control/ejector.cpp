@@ -93,6 +93,8 @@ namespace Ejector{
 		}
 	}
 
+	Estimator::Location Estimator::estimate()const{ return location; }
+
 	//I'm not sure that this function should be part of the class.
 	Status Estimator::status()const{
 		return location_to_status(location);
@@ -119,13 +121,19 @@ namespace Ejector{
 		return o;
 	}
 
-	Output control(Status status,Goal goal){
-		switch(status){
-			case IDLE: return (goal==START)?OUTPUT_UP:OUTPUT_DOWN;
-			case SHOOTING: return OUTPUT_UP;
-			case RECOVERY: return OUTPUT_DOWN;
+	Output control(Estimator::Location location,Goal goal){
+		switch(location){
+			case Estimator::DOWN: return (goal==START)?OUTPUT_UP:OUTPUT_DOWN;
+			case Estimator::GOING_UP: return OUTPUT_UP;
+			case Estimator::UP:
+			case Estimator::GOING_DOWN:
+				return OUTPUT_DOWN;
 			default: assert(0);
 		}
+	}
+
+	bool ready(Estimator::Location location,Goal goal){
+		return ready(location_to_status(location),goal);
 	}
 
 	bool ready(Status status,Goal goal){
@@ -147,9 +155,9 @@ int main(){
 	static const vector<Status> STATUS_LIST{IDLE,SHOOTING,RECOVERY};
 	static const vector<Goal> GOALS{START,WAIT,X};
 	cout<<"Control outputs:\n";
-	for(auto status:STATUS_LIST){
+	for(auto location:LOCATIONS){
 		for(auto goal:GOALS){
-			cout<<status<<"\t"<<goal<<"\t"<<control(status,goal)<<"\n";
+			cout<<location<<"\t"<<goal<<"\t"<<control(location,goal)<<"\n";
 		}
 	}
 	cout<<"Ready states:\n";

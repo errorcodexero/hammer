@@ -31,8 +31,9 @@ namespace Ejector{
 	std::ostream& operator<<(std::ostream&,Estimator::Location);
 	std::ostream& operator<<(std::ostream&,Estimator);
 
-	Output control(Status,Goal);
+	Output control(Estimator::Location,Goal);
 	bool ready(Status,Goal);
+	bool ready(Estimator::Location,Goal);
 }
 
 #endif

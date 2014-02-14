@@ -8,6 +8,7 @@
 #include "shooter_wheels.h"
 #include "ejector.h"
 #include "pump.h"
+#include "../util/point.h"
 
 namespace Toplevel{
 	struct Output{
@@ -20,6 +21,7 @@ namespace Toplevel{
 		Ejector::Output ejector;
 		Shooter_wheels::Output shooter_wheels;
 		Pump::Output pump;
+		Pt drive;
 	};
 	std::ostream& operator<<(std::ostream&,Output);
 

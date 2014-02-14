@@ -23,6 +23,7 @@ namespace Toplevel{
 		o<<" eject:"<<g.ejector;
 		o<<" shoot:"<<g.shooter_wheels;
 		o<<" pump:"<<g.pump;
+		o<<" drive:"<<g.drive;
 		return o<<")";
 	}
 

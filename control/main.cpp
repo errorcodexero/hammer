@@ -1,9 +1,12 @@
 #include "main.h"
 #include<iostream>
 #include<sstream>
+#include<cassert>
 #include "octocanum.h"
 #include "../util/util.h"
 #include <math.h>
+#include "holonomic.h"
+#include "toplevel.h"
 
 using namespace std;
 
@@ -11,39 +14,41 @@ double max3(double a,double b,double c){
 	return max(max(a,b),c);
 }
 
-struct Drive_motors {
-	double a,b,c;
-//Outputs to motors; 
-//a = frontLeft, b = frontRight, c = back;
-//+value = clockwise
-};
-
-Drive_motors func_inner(double x, double y, double theta){	
-	Drive_motors r;
-	r.a=-double(1)/3* theta- double(1)/3* x -(double(1)/sqrt(3))*y;
-	r.b=-double(1)/3* theta- double(1)/3* x +(double(1)/sqrt(3))*y;
-	r.c=(-(double(1)/3)* theta) + ((double(2)/3)* x);
-	return r;
-}
-
-Drive_motors func(double x,double y,double theta){
-	//This function exists in order to pull the full power out of the drivetrain.  It makes some of the areas of the x/y/theta space have funny edges/non-smooth areas, but I think this is an acceptable tradeoff.
-	Drive_motors r=func_inner(x,y,theta);
-	const double s=sqrt(3);
-	r.a*=s;
-	r.b*=s;
-	r.c*=s;
-	const double m=max3(fabs(r.a),fabs(r.b),fabs(r.c));
-	if(m>1){
-		r.a/=m;
-		r.b/=m;
-		r.c/=m;
+double convert_output(Collector_mode m){
+	switch(m){
+		case ON: return 1;
+		case OFF: return 0;
+		case REVERSE: return -1;
+		default: assert(0);
 	}
-	return r;
 }
 
-ostream& operator<<(ostream& o, Drive_motors d){
-	return o<<"dm("<<d.a<<","<<d.b<<","<<d.c<<")";
+Robot_outputs convert_output(Toplevel::Output a){
+	Robot_outputs r;
+	Drive_motors d=holonomic_mix(a.drive);
+	r.pwm[0]=d.a;
+	r.pwm[1]=d.b;
+	r.pwm[2]=d.c;
+	r.pwm[3]=convert_output(a.collector);
+	
+	r.relay[0]=(a.pump==ON)?RELAY_10:RELAY_00;
+	
+	r.solenoid[0]=(a.collector==Collector_tilt::OUTPUT_DOWN);
+	r.solenoid[1]=(a.collector==Collector_tilt::OUTPUT_UP);
+	r.solenoid[2]=r.solenoid[3]=(a.injector==Injector::OUTPUT_DOWN);
+	r.solenoid[4]=r.solenoid[5]=(a.injector==Injector::OUTPUT_UP);
+	r.solenoid[6]=(a.ejector==Ejector::OUTPUT_UP);
+	r.solenoid[7]=(a.injector_arms==Injector_arms::OUTPUT_CLOSE);
+
+	/*
+	TODO: CAN bus stuff
+	2 bottom
+	6 top
+	7 bottom
+	9 top
+	*/
+	
+	return r;
 }
 
 unsigned interpret_10_turn_pot(Volt v){

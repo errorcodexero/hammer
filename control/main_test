@@ -10,4 +10,5 @@ g++ -DMAIN_TEST -I.. main.cpp \
 	../util/perf_tracker.cpp \
 	../util/util.cpp \
 	../util/countdown_timer.cpp \
-	../util/bound_tracker.cpp -o main 2>&1 && ./main
+	../util/bound_tracker.cpp \
+	holonomic.cpp -o main 2>&1 && ./main

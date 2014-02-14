@@ -1,6 +1,13 @@
 #include "holonomic.h"
+#include<math.h>
+#include<algorithm>
+#include<iostream>
 
 using namespace std;
+
+double max3(double a,double b,double c){
+	return max(max(a,b),c);
+}
 
 Drive_motors func_inner(double x, double y, double theta){	
 	Drive_motors r;
@@ -24,6 +31,10 @@ Drive_motors holonomic_mix(double x,double y,double theta){
 		r.c/=m;
 	}
 	return r;
+}
+
+Drive_motors holonomic_mix(Pt p){
+	return holonomic_mix(p.x,p.y,p.theta);
 }
 
 ostream& operator<<(ostream& o, Drive_motors d){

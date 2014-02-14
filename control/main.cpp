@@ -10,9 +10,23 @@
 
 using namespace std;
 
-double max3(double a,double b,double c){
-	return max(max(a,b),c);
+enum Joystick_section{JOY_LEFT,JOY_RIGHT,JOY_UP,JOY_DOWN,JOY_CENTER};
+Joystick_section joystick_section(double x,double y){
+	static const double LIM=.25;
+	if(fabs(x)<LIM && fabs(y)<LIM){
+		return JOY_CENTER;
+	}
+	if(x<y){
+		if(x>-y){
+			return JOY_DOWN;
+		}
+		return JOY_LEFT;
+	}
+	if(x>-y) return JOY_RIGHT;
+	return JOY_UP;
 }
+
+Joystick_section divide_vertical(double y){ return joystick_section(0,y); }
 
 double convert_output(Collector_mode m){
 	switch(m){
@@ -31,10 +45,10 @@ Robot_outputs convert_output(Toplevel::Output a){
 	r.pwm[2]=d.c;
 	r.pwm[3]=convert_output(a.collector);
 	
-	r.relay[0]=(a.pump==ON)?RELAY_10:RELAY_00;
+	r.relay[0]=(a.pump==Pump::ON)?RELAY_10:RELAY_00;
 	
-	r.solenoid[0]=(a.collector==Collector_tilt::OUTPUT_DOWN);
-	r.solenoid[1]=(a.collector==Collector_tilt::OUTPUT_UP);
+	r.solenoid[0]=(a.collector_tilt==Collector_tilt::OUTPUT_DOWN);
+	r.solenoid[1]=(a.collector_tilt==Collector_tilt::OUTPUT_UP);
 	r.solenoid[2]=r.solenoid[3]=(a.injector==Injector::OUTPUT_DOWN);
 	r.solenoid[4]=r.solenoid[5]=(a.injector==Injector::OUTPUT_UP);
 	r.solenoid[6]=(a.ejector==Ejector::OUTPUT_UP);
@@ -230,7 +244,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	//Also, (1 - Throttle) ranges from 0 to 2, so need to divide the values in half to range form 0 to 1
 	//This means that by default the robot will run at 0.5x max speed when throttle is not pressed
 	//This is how the robot has driven for the last few seasons
-	Drive_motors d=func ( in.joystick[0].axis[0] * throttle, -in.joystick[0].axis[1] * throttle, in.joystick[0].axis[3] * throttle);
+	Drive_motors d=holonomic_mix( in.joystick[0].axis[0] * throttle, -in.joystick[0].axis[1] * throttle, in.joystick[0].axis[3] * throttle);
 	r.pwm[0]=pwm_convert(d.a);
 	r.pwm[1]=pwm_convert(d.b);
 	r.pwm[2]=pwm_convert(d.c);
@@ -361,9 +375,9 @@ void getDistance(float value){
 	cout<<converttodistance(value)<<"m\n";
 }
 
-enum WallCommand{
+/*enum WallCommand{
 	OFF,RIGHT,LEFT,FRONT
-};
+};*/
 
 /*WallCommand wallstop(double x,double y){
 	if(x>=-0.2&&x<=0.2&&y>=-0.2&&y<=0.2){
@@ -372,9 +386,51 @@ enum WallCommand{
 	else if() 
 */	
 	
-
+struct Gunner_input{
+	//this could happen in a more elegant way.
+	Posedge_trigger drive_w_ball,drive_wo_ball,catch_mode,collect,prep_high,prep_toss,prep_pass,prep_eject,high,toss,pass,eject;
+	Mode current;
+	
+	Gunner_input():current(DRIVE_W_BALL){}
+	
+	void update(Joystick_data j){
+		static const A=0;
+		static const B=1;
+		static const X=2;
+		static const Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
+		using namespace Toplevel;
+		if(drive_w_ball.update(j.button[X])){
+			current=DRIVE_W_BALL;
+		}
+		if(drive_wo_ball.update(j.button[Y])){
+			current=DRIVE_WO_BALL;
+		}
+		if(catch_mode.update(j.button[B])) current=CATCH;
+		if(collect.update(j.button[A])) current=COLLECT;
+		
+		Joystick_section ls=joystick_section(j.axis[0],j.axis[1]);
+		if(prep_high.update(ls==JOY_UP)) current=SHOOT_HIGH_PREP;
+		if(prep_toss.update(ls==JOY_LEFT)) current=TRUSS_TOSS_PREP;
+		if(prep_eject.update(ls==JOY_DOWN)) current=EJECT_PREP;
+		if(prep_pass.update(ls==JOY_RIGHT)) current=PASS_PREP;
+		
+		Joystick_section rs=joystick_section(j.axis[2],j.axis[3]);
+		if(high.update(rs==JOY_UP)) current=SHOOT_HIGH;
+		if(toss.update(rs==JOY_LEFT)) current=TRUSS_TOSS;
+		if(eject.update(rs==JOY_DOWN)) current=EJECT;
+		if(pass.update(rs==JOY_RIGHT)) current=PASS;
+	}
+};
 
 #ifdef MAIN_TEST
+void joystick_section_test(){
+	assert(joystick_section(0,0)==JOY_CENTER);
+	assert(joystick_section(-1,0)==JOY_LEFT);
+	assert(joystick_section(1,0)==JOY_RIGHT);
+	assert(joystick_section(0,-1)==JOY_UP);
+	assert(joystick_section(0,1)==JOY_DOWN);
+}
+
 int main(){
 	/*Main m;
 	cout<<m<<"\n";
@@ -392,6 +448,7 @@ int main(){
 		a=converttodistance(input);
 		cout<<input<<"	"<<a<<"\n";
 	}*/
+	/*
 	cout<<func(0, 1, 0)<<"\n";
 	cout<<func(0, -1, 0)<<"\n";
 	cout<<func(0, 0, 1)<<"\n";
@@ -399,5 +456,7 @@ int main(){
 	cout<<func(1, 0, 0)<<"\n";
 	cout<<func(-1, 0, 0)<<"\n";
 	cout<<func(0, 0, 0)<<"\n";
+	*/
+	joystick_section_test();
 }
 #endif

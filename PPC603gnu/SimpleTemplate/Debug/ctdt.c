@@ -7,6 +7,8 @@
 /*       -fdollars-in-identifiers flag.                   */
 
 
+void _GLOBAL__I__Z10bist_stepsv();
+
 void _GLOBAL__I__Z10collecting14Collector_modebbb();
 
 void _GLOBAL__I__Z11pwm_convertd();
@@ -15,11 +17,13 @@ void _GLOBAL__I__Z13read_joystickR13DriverStationi();
 
 void _GLOBAL__I__Z14digital_modulev();
 
-void _GLOBAL__I__Z18combinedthermostati();
+void _GLOBAL__I__Z16joystick_sectiondd();
 
 void _GLOBAL__I__Z4max3ddd();
 
 void _GLOBAL__I__ZN10IntegratorC2Ev();
+
+void _GLOBAL__I__ZN12Fire_controllsERSoNS_6TargetE();
 
 void _GLOBAL__I__ZN12Perf_trackerC2Ev();
 
@@ -47,7 +51,13 @@ void _GLOBAL__I__ZN15Negedge_triggerC2Ev();
 
 void _GLOBAL__I__ZN15Posedge_triggerC2Ev();
 
+void _GLOBAL__I__ZN2PtC2Ev();
+
+void _GLOBAL__I__ZN4PumplsERSoNS_6OutputE();
+
 void _GLOBAL__I__ZN5ForceC2Ev();
+
+void _GLOBAL__I__ZN7EjectorlsERSoNS_6StatusE();
 
 void _GLOBAL__I__ZN8InjectorlsERSoNS_6StatusE();
 
@@ -112,13 +122,15 @@ void _GLOBAL__I__ZN11StringArray19STRING_ARRAY_RAW_IDE();
 extern void (*_ctors[])();
 void (*_ctors[])() =
     {
+    _GLOBAL__I__Z10bist_stepsv,
     _GLOBAL__I__Z10collecting14Collector_modebbb,
     _GLOBAL__I__Z11pwm_convertd,
     _GLOBAL__I__Z13read_joystickR13DriverStationi,
     _GLOBAL__I__Z14digital_modulev,
-    _GLOBAL__I__Z18combinedthermostati,
+    _GLOBAL__I__Z16joystick_sectiondd,
     _GLOBAL__I__Z4max3ddd,
     _GLOBAL__I__ZN10IntegratorC2Ev,
+    _GLOBAL__I__ZN12Fire_controllsERSoNS_6TargetE,
     _GLOBAL__I__ZN12Perf_trackerC2Ev,
     _GLOBAL__I__ZN13Bound_trackerC2Ev,
     _GLOBAL__I__ZN13Countup_timerC2Ev,
@@ -132,7 +144,10 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN15Force_interfaceC2Ev,
     _GLOBAL__I__ZN15Negedge_triggerC2Ev,
     _GLOBAL__I__ZN15Posedge_triggerC2Ev,
+    _GLOBAL__I__ZN2PtC2Ev,
+    _GLOBAL__I__ZN4PumplsERSoNS_6OutputE,
     _GLOBAL__I__ZN5ForceC2Ev,
+    _GLOBAL__I__ZN7EjectorlsERSoNS_6StatusE,
     _GLOBAL__I__ZN8InjectorlsERSoNS_6StatusE,
     _GLOBAL__I__ZN8Toplevel6OutputC2Ev,
     _GLOBAL__I__ZlsRSo11Digital_out,
@@ -166,6 +181,8 @@ void (*_ctors[])() =
     0
     };
 
+void _GLOBAL__D__Z10bist_stepsv();
+
 void _GLOBAL__D__Z10collecting14Collector_modebbb();
 
 void _GLOBAL__D__Z11pwm_convertd();
@@ -174,11 +191,13 @@ void _GLOBAL__D__Z13read_joystickR13DriverStationi();
 
 void _GLOBAL__D__Z14digital_modulev();
 
-void _GLOBAL__D__Z18combinedthermostati();
+void _GLOBAL__D__Z16joystick_sectiondd();
 
 void _GLOBAL__D__Z4max3ddd();
 
 void _GLOBAL__D__ZN10IntegratorC2Ev();
+
+void _GLOBAL__D__ZN12Fire_controllsERSoNS_6TargetE();
 
 void _GLOBAL__D__ZN12Perf_trackerC2Ev();
 
@@ -206,7 +225,13 @@ void _GLOBAL__D__ZN15Negedge_triggerC2Ev();
 
 void _GLOBAL__D__ZN15Posedge_triggerC2Ev();
 
+void _GLOBAL__D__ZN2PtC2Ev();
+
+void _GLOBAL__D__ZN4PumplsERSoNS_6OutputE();
+
 void _GLOBAL__D__ZN5ForceC2Ev();
+
+void _GLOBAL__D__ZN7EjectorlsERSoNS_6StatusE();
 
 void _GLOBAL__D__ZN8InjectorlsERSoNS_6StatusE();
 
@@ -261,13 +286,15 @@ void _GLOBAL__D__ZN11StringArray19STRING_ARRAY_RAW_IDE();
 extern void (*_dtors[])();
 void (*_dtors[])() =
     {
+    _GLOBAL__D__Z10bist_stepsv,
     _GLOBAL__D__Z10collecting14Collector_modebbb,
     _GLOBAL__D__Z11pwm_convertd,
     _GLOBAL__D__Z13read_joystickR13DriverStationi,
     _GLOBAL__D__Z14digital_modulev,
-    _GLOBAL__D__Z18combinedthermostati,
+    _GLOBAL__D__Z16joystick_sectiondd,
     _GLOBAL__D__Z4max3ddd,
     _GLOBAL__D__ZN10IntegratorC2Ev,
+    _GLOBAL__D__ZN12Fire_controllsERSoNS_6TargetE,
     _GLOBAL__D__ZN12Perf_trackerC2Ev,
     _GLOBAL__D__ZN13Bound_trackerC2Ev,
     _GLOBAL__D__ZN13Countup_timerC2Ev,
@@ -281,7 +308,10 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN15Force_interfaceC2Ev,
     _GLOBAL__D__ZN15Negedge_triggerC2Ev,
     _GLOBAL__D__ZN15Posedge_triggerC2Ev,
+    _GLOBAL__D__ZN2PtC2Ev,
+    _GLOBAL__D__ZN4PumplsERSoNS_6OutputE,
     _GLOBAL__D__ZN5ForceC2Ev,
+    _GLOBAL__D__ZN7EjectorlsERSoNS_6StatusE,
     _GLOBAL__D__ZN8InjectorlsERSoNS_6StatusE,
     _GLOBAL__D__ZN8Toplevel6OutputC2Ev,
     _GLOBAL__D__ZlsRSo11Digital_out,

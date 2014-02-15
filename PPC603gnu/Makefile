@@ -162,7 +162,7 @@ SimpleTemplate_partialImage/$(MODE_DIR)/% : LIBPATH =
 SimpleTemplate_partialImage/$(MODE_DIR)/% : LIBS = 
 SimpleTemplate_partialImage/$(MODE_DIR)/% : OBJ_DIR := SimpleTemplate_partialImage/$(MODE_DIR)
 
-SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/Alpha-1.o : $(PRJ_ROOT_DIR)/control/Alpha-1.cpp $(FORCE_FILE_BUILD)
+SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/bist.o : $(PRJ_ROOT_DIR)/control/bist.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
@@ -178,7 +178,11 @@ SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/collector_tilt.o 
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
-SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/field_relative.o : $(PRJ_ROOT_DIR)/control/field_relative.cpp $(FORCE_FILE_BUILD)
+SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/ejector.o : $(PRJ_ROOT_DIR)/control/ejector.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
+SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/fire_control.o : $(PRJ_ROOT_DIR)/control/fire_control.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
@@ -191,6 +195,10 @@ SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/force_interface.o
 
 
 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/gyro_tracker.o : $(PRJ_ROOT_DIR)/control/gyro_tracker.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
+SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/holonomic.o : $(PRJ_ROOT_DIR)/control/holonomic.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
@@ -207,6 +215,10 @@ SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/main.o : $(PRJ_RO
 
 
 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/octocanum.o : $(PRJ_ROOT_DIR)/control/octocanum.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
+SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/pump.o : $(PRJ_ROOT_DIR)/control/pump.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
@@ -258,6 +270,10 @@ SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/perf_tracker.o : $(P
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
+SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/point.o : $(PRJ_ROOT_DIR)/util/point.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/posedge_toggle.o : $(PRJ_ROOT_DIR)/util/posedge_toggle.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
@@ -270,18 +286,21 @@ SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/util.o : $(PRJ_ROOT_
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
-OBJECTS_SimpleTemplate_partialImage = SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/Alpha-1.o \
+OBJECTS_SimpleTemplate_partialImage = SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/bist.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/bunny_launcher.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/collector.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/collector_tilt.o \
-	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/field_relative.o \
+	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/ejector.o \
+	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/fire_control.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/force.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/force_interface.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/gyro_tracker.o \
+	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/holonomic.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/injector.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/injector_arms.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/main.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/octocanum.o \
+	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/pump.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/shooter_wheels.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/toplevel.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/cyborg_joystick.o \
@@ -294,6 +313,7 @@ OBJECTS_SimpleTemplate_partialImage = SimpleTemplate_partialImage/$(MODE_DIR)/Ob
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/interface.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/negedge_trigger.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/perf_tracker.o \
+	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/point.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/posedge_toggle.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/posedge_trigger.o \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/util.o
@@ -310,15 +330,17 @@ SimpleTemplate_partialImage/$(MODE_DIR)/SimpleTemplate_partialImage_clean :
 
 force : 
 
-DEP_FILES := SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/Alpha-1.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/bunny_launcher.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/collector.d \
-	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/collector_tilt.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/field_relative.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/force.d \
-	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/force_interface.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/gyro_tracker.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/injector.d \
-	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/injector_arms.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/main.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/octocanum.d \
+DEP_FILES := SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/bist.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/bunny_launcher.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/collector.d \
+	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/collector_tilt.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/ejector.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/fire_control.d \
+	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/force.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/force_interface.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/gyro_tracker.d \
+	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/holonomic.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/injector.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/injector_arms.d \
+	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/main.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/octocanum.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/pump.d \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/shooter_wheels.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/control/toplevel.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/cyborg_joystick.d \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/dio_control.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/joystick_linux.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/to_crio.d \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/bound_tracker.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/countdown_timer.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/countup_timer.d \
 	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/interface.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/negedge_trigger.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/perf_tracker.d \
-	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/posedge_toggle.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/posedge_trigger.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/util.d
+	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/point.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/posedge_toggle.d SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/posedge_trigger.d \
+	 SimpleTemplate_partialImage/$(MODE_DIR)/Objects/hammer/util/util.d
 -include $(DEP_FILES)
 
 

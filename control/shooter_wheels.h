@@ -11,6 +11,8 @@ namespace Shooter_wheels{
 
 	struct Status{
 		Status();
+		Status(RPM,RPM);
+
 		RPM top,bottom;
 	};
 	std::ostream& operator<<(std::ostream&,Status);

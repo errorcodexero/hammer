@@ -3,10 +3,15 @@
 #include<cassert>
 
 using namespace std;
-
-	enum Target{NONE,HIGH,TRUSS,PASS,EJECT};
-
-	ostream& operator<<(ostream&,Target){
+namespace Fire_control{
+	ostream& operator<<(ostream& o,Target t){
+		#define X(name) if(t==name) return o<<""#name;
+		X(NONE)
+		X(HIGH)
+		X(TRUSS)
+		X(PASS)
+		X(EJECT)
+		#undef X
 		assert(0);
 	}
 
@@ -14,9 +19,14 @@ using namespace std;
 		assert(0);
 	}
 
-	enum Goal{PREP,FIRE,FIRE_WHEN_READY,DRIVE};
-
-	ostream& operator<<(ostream&,Goal g){
+	ostream& operator<<(ostream& o,Goal g){
+		#define X(name) if(g==name) return o<<""#name;
+		X(PREP)
+		X(FIRE)
+		X(FIRE_WHEN_READY)
+		X(DRIVE)
+		X(OTHER)
+		#undef X
 		assert(0);
 	}
 
@@ -56,13 +66,21 @@ using namespace std;
 		cout<<t<<" "<<g<<"\n";
 		assert(0);
 	}
+}
 
 #ifdef FIRE_CONTROL_TEST
 #include<vector>
 
 int main(){
 	using namespace Fire_control;
-	static const vector<Fire_control::Goal> GOALS{};
+	static const vector<Fire_control::Goal> GOALS{PREP,FIRE,FIRE_WHEN_READY,DRIVE,OTHER};
 	cout<<GOALS<<"\n";
+	static const vector<Target> TARGETS{NONE,HIGH,TRUSS,PASS,EJECT};
+	cout<<TARGETS<<"\n";
+	for(auto goal:GOALS){
+		for(auto target:TARGETS){
+			//cout<<goal<<" "<<target<<generate_status(
+		}
+	}
 }
 #endif

@@ -216,6 +216,9 @@ ostream& operator<<(ostream& o,Bunnybot a){
 	return o<<")";
 }
 
+//todo: at some point, might want to make this whatever is right to start autonomous mode.
+Main::Main():control_status(Control_status::DRIVE_W_BALL){}
+
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
@@ -229,7 +232,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		main_joystick.button[1],
 		main_joystick.button[2]
 	);
-	Bunnybot_output b=bunnybot(in);
+	//Bunnybot_output b=bunnybot(in);
 
 	Robot_outputs r;
 	/*r.pwm[0]=pwm_convert(b.drive.wheels.lf);
@@ -237,9 +240,9 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	r.pwm[2]=pwm_convert(-b.drive.wheels.rf);
 	r.pwm[3]=pwm_convert(-b.drive.wheels.rr);*/
 	ball_collecter.update(main_joystick.button[5]);
-	r.solenoid[1]=b.drive.traction_mode;
+	/*r.solenoid[1]=b.drive.traction_mode;
 	r.solenoid[0]=b.launch_bunny;
-	r.solenoid[2]=b.poop_bunny;
+	r.solenoid[2]=b.poop_bunny;*/
 	double throttle = (1 - in.joystick[0].axis[5]) / 2; 
 	//Since the throttle axis ranges from -1 to 1, need to make all values positive   
 	//Also, (1 - Throttle) ranges from 0 to 2, so need to divide the values in half to range form 0 to 1
@@ -292,6 +295,36 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	return r;
 }
 
+namespace Control_status{
+	ostream& operator<<(ostream& o,Control_status c){
+		#define X(name) if(c==name) return o<<""#name;
+		X(AUTO_SPIN_UP)
+		X(AUTO_FIRE)
+		X(AUTO_TO_COLLECT)
+		X(AUTO_COLLECT)
+		X(AUTO_SPIN_UP2)
+		X(AUTO_FIRE2)
+		X(DRIVE_W_BALL)
+		X(DRIVE_WO_BALL)
+		X(COLLECT)
+		X(SHOOT_HIGH_PREP)
+		X(SHOOT_HIGH)
+		X(SHOOT_HIGH_WHEN_READY)
+		X(TRUSS_TOSS_PREP)
+		X(TRUSS_TOSS)
+		X(TRUSS_TOSS_WHEN_READY)
+		X(PASS_PREP)
+		X(PASS)
+		X(PASS_WHEN_READY)
+		X(EJECT_PREP)
+		X(EJECT)
+		X(EJECT_WHEN_READY)
+		X(CATCH)
+		#undef X
+		assert(0);
+	}
+}
+
 ostream& operator<<(ostream& o,Main m){
 	o<<"Main(";
 	//o<<m.auto_timer<<" ";
@@ -305,7 +338,8 @@ ostream& operator<<(ostream& o,Main m){
 /*	for(unsigned i=0;i<Joystick_data::AXES;i++){
 		o<<m.bound[i];
 	}*/
-	o<<m.bunnybot;
+	//o<<m.bunnybot;
+	o<<m.control_status;
 	return o<<")";
 }
 
@@ -550,5 +584,7 @@ int main(){
 	cout<<func(0, 0, 0)<<"\n";
 	*/
 	joystick_section_test();
+	Main m;
+	cout<<m<<"\n";
 }
 #endif

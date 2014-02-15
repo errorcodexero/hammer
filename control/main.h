@@ -85,9 +85,11 @@ struct Main{
 	Force_interface force;
 	Perf_tracker perf;
 	Gyro_tracker gyro;
-	Bunnybot bunnybot;
+	//Bunnybot bunnybot;
+	Control_status::Control_status control_status;
 	Posedge_toggle ball_collecter;
-	
+
+	Main();	
 	Robot_outputs operator()(Robot_inputs);
 };
 

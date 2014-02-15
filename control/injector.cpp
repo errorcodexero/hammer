@@ -159,16 +159,16 @@ namespace Injector{
 
 	Output control(Estimator::Location loc,Goal g){
 		switch(loc){
-			case Estimator::Location::GOING_UP:
+			case Estimator::GOING_UP:
 				return OUTPUT_UP;
-			case Estimator::Location::UP:
-			case Estimator::Location::GOING_DOWN:
+			case Estimator::UP:
+			case Estimator::GOING_DOWN:
 				return OUTPUT_DOWN;
 			case Estimator::DOWN_VENT:
 				return OUTPUT_VENT;
-			case Estimator::Location::DOWN_IDLE:
+			case Estimator::DOWN_IDLE:
 				return (g==START)?OUTPUT_UP:OUTPUT_DOWN;
-			case Estimator::Location::X:
+			case Estimator::X:
 				return OUTPUT_DOWN;
 			default: assert(0);
 		}

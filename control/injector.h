@@ -31,6 +31,7 @@ namespace Injector{
 	std::ostream& operator<<(std::ostream&,Estimator::Location);
 	std::ostream& operator<<(std::ostream&,Estimator);
 
+	Status location_to_status(Estimator::Location);
 	Output control(Estimator::Location,Goal);
 
 	bool ready(Estimator::Location,Goal);

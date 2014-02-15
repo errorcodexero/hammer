@@ -11,4 +11,17 @@ g++ -DMAIN_TEST -I.. main.cpp \
 	../util/util.cpp \
 	../util/countdown_timer.cpp \
 	../util/bound_tracker.cpp \
-	holonomic.cpp -o main 2>&1 && ./main
+	holonomic.cpp \
+	toplevel.cpp \
+	injector.cpp \
+	ejector.cpp \
+	shooter_wheels.cpp \
+	../util/point.cpp \
+	collector_tilt.cpp \
+	pump.cpp \
+	collector.cpp \
+	injector_arms.cpp \
+	../util/countup_timer.cpp \
+	../util/negedge_trigger.cpp \
+	fire_control.cpp \
+	-o main 2>&1 && ./main

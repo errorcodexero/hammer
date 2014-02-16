@@ -114,8 +114,22 @@ SimpleTemplate_partialImage/Debug/Objects/hammer/control/main.o:  \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/vector \
   C:/WindRiver/workspace/hammer/control/../util/bound_tracker.h \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/sstream \
+  c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/cassert \
+  C:/WindRiver/vxworks-6.3/target/h/assert.h \
   C:/WindRiver/workspace/hammer/control/../util/util.h \
-  C:/WindRiver/vxworks-6.3/target/h/math.h
+  C:/WindRiver/vxworks-6.3/target/h/math.h \
+  C:/WindRiver/workspace/hammer/control/holonomic.h \
+  C:/WindRiver/workspace/hammer/control/../util/point.h \
+  C:/WindRiver/workspace/hammer/control/toplevel.h \
+  C:/WindRiver/workspace/hammer/control/collector.h \
+  C:/WindRiver/workspace/hammer/control/../util/negedge_trigger.h \
+  C:/WindRiver/workspace/hammer/control/collector_tilt.h \
+  C:/WindRiver/workspace/hammer/control/../util/countup_timer.h \
+  C:/WindRiver/workspace/hammer/control/injector.h \
+  C:/WindRiver/workspace/hammer/control/injector_arms.h \
+  C:/WindRiver/workspace/hammer/control/shooter_wheels.h \
+  C:/WindRiver/workspace/hammer/control/ejector.h \
+  C:/WindRiver/workspace/hammer/control/pump.h
 
 C:/WindRiver/workspace/hammer/control/main.h:
 
@@ -345,6 +359,34 @@ C:/WindRiver/workspace/hammer/control/../util/bound_tracker.h:
 
 c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/sstream:
 
+c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/cassert:
+
+C:/WindRiver/vxworks-6.3/target/h/assert.h:
+
 C:/WindRiver/workspace/hammer/control/../util/util.h:
 
 C:/WindRiver/vxworks-6.3/target/h/math.h:
+
+C:/WindRiver/workspace/hammer/control/holonomic.h:
+
+C:/WindRiver/workspace/hammer/control/../util/point.h:
+
+C:/WindRiver/workspace/hammer/control/toplevel.h:
+
+C:/WindRiver/workspace/hammer/control/collector.h:
+
+C:/WindRiver/workspace/hammer/control/../util/negedge_trigger.h:
+
+C:/WindRiver/workspace/hammer/control/collector_tilt.h:
+
+C:/WindRiver/workspace/hammer/control/../util/countup_timer.h:
+
+C:/WindRiver/workspace/hammer/control/injector.h:
+
+C:/WindRiver/workspace/hammer/control/injector_arms.h:
+
+C:/WindRiver/workspace/hammer/control/shooter_wheels.h:
+
+C:/WindRiver/workspace/hammer/control/ejector.h:
+
+C:/WindRiver/workspace/hammer/control/pump.h:

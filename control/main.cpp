@@ -11,7 +11,8 @@
 using namespace std;
 
 enum Joystick_section{JOY_LEFT,JOY_RIGHT,JOY_UP,JOY_DOWN,JOY_CENTER};
-Joystick_section joystick_section(double x,double y){
+
+Joystick_section js(double x,double y){
 	static const double LIM=.25;
 	if(fabs(x)<LIM && fabs(y)<LIM){
 		return JOY_CENTER;
@@ -26,7 +27,7 @@ Joystick_section joystick_section(double x,double y){
 	return JOY_UP;
 }
 
-Joystick_section divide_vertical(double y){ return joystick_section(0,y); }
+Joystick_section divide_vertical(double y){ return js(0,y); }
 
 double convert_output(Collector_mode m){
 	switch(m){
@@ -218,6 +219,7 @@ ostream& operator<<(ostream& o,Bunnybot a){
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
+	
 
 	Joystick_data main_joystick=in.joystick[0];
 	force.update(
@@ -239,12 +241,28 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	r.solenoid[1]=b.drive.traction_mode;
 	r.solenoid[0]=b.launch_bunny;
 	r.solenoid[2]=b.poop_bunny;
-	double throttle = (1 - in.joystick[0].axis[5]) / 2; 
-	//Since the throttle axis ranges from -1 to 1, need to make all values positive   
-	//Also, (1 - Throttle) ranges from 0 to 2, so need to divide the values in half to range form 0 to 1
-	//This means that by default the robot will run at 0.5x max speed when throttle is not pressed
-	//This is how the robot has driven for the last few seasons
-	Drive_motors d=holonomic_mix( in.joystick[0].axis[0] * throttle, -in.joystick[0].axis[1] * throttle, in.joystick[0].axis[3] * throttle);
+	double throttle = 1.0;
+	if (in.joystick[0].axis[0] > 0.5 || in.joystick[0].axis[0] < -0.5){
+		throttle = 0.5;
+	}
+	//Well they said the robot needs to go full speed all the time
+	//Throttle now scales down speeds by 50% and activates when either of the triggers is pulled
+	//Check to see if somebody pushed the field relative button and turn on/off the mode
+	if (in.joystick[0].button[2]) {
+			if (!isPressed) {
+				isPressed = true;
+				fieldRelative = !fieldRelative; //Turn fieldRelative on/off
+			}
+		} else {
+			isPressed = false;
+		}
+	
+	Drive_motors d=holonomic_mix( 
+			in.joystick[0].axis[0] * throttle, 
+			-in.joystick[0].axis[1] * throttle, 
+			in.joystick[0].axis[3] * throttle,
+			gyro.angle(),
+			fieldRelative);
 	r.pwm[0]=pwm_convert(d.a);
 	r.pwm[1]=pwm_convert(d.b);
 	r.pwm[2]=pwm_convert(d.c);
@@ -385,7 +403,7 @@ void getDistance(float value){
 	}
 	else if() 
 */	
-	
+#if 0	
 struct Gunner_input{
 	//this could happen in a more elegant way.
 	Posedge_trigger drive_w_ball,drive_wo_ball,catch_mode,collect,prep_high,prep_toss,prep_pass,prep_eject,high,toss,pass,eject;
@@ -421,6 +439,7 @@ struct Gunner_input{
 		if(pass.update(rs==JOY_RIGHT)) current=PASS;
 	}
 };
+#endif
 
 #ifdef MAIN_TEST
 void joystick_section_test(){

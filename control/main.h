@@ -64,6 +64,8 @@ struct Main{
 	Gyro_tracker gyro;
 	Bunnybot bunnybot;
 	Posedge_toggle ball_collecter;
+	bool isPressed;
+	bool fieldRelative;
 	
 	Robot_outputs operator()(Robot_inputs);
 };

@@ -16,8 +16,41 @@ namespace Fire_control{
 		assert(0);
 	}
 
-	Target target(Control_status::Control_status){
-		assert(0);
+	Target target(Control_status::Control_status c){
+		switch(c){
+			//or maybe the auto stuff should all return 'other'
+			case Control_status::AUTO_SPIN_UP:
+			case Control_status::AUTO_FIRE:
+				return HIGH;
+			case Control_status::AUTO_TO_COLLECT:
+			case Control_status::AUTO_COLLECT:
+				return NO_TARGET;
+			case Control_status::AUTO_SPIN_UP2:
+			case Control_status::AUTO_FIRE2:
+				return HIGH;
+			case Control_status::DRIVE_W_BALL:
+			case Control_status::DRIVE_WO_BALL:
+			case Control_status::COLLECT:
+				return NO_TARGET;
+			case Control_status::SHOOT_HIGH_PREP:
+			case Control_status::SHOOT_HIGH:
+			case Control_status::SHOOT_HIGH_WHEN_READY:
+				return HIGH;
+			case Control_status::TRUSS_TOSS_PREP:
+			case Control_status::TRUSS_TOSS:
+			case Control_status::TRUSS_TOSS_WHEN_READY:
+				return TRUSS;
+			case Control_status::PASS_PREP:
+			case Control_status::PASS:
+			case Control_status::PASS_WHEN_READY:
+				return PASS;
+			case Control_status::EJECT_PREP:
+			case Control_status::EJECT:
+			case Control_status::EJECT_WHEN_READY:
+				return EJECT;
+			case Control_status::CATCH: return NO_TARGET;
+			default: assert(0);
+		}
 	}
 
 	ostream& operator<<(ostream& o,Goal g){
@@ -31,8 +64,34 @@ namespace Fire_control{
 		assert(0);
 	}
 
-	Goal goal(Control_status::Control_status){
-		assert(0);
+	Goal goal(Control_status::Control_status c){
+		switch(c){
+			//or maybe the auto stuff should all return 'other'
+			case Control_status::AUTO_SPIN_UP: return FIRE_WHEN_READY;
+			case Control_status::AUTO_FIRE: return FIRE;
+			case Control_status::AUTO_TO_COLLECT: return DRIVE;
+			case Control_status::AUTO_COLLECT: return DRIVE;
+			case Control_status::AUTO_SPIN_UP2: return FIRE_WHEN_READY;
+			case Control_status::AUTO_FIRE2: return FIRE;
+			case Control_status::DRIVE_W_BALL:
+			case Control_status::DRIVE_WO_BALL:
+			case Control_status::COLLECT:
+				return DRIVE;
+			case Control_status::SHOOT_HIGH_PREP: return PREP;
+			case Control_status::SHOOT_HIGH: return FIRE;
+			case Control_status::SHOOT_HIGH_WHEN_READY: return FIRE_WHEN_READY;
+			case Control_status::TRUSS_TOSS_PREP: return PREP;
+			case Control_status::TRUSS_TOSS: return FIRE;
+			case Control_status::TRUSS_TOSS_WHEN_READY: return FIRE_WHEN_READY;
+			case Control_status::PASS_PREP: return PREP;
+			case Control_status::PASS: return FIRE;
+			case Control_status::PASS_WHEN_READY: return FIRE_WHEN_READY;
+			case Control_status::EJECT_PREP: return PREP;
+			case Control_status::EJECT: return FIRE;
+			case Control_status::EJECT_WHEN_READY: return FIRE_WHEN_READY;
+			case Control_status::CATCH: return OTHER;
+			default: assert(0);
+		}
 	}
 
 	Control_status::Control_status generate_status(Target target,Goal goal){
@@ -88,6 +147,11 @@ namespace Fire_control{
 
 int main(){
 	using namespace Fire_control;
+
+	for(auto a:Control_status::all()){
+		cout<<a<<" "<<goal(a)<<" "<<target(a)<<"\n";
+	}
+
 	static const vector<Fire_control::Goal> GOALS{PREP,FIRE,FIRE_WHEN_READY,DRIVE,OTHER};
 	cout<<GOALS<<"\n";
 	static const vector<Target> TARGETS{/*NO_TARGET,*/HIGH,TRUSS,PASS,EJECT};

@@ -6,7 +6,7 @@ using namespace std;
 namespace Fire_control{
 	ostream& operator<<(ostream& o,Target t){
 		#define X(name) if(t==name) return o<<""#name;
-		X(NONE)
+		X(NO_TARGET)
 		X(HIGH)
 		X(TRUSS)
 		X(PASS)
@@ -35,8 +35,16 @@ namespace Fire_control{
 	}
 
 	Control_status::Control_status generate_status(Target target,Goal goal){
+		if(target == HIGH && goal == PREP){return Control_status::SHOOT_HIGH_PREP;}
+		if(target == TRUSS && goal == PREP) {return Control_status::TRUSS_TOSS_PREP;}
+		if(target == PASS && goal == PREP) {return Control_status::PASS_PREP;}
+		if(target == EJECT && goal == PREP) {return Control_status::EJECT_PREP;}
+		if(target == HIGH && goal == FIRE) {return Control_status::SHOOT_HIGH;}
+		if(target == TRUSS && goal == FIRE) {return Control_status::TRUSS_TOSS;}
+		if(target == PASS && goal == FIRE) {return Control_status::PASS;}
+		
 		switch(target){
-			case NONE:
+			case NO_TARGET:
 			case HIGH:
 			case TRUSS:
 			case EJECT:
@@ -75,11 +83,13 @@ int main(){
 	using namespace Fire_control;
 	static const vector<Fire_control::Goal> GOALS{PREP,FIRE,FIRE_WHEN_READY,DRIVE,OTHER};
 	cout<<GOALS<<"\n";
-	static const vector<Target> TARGETS{NONE,HIGH,TRUSS,PASS,EJECT};
+	static const vector<Target> TARGETS{/*NO_TARGET,*/HIGH,TRUSS,PASS,EJECT};
 	cout<<TARGETS<<"\n";
 	for(auto goal:GOALS){
 		for(auto target:TARGETS){
-			//cout<<goal<<" "<<target<<generate_status(
+			cout<<goal<<" "<<target<<"\n";
+			cout.flush();
+			cout<<generate_status(target, goal)<<"\n";
 		}
 	}
 }

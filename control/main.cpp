@@ -224,7 +224,7 @@ Main::Main():control_status(Control_status::DRIVE_W_BALL){}
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
-	
+	fieldRelative = false;
 
 	Joystick_data main_joystick=in.joystick[0];
 	force.update(
@@ -252,6 +252,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	}
 	//Well they said the robot needs to go full speed all the time
 	//Throttle now scales down speeds by 50% and activates when either of the triggers is pulled
+	//Start in NOT fieldRelative Mode
 	
 	//Check to see if somebody pushed the field relative button and turn on/off the mode
 	if (in.joystick[0].button[2]) {

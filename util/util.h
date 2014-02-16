@@ -41,4 +41,8 @@ std::ostream& operator<<(std::ostream& o,std::vector<T> const& v){
 	return o<<" ]";
 }
 
+double sum(std::vector<double>);
+double mean(std::vector<double>);
+double stddev(std::vector<double>);
+
 #endif

@@ -1,6 +1,7 @@
 #include "fire_control.h"
 #include<iostream>
 #include<cassert>
+#include "../util/util.cpp"
 
 using namespace std;
 namespace Fire_control{
@@ -42,7 +43,13 @@ namespace Fire_control{
 		if(target == HIGH && goal == FIRE) {return Control_status::SHOOT_HIGH;}
 		if(target == TRUSS && goal == FIRE) {return Control_status::TRUSS_TOSS;}
 		if(target == PASS && goal == FIRE) {return Control_status::PASS;}
-		
+		if(target == EJECT && goal == FIRE) {return Control_status::EJECT;}
+		if(target == HIGH && goal == FIRE_WHEN_READY) {return Control_status::SHOOT_HIGH_WHEN_READY;}
+		if(target == TRUSS && goal == FIRE_WHEN_READY) {return Control_status::TRUSS_TOSS_WHEN_READY;}
+		if(target == PASS && goal == FIRE_WHEN_READY) {return Control_status::PASS_WHEN_READY;}
+		if(target == EJECT && goal == FIRE_WHEN_READY) {return Control_status::EJECT_WHEN_READY;}
+		//DRIVE HIGH, DRIVE TRUSS, DRIVE PASS, DRIVE EJECT, OTHER HIGH, OTHER TRUSS, OTHER PASS, OTHER EJECT
+		//^^^^^All these combinations are undefined in control_status.h there for code fails here.^^^^^
 		switch(target){
 			case NO_TARGET:
 			case HIGH:

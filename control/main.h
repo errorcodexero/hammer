@@ -10,6 +10,7 @@
 #include "../util/perf_tracker.h"
 #include "../util/countdown_timer.h"
 #include "../util/bound_tracker.h"
+#include "control_status.h"
 
 struct Bunnybot_goal{
 	Octocanum_goal drive;
@@ -57,29 +58,6 @@ struct Bunnybot{
 
 std::ostream& operator<<(std::ostream&,Bunnybot::Mode);
 std::ostream& operator<<(std::ostream&,Bunnybot);
-
-namespace Control_status{
-enum Control_status{
-	AUTO_SPIN_UP,
-	AUTO_FIRE,
-	AUTO_TO_COLLECT,
-	AUTO_COLLECT,
-	AUTO_SPIN_UP2,
-	AUTO_FIRE2,
-
-	//many of these are the same as things in "Mode"
-	DRIVE_W_BALL,DRIVE_WO_BALL,
-	COLLECT,
-	SHOOT_HIGH_PREP,SHOOT_HIGH,SHOOT_HIGH_WHEN_READY,
-	TRUSS_TOSS_PREP,TRUSS_TOSS,TRUSS_TOSS_WHEN_READY,
-	PASS_PREP,PASS,PASS_WHEN_READY,
-	EJECT_PREP,EJECT,EJECT_WHEN_READY,
-	CATCH	
-};
-std::ostream& operator<<(std::ostream&,Control_status);
-}
-
-
 
 struct Main{
 	Force_interface force;

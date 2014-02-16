@@ -2,7 +2,7 @@
 #define FIRE_CONTROL_H
 
 #include<iosfwd>
-#include "main.h"
+#include "control_status.h"
 
 namespace Fire_control{
 	enum Target{NO_TARGET,HIGH,TRUSS,PASS,EJECT};

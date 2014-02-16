@@ -1,1 +1,29 @@
-g++ -Wall -Werror -std=c++0x -DFIRE_CONTROL_TEST fire_control.cpp -o fire_control 2>&1 && ./fire_control
+g++ -Wall -std=c++0x -DFIRE_CONTROL_TEST \
+\
+fire_control.cpp \
+main.cpp \
+../util/interface.cpp \
+holonomic.cpp \
+octocanum.cpp \
+../util/countdown_timer.cpp \
+../util/posedge_toggle.cpp \
+bunny_launcher.cpp \
+force_interface.cpp \
+../util/perf_tracker.cpp \
+gyro_tracker.cpp \
+../util/util.cpp \
+toplevel.cpp \
+injector.cpp \
+ejector.cpp \
+force.cpp \
+../util/posedge_trigger.cpp \
+shooter_wheels.cpp \
+../util/point.cpp \
+collector_tilt.cpp \
+injector_arms.cpp \
+pump.cpp \
+collector.cpp \
+../util/countup_timer.cpp \
+../util/negedge_trigger.cpp \
+\
+-o fire_control 2>&1 && ./fire_control

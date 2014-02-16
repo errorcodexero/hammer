@@ -1,0 +1,1 @@
+g++ control_status.cpp -o control_status && ./control_status

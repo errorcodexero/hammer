@@ -1,5 +1,4 @@
 Drivebase:
-	-Give better names to the mixing functions
 	-Check that the throttle stuff that was added works as expected on the robot
 	-Move some of the control of this into the toplevel structs
 	-Write location estimate code
@@ -10,8 +9,7 @@ Shooter wheels:
 	-Add CAN support
 	-Determine the actual speeds to use
 	-Add option to use config file
+	-Add fallback systems
 Main:
-	-Write down button & axis mapping that the driver station uses for the gamepads
-	-Determine button mapping to robot functions
-	-Add the mapping from the toplevel outputs to physical IO
-	-Double check that the pin map makes sense
+	-Make isPressed/fieldRelative use Posedge_toggle
+

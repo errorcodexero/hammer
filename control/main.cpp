@@ -14,7 +14,7 @@ using namespace std;
 
 enum Joystick_section{JOY_LEFT,JOY_RIGHT,JOY_UP,JOY_DOWN,JOY_CENTER};
 
-Joystick_section js(double x,double y){
+Joystick_section joystick_section(double x,double y){
 	static const double LIM=.25;
 	if(fabs(x)<LIM && fabs(y)<LIM){
 		return JOY_CENTER;
@@ -29,7 +29,7 @@ Joystick_section js(double x,double y){
 	return JOY_UP;
 }
 
-Joystick_section divide_vertical(double y){ return js(0,y); }
+Joystick_section divide_vertical(double y){ return joystick_section(0,y); }
 
 double convert_output(Collector_mode m){
 	switch(m){
@@ -100,131 +100,23 @@ unsigned interpret_10_turn_pot(Volt v){
 	return 9;
 }
 
-Bunnybot_goal::Bunnybot_goal():launch_bunny_now(0),poop_bunny_now(0){}
-
-ostream& operator<<(ostream& o,Bunnybot_goal a){
-	return o<<"Bunnybot_goal";
-}
-
-Bunnybot_output::Bunnybot_output():launch_bunny(0),poop_bunny(0){}
-
-Bunnybot::Bunnybot():mode(TELEOP){}
-
-Bunnybot_goal Bunnybot::autonomous(Robot_inputs in){
-	//The lack of "break" is on purpose.
-	switch(mode){
-		case TELEOP:
-			auto_timer.set(2);
-			mode=AUTO_DRIVE1;
-		case AUTO_DRIVE1:
-			if(!auto_timer.done()){
-				Bunnybot_goal r;
-				r.drive=Traction_mode_goal(.1,0);
-				return r;
-			}
-			mode=AUTO_SHOOT;
-		case AUTO_SHOOT:
-			if(bunny_launcher.state()!=Bunny_launcher::LAUNCHED){
-				Bunnybot_goal r;
-				r.launch_bunny_now=1;
-				r.poop_bunny_now=1;
-				return r;
-			}
-			auto_timer.set(2);
-			mode=AUTO_DRIVE2;
-		case AUTO_DRIVE2:
-			if(!auto_timer.done()){
-				Bunnybot_goal r;
-				r.drive=Traction_mode_goal(.1,0);
-				return r;
-			}
-			mode=AUTO_DONE;
-		default: //should never get here.  Perhaps should add an assert or something.
-		case AUTO_DONE:
-			return Bunnybot_goal();
-	}
-}
-
-Bunnybot_goal Bunnybot::teleop(Robot_inputs in){
-	mode=TELEOP;
-		
-	Joystick_data main_joystick=in.joystick[0];
-	bool traction_mode_button=main_joystick.button[3];//chosen arbitrarily.
-	double x=main_joystick.axis[0];
-	double y=-main_joystick.axis[1];
-	double theta=-main_joystick.axis[2];
-	/*for(unsigned i=0;i<Joystick_data::AXES;i++){
-		bound[i].update(main_joystick.axis[i]);
-	}*/
-	
-	goal_traction_mode.update(traction_mode_button);
-
-	Bunnybot_goal r;
-	if (main_joystick.button [7]){
-		r.poop_bunny_now = 1;
-	}
-	
-	if(goal_traction_mode.get()){
-		r.drive=Traction_mode_goal(y,theta);
-	}else{
-		r.drive=Mecanum_goal(x,y,theta);
-	}
-	return r;
-}
-
-Bunnybot_goal Bunnybot::goal(Robot_inputs in){
-	if(in.robot_mode.autonomous){
-		return autonomous(in);
-	}else{
-		return teleop(in);
-	}
-}
-
-Bunnybot_output Bunnybot::operator()(Robot_inputs in){
-	auto_timer.update(in.now,in.robot_mode.enabled);
-	Bunnybot_goal todo=goal(in);
-	bunny_launcher.update(in.now,!in.robot_mode.enabled,todo.launch_bunny_now,0);
-	bunny_pooper.update(in.now,!in.robot_mode.enabled,todo.poop_bunny_now,0);
-	//pair<Octocanum_state,Octocanum_output> p=run(octocanum,todo.drive,in.now);
-	//octocanum=p.first;
-	Bunnybot_output r;
-	//r.drive=p.second;
-	r.launch_bunny=bunny_launcher.output();
-	r.poop_bunny=bunny_pooper.output();
-	return r;
-}
-
-ostream& operator<<(ostream& o,Bunnybot::Mode a){
-	switch(a){
-		#define X(name) case Bunnybot::name: return o<<""#name;
-		X(TELEOP)
-		X(AUTO_DRIVE1)
-		X(AUTO_SHOOT)
-		X(AUTO_DRIVE2)
-		X(AUTO_DONE)
-		#undef X
-		default: return o<<"error";
-	}
-}
-
-ostream& operator<<(ostream& o,Bunnybot a){
-	o<<"Bunnybot(";
-	o<<a.mode;
-	o<<a.auto_timer;
-	o<<"traction_mode="<<a.goal_traction_mode;
-	o<<a.octocanum;
-	o<<a.bunny_launcher;
-	o<<a.bunny_pooper;
-	return o<<")";
+namespace Gamepad_button{
+	//how the logitech gamepads appear in the driver station
+	static const unsigned A=0,B=1,X=2;
+	static const unsigned Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
 }
 
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
-Main::Main():control_status(Control_status::DRIVE_W_BALL){}
+Main::Main():control_status(Control_status::DRIVE_W_BALL){
+	
+	fieldRelative = false;
+	isPressed = false;
+}
 
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
-	fieldRelative = false;
+	since_switch.update(in.now,0);
 
 	Joystick_data main_joystick=in.joystick[0];
 	force.update(
@@ -235,39 +127,33 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		main_joystick.button[1],
 		main_joystick.button[2]
 	);
-	Bunnybot_output b;
 
 	Robot_outputs r;
-	/*r.pwm[0]=pwm_convert(b.drive.wheels.lf);
-	r.pwm[1]=pwm_convert(b.drive.wheels.lr);
-	r.pwm[2]=pwm_convert(-b.drive.wheels.rf);
-	r.pwm[3]=pwm_convert(-b.drive.wheels.rr);*/
 	ball_collecter.update(main_joystick.button[5]);
-	r.solenoid[1]=b.drive.traction_mode;
-	r.solenoid[0]=b.launch_bunny;
-	r.solenoid[2]=b.poop_bunny;
+
 	double throttle = 1.0;
-	if (in.joystick[0].axis[0] > 0.5 || in.joystick[0].axis[0] < -0.5){
+	if (main_joystick.axis[0] > 0.5 || main_joystick.axis[0] < -0.5){
 		throttle = 0.5;
 	}
+
 	//Well they said the robot needs to go full speed all the time
 	//Throttle now scales down speeds by 50% and activates when either of the triggers is pulled
 	//Start in NOT fieldRelative Mode
 	
 	//Check to see if somebody pushed the field relative button and turn on/off the mode
-	if (in.joystick[0].button[2]) {
-			if (!isPressed) {
-				isPressed = true;
-				fieldRelative = !fieldRelative; //Turn fieldRelative on/off
-			}
-		} else {
-			isPressed = false;
+	if (main_joystick.button[Gamepad_button::X]) {
+		if (!isPressed) {
+			isPressed = true;
+			fieldRelative = !fieldRelative; //Turn fieldRelative on/off
 		}
+	} else {
+		isPressed = false;
+	}
 	
 	Drive_motors d=holonomic_mix( 
-			in.joystick[0].axis[0] * throttle, 
-			-in.joystick[0].axis[1] * throttle, 
-			in.joystick[0].axis[3] * throttle,
+			main_joystick.axis[0] * throttle, 
+			-main_joystick.axis[1] * throttle, 
+			main_joystick.axis[3] * throttle,
 			gyro.angle(),
 			fieldRelative);
 	r.pwm[0]=pwm_convert(d.a);
@@ -281,13 +167,18 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	
 	r=force(r);
 	
-	static int i=0;
+	/*static int i=0;
 	if(i==0){
 		stringstream ss;
 		ss<<in<<"\r\n"<<*this<<"\r\n";
 		cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
 	}
-	i=(i+1)%100;
+	i=(i+1)%100;*/
+	if(print_button(main_joystick.button[Gamepad_button::LB])){
+		cout<<in<<"\r\n";
+		cout<<*this<<"\r\n";
+		cout<<"\r\n";
+	}
 	
 	string filename="demo.tmp";
 	string data="lien1\nline2";
@@ -320,18 +211,9 @@ Robot_outputs Main::operator()(Robot_inputs in){
 
 ostream& operator<<(ostream& o,Main m){
 	o<<"Main(";
-	//o<<m.auto_timer<<" ";
-	//o<<"traction_mode="<<m.goal_traction_mode<<" ";
-	//o<<m.octocanum<<" ";
 	o<<m.force;
 	o<<m.perf;
-	//o<<m.bunny_launcher;
-	//o<<m.bunny_pooper;
 	o<<m.gyro;
-/*	for(unsigned i=0;i<Joystick_data::AXES;i++){
-		o<<m.bound[i];
-	}*/
-	//o<<m.bunnybot;
 	o<<m.control_status;
 	return o<<")";
 }
@@ -413,14 +295,6 @@ void getDistance(float value){
 	}
 	else if() 
 */	
-#if 0 
-struct Gunner_input{
-
-namespace Gamepad_button{
-	//how the logitech gamepads appear in the driver station
-	static const unsigned A=0,B=1,X=2;
-	static const unsigned Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
-}
 
 Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	using namespace Control_status;
@@ -509,7 +383,6 @@ Control_status::Control_status next(Control_status::Control_status status,Toplev
 			assert(0);
 	}
 }
-#endif
 
 /*struct Gunner_input{
 	//this could happen in a more elegant way.

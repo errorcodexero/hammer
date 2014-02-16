@@ -1,5 +1,6 @@
 #include "util.h"
 #include<fstream>
+#include<cmath>
 
 using namespace std;
 
@@ -39,12 +40,45 @@ int read_file(string const& filename,string &out){
 	return 0;
 }
 
+double sum(std::vector<double> v){
+	double total=0;
+	for(unsigned i=0;i<v.size();i++) total+=v[i];
+	return total;
+}
+
+double mean(vector<double> v){
+	if(v.size()==0) return nan("");
+	return sum(v)/v.size();
+}
+
+vector<double> operator-(vector<double> v,double d){
+	for(unsigned i=0;i<v.size();i++){
+		v[i]-=d;
+	}
+	return v;
+}
+
+vector<double> square(vector<double> v){
+	for(unsigned i=0;i<v.size();i++){
+		v[i]*=v[i];
+	}
+	return v;
+}
+
+double stddev(vector<double> v){
+	//could write a faster version of this.
+	return sqrt(mean(square(
+		v-mean(v)
+	)));
+}
+
 #ifdef UTIL_TEST
 
 #include<cassert>
 #include<iostream>
+#include "point.h"
 
-int main(){
+void fileio_test(){
 	string data="line1\nline2";
 	string filename="f1.tmp";
 	{
@@ -57,5 +91,18 @@ int main(){
 		assert(!r);
 	}
 	assert(out==data);
+}
+
+int main(){
+	fileio_test();
+
+	vector<double> v{3,3,3};
+	assert(approx_equal(mean(v),3));
+	assert(approx_equal(stddev(v),0));
+	v[1]=4;
+	v.push_back(4);
+	assert(approx_equal(mean(v),3.5));
+	double s=stddev(v);
+	assert(approx_equal(s,.5));
 }
 #endif

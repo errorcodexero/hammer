@@ -218,13 +218,22 @@ ostream& operator<<(ostream& o,Bunnybot a){
 	return o<<")";
 }
 
+namespace Gamepad_button{
+	//how the logitech gamepads appear in the driver station
+	static const unsigned A=0,B=1,X=2;
+	static const unsigned Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
+}
+
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
-Main::Main():control_status(Control_status::DRIVE_W_BALL){}
+Main::Main():control_status(Control_status::DRIVE_W_BALL){
+	
+	fieldRelative = false;
+	isPressed = false;
+}
 
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
-	fieldRelative = false;
 
 	Joystick_data main_joystick=in.joystick[0];
 	force.update(
@@ -255,7 +264,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	//Start in NOT fieldRelative Mode
 	
 	//Check to see if somebody pushed the field relative button and turn on/off the mode
-	if (in.joystick[0].button[2]) {
+	if (in.joystick[0].button[Gamepad_button::X]) {
 			if (!isPressed) {
 				isPressed = true;
 				fieldRelative = !fieldRelative; //Turn fieldRelative on/off
@@ -415,12 +424,6 @@ void getDistance(float value){
 */	
 #if 0 
 struct Gunner_input{
-
-namespace Gamepad_button{
-	//how the logitech gamepads appear in the driver station
-	static const unsigned A=0,B=1,X=2;
-	static const unsigned Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
-}
 
 Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	using namespace Control_status;

@@ -24,5 +24,6 @@ enum Control_status{
 };
 std::ostream& operator<<(std::ostream&,Control_status);
 std::vector<Control_status> all();
+bool autonomous(Control_status);
 }
 #endif

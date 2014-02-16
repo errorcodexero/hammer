@@ -7,7 +7,8 @@ Joystick_data read_joystick(DriverStation& ds,int port){
 	//I don't know what the DriverStation does when port is out of range.
 	Joystick_data r;
 	for(unsigned i=0;i<Joystick_data::AXES;i++){
-		r.axis[i]=ds.GetStickAxis(port+1,i+1);
+		//r.axis[i]=ds.GetStickAxis(port+1,i+1);
+		r.axis[i]=ds.GetRawAxis(port+1,i+1);
 	}
 	
 	uint16_t buttons=ds.GetStickButtons(port+1);

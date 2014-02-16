@@ -8,7 +8,7 @@ Joystick_data read_joystick(DriverStation& ds,int port){
 	Joystick_data r;
 	for(unsigned i=0;i<Joystick_data::AXES;i++){
 		//r.axis[i]=ds.GetStickAxis(port+1,i+1);
-		r.axis[i]=ds.GetRawAxis(port+1,i+1);
+		r.axis[i]=ds.GetStickAxis(port+1,i+1);
 	}
 	
 	uint16_t buttons=ds.GetStickButtons(port+1);
@@ -160,8 +160,8 @@ public:
 			//cerr<<"Ran "<<mode<<"\r\n";
 			/*cerr<<in<<"\r\n";
 			cerr<<main<<"\r\n";*/
-			cerr<<"errorcode="<<error_code<<"\n";
-			cerr.flush();
+			//cerr<<"errorcode="<<error_code<<"\n";
+			//cerr.flush();
 			//cerr<<out<<"\r\n";
 			/*cerr<<"Going to start task\r\n";
 			int priority=Task::kDefaultPriority;
@@ -180,7 +180,7 @@ public:
 		static int i=0;
 		if(!i){
 			for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
-				cerr<<"dio"<<i<<":"<<digital_io[i]<<"\n";
+				//cerr<<"dio"<<i<<":"<<digital_io[i]<<"\n";
 			}
 		}
 		i=(i+1)%100;

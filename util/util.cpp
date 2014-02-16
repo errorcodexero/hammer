@@ -47,7 +47,7 @@ double sum(std::vector<double> v){
 }
 
 double mean(vector<double> v){
-	if(v.size()==0) return nan("");
+	//if(v.size()==0) return nan("");
 	return sum(v)/v.size();
 }
 

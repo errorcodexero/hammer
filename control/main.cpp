@@ -116,7 +116,7 @@ Main::Main():control_status(Control_status::DRIVE_W_BALL){
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
-	since_switch.update(in.now);
+	since_switch.update(in.now,0);
 
 	Joystick_data main_joystick=in.joystick[0];
 	force.update(

@@ -156,7 +156,7 @@ namespace Injector{
 		est.out(o);
 		return o;
 	}
-
+#if 0
 	Output control(Estimator::Location loc,Goal g){
 		switch(loc){
 			case Estimator::GOING_UP:
@@ -173,7 +173,7 @@ namespace Injector{
 			default: assert(0);
 		}
 	}
-
+#endif
 	bool ready(Estimator::Location loc,Goal goal){
 		return ready(location_to_status(loc),goal);
 	}

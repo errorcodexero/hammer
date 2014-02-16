@@ -36,7 +36,9 @@ void Gyro_tracker::update(Time now,Volt v){
 }
 
 //it might make more sense to do the unit convertion in here instead of in update.
-Degree Gyro_tracker::angle()const{ return integrator.total; }
+Degree Gyro_tracker::angle()const{ 
+	return integrator.total; 
+}
 
 ostream& operator<<(ostream& o,Gyro_tracker a){
 	return o<<"Gyro_tracker(cal_a:"<<a.cal_accumulated<<" cal_s:"<<a.cal_samples<<" cal_t:"<<a.cal_start<<" ctr:"<<a.center<<" int:"<<a.integrator<<")";

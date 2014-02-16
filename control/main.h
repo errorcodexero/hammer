@@ -66,7 +66,9 @@ struct Main{
 	//Bunnybot bunnybot;
 	Control_status::Control_status control_status;
 	Posedge_toggle ball_collecter;
-
+	bool isPressed;
+	bool fieldRelative;
+	
 	Main();	
 	Robot_outputs operator()(Robot_inputs);
 };

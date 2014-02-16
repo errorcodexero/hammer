@@ -24,4 +24,5 @@ g++ -DMAIN_TEST -I.. main.cpp \
 	../util/countup_timer.cpp \
 	../util/negedge_trigger.cpp \
 	fire_control.cpp \
+	control_status.cpp \
 	-o main 2>&1 && ./main

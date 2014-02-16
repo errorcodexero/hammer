@@ -14,7 +14,7 @@ using namespace std;
 
 enum Joystick_section{JOY_LEFT,JOY_RIGHT,JOY_UP,JOY_DOWN,JOY_CENTER};
 
-Joystick_section js(double x,double y){
+Joystick_section joystick_section(double x,double y){
 	static const double LIM=.25;
 	if(fabs(x)<LIM && fabs(y)<LIM){
 		return JOY_CENTER;
@@ -29,7 +29,7 @@ Joystick_section js(double x,double y){
 	return JOY_UP;
 }
 
-Joystick_section divide_vertical(double y){ return js(0,y); }
+Joystick_section divide_vertical(double y){ return joystick_section(0,y); }
 
 double convert_output(Collector_mode m){
 	switch(m){
@@ -422,8 +422,6 @@ void getDistance(float value){
 	}
 	else if() 
 */	
-#if 0 
-struct Gunner_input{
 
 Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	using namespace Control_status;
@@ -512,7 +510,6 @@ Control_status::Control_status next(Control_status::Control_status status,Toplev
 			assert(0);
 	}
 }
-#endif
 
 /*struct Gunner_input{
 	//this could happen in a more elegant way.

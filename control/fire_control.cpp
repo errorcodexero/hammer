@@ -1,7 +1,7 @@
 #include "fire_control.h"
 #include<iostream>
 #include<cassert>
-#include "../util/util.cpp"
+#include "../util/util.h"
 
 using namespace std;
 namespace Fire_control{

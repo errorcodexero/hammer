@@ -33,6 +33,8 @@ namespace Control_status{
 	}
 }
 
+#ifdef CONTROL_STATUS_TEST
 int main(){
 	cout<<Control_status::DRIVE_W_BALL;
 }
+#endif

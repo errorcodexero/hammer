@@ -1,1 +1,1 @@
-g++ control_status.cpp -o control_status && ./control_status
+g++ control_status.cpp -D CONTROL_STATUS_TEST -o control_status && ./control_status

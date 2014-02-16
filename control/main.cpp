@@ -247,14 +247,10 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	Bunnybot_output b;
 
 	Robot_outputs r;
-	/*r.pwm[0]=pwm_convert(b.drive.wheels.lf);
-	r.pwm[1]=pwm_convert(b.drive.wheels.lr);
-	r.pwm[2]=pwm_convert(-b.drive.wheels.rf);
-	r.pwm[3]=pwm_convert(-b.drive.wheels.rr);*/
 	ball_collecter.update(main_joystick.button[5]);
-	r.solenoid[1]=b.drive.traction_mode;
-	r.solenoid[0]=b.launch_bunny;
-	r.solenoid[2]=b.poop_bunny;
+	//r.solenoid[1]=b.drive.traction_mode;
+	//r.solenoid[0]=b.launch_bunny;
+	//r.solenoid[2]=b.poop_bunny;
 	double throttle = 1.0;
 	if (in.joystick[0].axis[0] > 0.5 || in.joystick[0].axis[0] < -0.5){
 		throttle = 0.5;

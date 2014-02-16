@@ -39,13 +39,13 @@ vector< pair<Toplevel::Output,Time> > bist_steps(){
 
 	g.injector_arms=Injector_arms::OUTPUT_CLOSE;
 	r|=make_pair(g,1.0);
-#if 0 
-	g.ejector=Injector::OUTPUT_UP;
+
+	g.ejector=Ejector::OUTPUT_UP;
 	r|=make_pair(g,1.0);
 
-	g.ejector=Injector::OUTPUT_DOWN;
+	g.ejector=Ejector::OUTPUT_DOWN;
 	r|=make_pair(g,2.0);
-#endif
+
 	g.shooter_wheels.top=1000;
 	r|=make_pair(g,1.0);
 

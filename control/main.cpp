@@ -7,6 +7,7 @@
 #include <math.h>
 #include "holonomic.h"
 #include "toplevel.h"
+#include "fire_control.h"
 
 using namespace std;
 
@@ -216,6 +217,9 @@ ostream& operator<<(ostream& o,Bunnybot a){
 	return o<<")";
 }
 
+//todo: at some point, might want to make this whatever is right to start autonomous mode.
+Main::Main():control_status(Control_status::DRIVE_W_BALL){}
+
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
@@ -230,7 +234,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		main_joystick.button[1],
 		main_joystick.button[2]
 	);
-	Bunnybot_output b=bunnybot(in);
+	Bunnybot_output b;
 
 	Robot_outputs r;
 	/*r.pwm[0]=pwm_convert(b.drive.wheels.lf);
@@ -247,6 +251,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	}
 	//Well they said the robot needs to go full speed all the time
 	//Throttle now scales down speeds by 50% and activates when either of the triggers is pulled
+	
 	//Check to see if somebody pushed the field relative button and turn on/off the mode
 	if (in.joystick[0].button[2]) {
 			if (!isPressed) {
@@ -309,6 +314,36 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	return r;
 }
 
+namespace Control_status{
+	ostream& operator<<(ostream& o,Control_status c){
+		#define X(name) if(c==name) return o<<""#name;
+		X(AUTO_SPIN_UP)
+		X(AUTO_FIRE)
+		X(AUTO_TO_COLLECT)
+		X(AUTO_COLLECT)
+		X(AUTO_SPIN_UP2)
+		X(AUTO_FIRE2)
+		X(DRIVE_W_BALL)
+		X(DRIVE_WO_BALL)
+		X(COLLECT)
+		X(SHOOT_HIGH_PREP)
+		X(SHOOT_HIGH)
+		X(SHOOT_HIGH_WHEN_READY)
+		X(TRUSS_TOSS_PREP)
+		X(TRUSS_TOSS)
+		X(TRUSS_TOSS_WHEN_READY)
+		X(PASS_PREP)
+		X(PASS)
+		X(PASS_WHEN_READY)
+		X(EJECT_PREP)
+		X(EJECT)
+		X(EJECT_WHEN_READY)
+		X(CATCH)
+		#undef X
+		assert(0);
+	}
+}
+
 ostream& operator<<(ostream& o,Main m){
 	o<<"Main(";
 	//o<<m.auto_timer<<" ";
@@ -322,7 +357,8 @@ ostream& operator<<(ostream& o,Main m){
 /*	for(unsigned i=0;i<Joystick_data::AXES;i++){
 		o<<m.bound[i];
 	}*/
-	o<<m.bunnybot;
+	//o<<m.bunnybot;
+	o<<m.control_status;
 	return o<<")";
 }
 
@@ -403,8 +439,105 @@ void getDistance(float value){
 	}
 	else if() 
 */	
-#if 0	
+#if 0 
 struct Gunner_input{
+
+namespace Gamepad_button{
+	//how the logitech gamepads appear in the driver station
+	static const unsigned A=0,B=1,X=2;
+	static const unsigned Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
+}
+
+Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
+	using namespace Control_status;
+	//at the top here should deal with all the buttons that put you into a specific mode.
+	if(j.button[Gamepad_button::A]) return Control_status::CATCH;
+	if(j.button[Gamepad_button::B]) return COLLECT;
+	if(j.button[Gamepad_button::X]) return DRIVE_W_BALL;
+	if(j.button[Gamepad_button::Y]) return DRIVE_WO_BALL;
+
+	//todo: use some sort of constants rather than 0/1 for the axes
+	switch(joystick_section(j.axis[0],j.axis[1])){
+		case JOY_LEFT: return TRUSS_TOSS_PREP;
+		case JOY_RIGHT: return PASS_PREP;
+		case JOY_UP: return SHOOT_HIGH_PREP;
+		case JOY_DOWN: return EJECT_PREP;
+		default: break;
+	}
+
+	bool fire_now,fire_when_ready;
+	{
+		//I think 3 is the right axis
+		Joystick_section vert=divide_vertical(j.axis[3]);
+		fire_now=vert==JOY_UP;
+		fire_when_ready=vert==JOY_DOWN;
+	}
+
+	bool ready_to_shoot=ready(part_status,subgoals(Toplevel::SHOOT_HIGH_PREP));
+	bool ready_to_truss_toss=ready(part_status,subgoals(Toplevel::TRUSS_TOSS_PREP));
+	bool ready_to_pass=ready(part_status,subgoals(Toplevel::PASS_PREP));
+	bool ready_to_collect=ready(part_status,subgoals(Toplevel::COLLECT));
+	bool took_shot=location_to_status(part_status.injector)==Injector::RECOVERY;
+	switch(status){
+		case AUTO_SPIN_UP:
+			if(autonomous_mode){
+				return ready_to_shoot?AUTO_FIRE:AUTO_SPIN_UP;
+			}
+			return SHOOT_HIGH_PREP;
+		case AUTO_FIRE:
+			if(autonomous_mode){
+				return took_shot?AUTO_TO_COLLECT:AUTO_FIRE;
+			}
+			return SHOOT_HIGH;
+		case AUTO_TO_COLLECT:
+			if(autonomous_mode){
+				return ready_to_collect?AUTO_COLLECT:AUTO_TO_COLLECT;
+			}
+			return COLLECT;
+		case AUTO_COLLECT:
+			if(autonomous_mode){
+				//this is a very non-scientific way of driving, and not really the right way to do this.
+				return (since_switch>2.4)?AUTO_SPIN_UP2:AUTO_COLLECT;
+			}
+			return COLLECT;
+		case AUTO_SPIN_UP2:
+			if(autonomous_mode){
+				return ready_to_shoot?AUTO_FIRE2:AUTO_SPIN_UP2;
+			}
+			return SHOOT_HIGH_PREP;
+		case AUTO_FIRE2:
+			if(autonomous_mode){
+				return took_shot?DRIVE_WO_BALL:AUTO_FIRE2;
+			}
+			return SHOOT_HIGH;
+		case DRIVE_W_BALL:
+		case DRIVE_WO_BALL:
+		case SHOOT_HIGH_PREP:
+			return status;
+		case SHOOT_HIGH: return took_shot?DRIVE_WO_BALL:SHOOT_HIGH;
+		case SHOOT_HIGH_WHEN_READY:
+			return ready_to_shoot?SHOOT_HIGH:SHOOT_HIGH_WHEN_READY;
+		case TRUSS_TOSS_PREP: return status;
+		case TRUSS_TOSS: return took_shot?DRIVE_WO_BALL:TRUSS_TOSS;
+		case TRUSS_TOSS_WHEN_READY: return ready_to_truss_toss?TRUSS_TOSS:TRUSS_TOSS_WHEN_READY;
+		case PASS_PREP: return status;
+		case PASS: return took_shot?DRIVE_WO_BALL:PASS;
+		case PASS_WHEN_READY: return ready_to_pass?PASS:PASS_WHEN_READY;
+		case EJECT_PREP: return status;
+		case EJECT: return (location_to_status(part_status.ejector)==Ejector::RECOVERY)?DRIVE_WO_BALL:EJECT;
+		case EJECT_WHEN_READY:
+		{
+			bool ready_to_eject=(location_to_status(part_status.ejector)==Ejector::IDLE);
+			return ready_to_eject?EJECT:EJECT_WHEN_READY;
+		}
+		case CATCH: return status;
+		default:
+			assert(0);
+	}
+}
+#endif
+
+/*struct Gunner_input{
 	//this could happen in a more elegant way.
 	Posedge_trigger drive_w_ball,drive_wo_ball,catch_mode,collect,prep_high,prep_toss,prep_pass,prep_eject,high,toss,pass,eject;
 	Mode current;
@@ -412,10 +545,7 @@ struct Gunner_input{
 	Gunner_input():current(DRIVE_W_BALL){}
 	
 	void update(Joystick_data j){
-		static const A=0;
-		static const B=1;
-		static const X=2;
-		static const Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
+		using namespace Gamepad_button;
 		using namespace Toplevel;
 		if(drive_w_ball.update(j.button[X])){
 			current=DRIVE_W_BALL;
@@ -438,8 +568,7 @@ struct Gunner_input{
 		if(eject.update(rs==JOY_DOWN)) current=EJECT;
 		if(pass.update(rs==JOY_RIGHT)) current=PASS;
 	}
-};
-#endif
+};*/
 
 #ifdef MAIN_TEST
 void joystick_section_test(){
@@ -477,5 +606,7 @@ int main(){
 	cout<<func(0, 0, 0)<<"\n";
 	*/
 	joystick_section_test();
+	Main m;
+	cout<<m<<"\n";
 }
 #endif

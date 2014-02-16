@@ -1,4 +1,5 @@
 #ifndef BOUND_TRACKER_H
+#define BOUND_TRACKER_H
 
 #include<iosfwd>
 

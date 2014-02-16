@@ -13,6 +13,7 @@
 #include<dirent.h>
 #include "util/util.h"
 #include <unistd.h>
+#include<cassert>
 
 using namespace std;
 
@@ -23,7 +24,11 @@ vector<string> dir(string name){
 	vector<string> r;
 	while(1){
 		struct dirent *ent=readdir(d);
-		if(!ent) return r;
+		if(!ent){
+			int cr=closedir(d);
+			assert(!cr);
+			return r;
+		}
 		r|=string(ent->d_name);
 	}
 }

@@ -9,4 +9,7 @@ Shooter wheels:
 	-Add CAN support
 	-Determine the actual speeds to use
 	-Add option to use config file
+	-Add fallback systems
+Main:
+	-Make isPressed/fieldRelative use Posedge_toggle
 

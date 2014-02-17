@@ -115,8 +115,6 @@ namespace Fire_control{
 		if(target == PASS && goal == OTHER) {throw "error1";}
 		if(target == TRUSS && goal == OTHER) {throw "error1";}
 		if(target == EJECT && goal == OTHER) {throw "error1";}
-		//DRIVE HIGH, DRIVE TRUSS, DRIVE PASS, DRIVE EJECT, OTHER HIGH, OTHER TRUSS, OTHER PASS, OTHER EJECT
-		//^^^^^All these combinations are undefined in control_status.h there for code fails here.^^^^^
 		switch(target){
 			case NO_TARGET:
 			case HIGH:

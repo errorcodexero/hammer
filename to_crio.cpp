@@ -3,6 +3,8 @@
 #include "control/main.h"
 #include "dio_control.h"
 
+static const uint8_t SYNC_GROUP=0x40; //Don't know why, maybe ask Steve later
+
 Joystick_data read_joystick(DriverStation& ds,int port){
 	//I don't know what the DriverStation does when port is out of range.
 	Joystick_data r;
@@ -97,7 +99,39 @@ int demo(...){
 	cerr<<"In demo\n";
 	return 0;
 }
+class Jag_control
+{
+	CANJaguar *jaguar;
+	bool controlSpeed; //0 = voltage; 1 = speed
 
+	Jag_control(int CANBusAddress){	
+		static const uint8_t SYNC_GROUP=0x40; //Don't know why, maybe ask Steve later
+		jaguar = new CANJaguar(CANBusAddress);
+		jaguar->SetSafetyEnabled(false);
+		jaguar->Set(0.0, SYNC_GROUP);
+		jaguar->ChangeControlMode(CANJaguar::kSpeed);
+		controlSpeed = true;
+		jaguar->ConfigEncoderCodesPerRev(1);
+	}
+	
+	void set_output(Jaguar_output a){
+		float kP = 1.000;
+		float kI = 0.005;
+		float kD = 0.000;
+		if(a.controlSpeed != controlSpeed){
+			jaguar->ChangeControlMode(a.controlSpeed ? CANJaguar::kSpeed : CANJaguar::kPercentVbus);
+			controlSpeed = a.controlSpeed;
+			jaguar->SetPID(kP, kI, kD); //Need to add refernces to what PID is
+			jaguar->EnableControl();
+			jaguar->SetExpiration(2.0);
+		}
+		if(a.controlSpeed){
+			jaguar->Set(a.speed, SYNC_GROUP);
+		}else {
+			jaguar->Set(a.voltage, SYNC_GROUP);
+		}
+	}
+};
 template<typename USER_CODE>
 class To_crio
 {
@@ -107,6 +141,10 @@ class To_crio
 	int error_code;
 	USER_CODE main;
 	int skipped;
+	/*
+	CANJaguar *jaguar[Robot_outputs::CAN_JAGUARS];
+	bool controlSpeed[Robot_outputs::CAN_JAGUARS]; //0 = voltage; 1 = speed
+	*/
 	
 public:
 	To_crio():error_code(0),skipped(0)
@@ -121,14 +159,26 @@ public:
 				if(!solenoid[i]) error_code|=8;
 			}
 		}
-		
+		/*
+		static const uint8_t SYNC_GROUP=0x40; //Don't know why, maybe ask Steve later
+		for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+			jaguar[i] = new CANJaguar(i+1);
+			jaguar[1]->SetSafetyEnabled(false);
+			jaguar[i]->Set(0.0, SYNC_GROUP);
+			jaguar[i]->ChangeControlMode(CANJaguar::kSpeed);
+			controlSpeed[i] = true;
+			jaguar[i]->ConfigEncoderCodesPerRev(1);
+			
+		}
+		CANJaguar::UpdateSyncGroup(SYNC_GROUP);
+		*/
 		for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
 			int r=digital_io[i].set_channel(i);
 			if(r) error_code|=256;
 			//digital_in[i]=new DigitalInput(i+1);
 		}
 	}
-
+	
 	int set_solenoid(unsigned i,Solenoid_output v){
 		if(i>=Robot_outputs::SOLENOIDS) return 1;
 		if(!solenoid[i]) return 2;
@@ -154,7 +204,26 @@ public:
 			int r=digital_io[i].set(out.digital_io[i]);
 			if(r) error_code|=512;
 		}
-		
+		/*
+		float kP = 1.000;
+		float kI = 0.005;
+		float kD = 0.000;
+		for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+			if(out.jaguar[i].controlSpeed != controlSpeed[i]){
+				jaguar[i]->ChangeControlMode(out.jaguar[i].controlSpeed ? CANJaguar::kSpeed : CANJaguar::kPercentVbus);
+				controlSpeed[i] = out.jaguar[i].controlSpeed;
+				jaguar[1]->SetPID(kP, kI, kD); //Need to add refernces to what PID is
+				jaguar[1]->EnableControl();
+				jaguar[i]->SetExpiration(2.0);
+				
+			}
+			if(out.jaguar[i].controlSpeed){
+				jaguar[i]->Set(out.jaguar[i].speed, SYNC_GROUP);
+			}else {
+				jaguar[i]->Set(out.jaguar[i].voltage, SYNC_GROUP);
+			}
+		}
+		*/
 		//rate limiting the output  
 		if(skipped==0){
 			//cerr<<"Ran "<<mode<<"\r\n";

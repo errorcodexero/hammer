@@ -107,6 +107,14 @@ namespace Fire_control{
 		if(target == TRUSS && goal == FIRE_WHEN_READY) {return Control_status::TRUSS_TOSS_WHEN_READY;}
 		if(target == PASS && goal == FIRE_WHEN_READY) {return Control_status::PASS_WHEN_READY;}
 		if(target == EJECT && goal == FIRE_WHEN_READY) {return Control_status::EJECT_WHEN_READY;}
+		if(target == HIGH && goal == DRIVE) {throw "error1";}
+		if(target == TRUSS && goal == DRIVE) {throw "error1";}
+		if(target == PASS&& goal == DRIVE) {throw "error1";}
+		if(target == EJECT && goal == DRIVE) {throw "error1";}
+		if(target == HIGH && goal == OTHER) {throw "error1";}
+		if(target == PASS && goal == OTHER) {throw "error1";}
+		if(target == TRUSS && goal == OTHER) {throw "error1";}
+		if(target == EJECT && goal == OTHER) {throw "error1";}
 		//DRIVE HIGH, DRIVE TRUSS, DRIVE PASS, DRIVE EJECT, OTHER HIGH, OTHER TRUSS, OTHER PASS, OTHER EJECT
 		//^^^^^All these combinations are undefined in control_status.h there for code fails here.^^^^^
 		switch(target){
@@ -118,6 +126,7 @@ namespace Fire_control{
 		}
 	}
 
+	
 	Goal next_goal(Goal g,bool ready,bool fired,bool prep_button,bool fire_button,bool fire_when_ready_button){
 		if(fire_button) return FIRE;
 		switch(g){
@@ -160,7 +169,11 @@ int main(){
 		for(auto target:TARGETS){
 			cout<<goal<<" "<<target<<"\n";
 			cout.flush();
-			cout<<generate_status(target, goal)<<"\n";
+			try{
+				cout<<generate_status(target, goal)<<"\n";
+			}catch(...){
+			cout<<"Not an option\n";
+			}
 		}
 	}
 }

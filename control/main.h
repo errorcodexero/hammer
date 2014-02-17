@@ -10,11 +10,13 @@
 #include "../util/bound_tracker.h"
 #include "control_status.h"
 #include "../util/countup_timer.h"
+#include "toplevel.h"
 
 struct Main{
 	Force_interface force;
 	Perf_tracker perf;
 	Gyro_tracker gyro;
+	Toplevel::Estimator est;
 
 	Control_status::Control_status control_status;
 	Countup_timer since_switch;

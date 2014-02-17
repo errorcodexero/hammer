@@ -33,9 +33,9 @@ Joystick_section divide_vertical(double y){ return joystick_section(0,y); }
 
 double convert_output(Collector_mode m){
 	switch(m){
-		case ON: return 1;
+		case ON: return -1; //Actually collecting
 		case OFF: return 0;
-		case REVERSE: return -1;
+		case REVERSE: return 1; //Ejecting
 		default: assert(0);
 	}
 }
@@ -400,6 +400,7 @@ Control_status::Control_status next(Control_status::Control_status status,Toplev
 	bool ready_to_pass=ready(part_status,subgoals(Toplevel::PASS_PREP));
 	bool ready_to_collect=ready(part_status,subgoals(Toplevel::COLLECT));
 	bool took_shot=location_to_status(part_status.injector)==Injector::RECOVERY;
+	bool have_collected_question = false;
 	switch(status){
 		case AUTO_SPIN_UP:
 			if(autonomous_mode){
@@ -434,6 +435,9 @@ Control_status::Control_status next(Control_status::Control_status status,Toplev
 			return SHOOT_HIGH;
 		case DRIVE_W_BALL:
 		case DRIVE_WO_BALL:
+			return status;
+		case COLLECT:
+			return have_collected_question?DRIVE_W_BALL:COLLECT;
 		case SHOOT_HIGH_PREP:
 			return status;
 		case SHOOT_HIGH: return took_shot?DRIVE_WO_BALL:SHOOT_HIGH;

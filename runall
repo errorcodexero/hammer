@@ -1,55 +1,82 @@
+set -e
+echo now running CYBORG TEST
 ./cyborg_joystick_test
 rm cyborg_joystick
 cd control
+echo now running BIST TEST
 ./bist_test
 rm bist
+echo now running BUNNY LAUNCHER TEST
 ./bunny_launcher_test
 rm bunny_launcher
+echo now running COLLECTOR TEST
 ./collector_test
 rm collector
+echo now running COLLECTOR TILT TEST
 ./collector_tilt_test
 rm collector_tilt
+echo now running CONTROL STATUS TEST
 ./control_status_test
 rm control_status
+echo now running EJECTOR TEST
 ./ejector_test
 rm ejector
+echo now running FIRE CONTROL TEST
 ./fire_control_test
 rm fire_control
+echo now running FORCE INTERFACE TEST
 ./force_interface_test
 rm force_interface
+echo now running GYRO TRACKER TEST
 ./gyro_tracker_test
 rm gyro_tracker
+echo now running INJECTOR TEST
 ./injector_test
 rm injector
+echo now running INJECTOR ARMS TEST
 ./injector_arms_test
 rm injector_arms
+echo now running MAIN TEST
 ./main_test
 rm main_
+echo now running OCTOCANUM TEST
 ./octocanum_test
 rm octocanum
+echo now running PUMP TEST
 ./pump_test
 rm pump
+echo now running TOPLEVEL TEST
 ./toplevel_test
 rm toplevel
+echo now running SHOOTER WHEELS TEST
 ./shooter_wheels_test
 rm shooter_wheels
 cd ../util
+echo now running BOUND TRACKER TEST
 ./bound_tracker_test
 rm bound_tracker
+echo now running COUNTDOWN TIMER TEST
 ./countdown_timer_test
 rm countdown_timer
+echo now running COUNTUP TEST
 ./countup_timer_test
 rm countup_timer
+echo new running INTERFACE TEST
 ./interface_test
 rm interface
+echo now running NEGEDGE TRIGGER TEST
 ./negedge_trigger_test
 rm negedge_trigger
+echo now running PERF TRACKER TEST
 ./perf_tracker_test
 rm perf_tracker
+echo now running POINT TEST
 ./point_test
 rm point
+echo now running POSEDGE TRIGGER TEST
 ./posedge_trigger_test
 rm posedge_trigger
+echo now running UTIL TEST
 ./util_test
 rm util
 

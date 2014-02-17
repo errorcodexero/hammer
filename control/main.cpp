@@ -168,14 +168,17 @@ Robot_outputs Main::operator()(Robot_inputs in){
 
 	Robot_outputs r;
 	ball_collecter.update(main_joystick.button[5]);
-
+	
+	
 	double throttle = 1.0;
+	/*
 	if (main_joystick.axis[Gamepad_axis::TRIGGER] > 0.5 || 
 		main_joystick.axis[Gamepad_axis::TRIGGER] < -0.5)
 	{
 			throttle = 0.5;
 	}
-
+	*/
+	
 	//Well they said the robot needs to go full speed all the time
 	//Throttle now scales down speeds by 50% and activates when either of the triggers is pulled
 	//Start in NOT fieldRelative Mode
@@ -237,13 +240,14 @@ Robot_outputs Main::operator()(Robot_inputs in){
 
 	r=force(r);
 	
-	/*static int i=0;
+	static int i=0;
 	if(i==0){
 		stringstream ss;
 		ss<<in<<"\r\n"<<*this<<"\r\n";
 		cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
+		cerr<<subgoals_now<<high_level_outputs<<"\n";
 	}
-	i=(i+1)%100;*/
+	i=(i+1)%100;
 	if(print_button(main_joystick.button[Gamepad_button::LB])){
 		cout<<in<<"\r\n";
 		cout<<*this<<"\r\n";

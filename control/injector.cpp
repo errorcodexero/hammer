@@ -76,7 +76,9 @@ namespace Injector{
 			case Estimator::DOWN_VENT:
 				switch(out){
 					case OUTPUT_UP: return make_pair(Estimator::GOING_UP,0);
-					case OUTPUT_DOWN: return make_pair(Estimator::DOWN_VENT,1);
+					case OUTPUT_DOWN: 
+						return make_pair(Estimator::DOWN_VENT,1);
+						//return make_pair(Estimator::GOING_DOWN,0);
 					case OUTPUT_VENT:
 						static const Time VENT_TIME=1;//this is probably a little high.
 						if(elapsed>VENT_TIME){
@@ -118,7 +120,6 @@ namespace Injector{
 			case Estimator::UP:
 				return SHOOTING;
 			case Estimator::GOING_DOWN:
-				return RECOVERY;
 			case Estimator::DOWN_VENT:
 				return RECOVERY;
 			case Estimator::DOWN_IDLE:
@@ -167,7 +168,7 @@ namespace Injector{
 			case Estimator::DOWN_VENT:
 				return OUTPUT_VENT;
 			case Estimator::DOWN_IDLE:
-				return (g==START)?OUTPUT_UP:OUTPUT_DOWN;
+				return (g==START)?OUTPUT_UP:OUTPUT_VENT;
 			case Estimator::X:
 				return OUTPUT_DOWN;
 			default: assert(0);

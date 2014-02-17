@@ -57,6 +57,9 @@ Robot_outputs convert_output(Toplevel::Output a){
 	r.solenoid[6]=(a.ejector==Ejector::OUTPUT_UP);
 	r.solenoid[7]=(a.injector_arms==Injector_arms::OUTPUT_CLOSE);
 
+	//pressure switch
+	r.digital_io[0]=DIO_INPUT;
+
 	/*
 	TODO: CAN bus stuff
 	2 bottom
@@ -66,6 +69,35 @@ Robot_outputs convert_output(Toplevel::Output a){
 	*/
 	
 	return r;
+}
+
+Toplevel::Mode to_mode(Control_status::Control_status status){
+	switch(status){
+		case Control_status::AUTO_SPIN_UP: return Toplevel::SHOOT_HIGH_PREP;
+		case Control_status::AUTO_FIRE: return Toplevel::SHOOT_HIGH;
+		case Control_status::AUTO_TO_COLLECT: return Toplevel::COLLECT;
+		case Control_status::AUTO_COLLECT: return Toplevel::COLLECT;
+		case Control_status::AUTO_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP;
+		case Control_status::AUTO_FIRE2: return Toplevel::SHOOT_HIGH;
+		case Control_status::DRIVE_W_BALL: return Toplevel::DRIVE_W_BALL;
+		case Control_status::DRIVE_WO_BALL: return Toplevel::DRIVE_WO_BALL;
+		case Control_status::COLLECT: return Toplevel::COLLECT;
+		case Control_status::SHOOT_HIGH_PREP: return Toplevel::SHOOT_HIGH_PREP;
+		case Control_status::SHOOT_HIGH: return Toplevel::SHOOT_HIGH;
+		case Control_status::SHOOT_HIGH_WHEN_READY: return Toplevel::SHOOT_HIGH_PREP;
+		case Control_status::TRUSS_TOSS_PREP: return Toplevel::TRUSS_TOSS_PREP;
+		case Control_status::TRUSS_TOSS: return Toplevel::TRUSS_TOSS;
+		case Control_status::TRUSS_TOSS_WHEN_READY: return Toplevel::TRUSS_TOSS_PREP;
+		case Control_status::PASS_PREP: return Toplevel::PASS_PREP;
+		case Control_status::PASS: return Toplevel::PASS;
+		case Control_status::PASS_WHEN_READY: return Toplevel::PASS_PREP;
+		case Control_status::EJECT_PREP: return Toplevel::EJECT_PREP;
+		case Control_status::EJECT: return Toplevel::EJECT;
+		case Control_status::EJECT_WHEN_READY: return Toplevel::EJECT_PREP;
+		case Control_status::CATCH: return Toplevel::CATCH;
+		default:
+			assert(0);
+	}
 }
 
 unsigned interpret_10_turn_pot(Volt v){
@@ -105,6 +137,10 @@ namespace Gamepad_button{
 	static const unsigned A=0,B=1,X=2;
 	static const unsigned Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
 }
+namespace Gamepad_axis{
+	//How the axes appear in the DS; though, trigger=5 is still questionable
+	static const unsigned LEFTX=0,LEFTY=1,RIGHTX=3,RIGHTY=2,TRIGGER=5;
+}
 
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
 Main::Main():control_status(Control_status::DRIVE_W_BALL){
@@ -112,6 +148,8 @@ Main::Main():control_status(Control_status::DRIVE_W_BALL){
 	fieldRelative = false;
 	isPressed = false;
 }
+
+Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch);
 
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
@@ -132,8 +170,10 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	ball_collecter.update(main_joystick.button[5]);
 
 	double throttle = 1.0;
-	if (main_joystick.axis[0] > 0.5 || main_joystick.axis[0] < -0.5){
-		throttle = 0.5;
+	if (main_joystick.axis[Gamepad_axis::TRIGGER] > 0.5 || 
+		main_joystick.axis[Gamepad_axis::TRIGGER] < -0.5)
+	{
+			throttle = 0.5;
 	}
 
 	//Well they said the robot needs to go full speed all the time
@@ -145,15 +185,21 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		if (!isPressed) {
 			isPressed = true;
 			fieldRelative = !fieldRelative; //Turn fieldRelative on/off
+			if(fieldRelative==false){
+				cout<<"Field Relative is now OFF!"<<"\n";
+			}
+			else{
+				cout<<"Field Relative is now ON!"<<"\n";
+			}
 		}
 	} else {
 		isPressed = false;
 	}
 	
 	Drive_motors d=holonomic_mix( 
-			main_joystick.axis[0] * throttle, 
-			-main_joystick.axis[1] * throttle, 
-			main_joystick.axis[3] * throttle,
+			main_joystick.axis[Gamepad_axis::LEFTX] * throttle, 
+			-main_joystick.axis[Gamepad_axis::LEFTY] * throttle, 
+			main_joystick.axis[Gamepad_axis::RIGHTX] * throttle,
 			gyro.angle(),
 			fieldRelative);
 	r.pwm[0]=pwm_convert(d.a);
@@ -161,10 +207,34 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	r.pwm[2]=pwm_convert(d.c);
 	
 	//todo: double check that this is right.
-	r.relay[0]=(in.digital_io[0]==DI_1)?RELAY_00:RELAY_10;
+	bool tanks_full=(in.digital_io[0]==DI_1);
+	r.relay[0]=tanks_full?RELAY_00:RELAY_10;
 	r.pwm[3]=(ball_collecter.get());
 	//r.pwm[3] = main_joystick.button[5]?1:(main_joystick.button[6?-1:0]);
 	
+	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
+	Toplevel::Status toplevel_status=est.estimate();
+	control_status=next(control_status,toplevel_status,in.joystick[1],in.robot_mode.autonomous,since_switch.elapsed());
+
+	Toplevel::Mode mode=to_mode(control_status);
+	Toplevel::Subgoals subgoals_now=subgoals(mode);
+	Toplevel::Output high_level_outputs=control(toplevel_status,subgoals_now);
+	r=convert_output(high_level_outputs);
+	est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL);
+
+	{
+		Drive_motors d=holonomic_mix( 
+			main_joystick.axis[0] * throttle, 
+			-main_joystick.axis[1] * throttle, 
+			main_joystick.axis[3] * throttle,
+			gyro.angle(),
+			fieldRelative
+		);
+		r.pwm[0]=pwm_convert(d.a);
+		r.pwm[1]=pwm_convert(d.b);
+		r.pwm[2]=pwm_convert(d.c);
+	}
+
 	r=force(r);
 	
 	/*static int i=0;
@@ -455,5 +525,8 @@ int main(){
 	joystick_section_test();
 	Main m;
 	cout<<m<<"\n";
+	for(Control_status::Control_status control_status:Control_status::all()){
+		cout<<control_status<<" "<<to_mode(control_status)<<"\n";
+	}
 }
 #endif

@@ -1,0 +1,58 @@
+./cyborg_joystick_test
+rm cyborg_joystick
+cd control
+./bist_test
+rm bist
+./bunny_launcher_test
+rm bunny_launcher
+./collector_test
+rm collector
+./collector_tilt_test
+rm collector_tilt
+./control_status_test
+rm control_status
+./ejector_test
+rm ejector
+./fire_control_test
+rm fire_control
+./force_interface_test
+rm force_interface
+./gyro_tracker_test
+rm gyro_tracker
+./injector_test
+rm injector
+./injector_arms_test
+rm injector_arms
+./main_test
+rm main_
+./octocanum_test
+rm octocanum
+./pump_test
+rm pump
+./toplevel_test
+rm toplevel
+./shooter_wheels_test
+rm shooter_wheels
+cd ../util
+./bound_tracker_test
+rm bound_tracker
+./countdown_timer_test
+rm countdown_timer
+./countup_timer_test
+rm countup_timer
+./interface_test
+rm interface
+./negedge_trigger_test
+rm negedge_trigger
+./perf_tracker_test
+rm perf_tracker
+./point_test
+rm point
+./posedge_trigger_test
+rm posedge_trigger
+./util_test
+rm util
+
+
+
+

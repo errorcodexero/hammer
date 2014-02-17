@@ -6,6 +6,17 @@
 typedef double Time;
 typedef unsigned char Pwm_output;
 typedef bool Solenoid_output;
+struct Jaguar_output{
+	double speed,voltage;
+	bool controlSpeed;
+	//0 = voltage
+	//1 = speed
+
+	Jaguar_output();
+	static Jaguar_output speedOut(double);
+	static Jaguar_output voltageOut(double);
+};
+std::ostream& operator<<(std::ostream&,Jaguar_output);
 
 typedef enum{DIO_INPUT,DIO_1,DIO_0} Digital_out;
 std::ostream& operator<<(std::ostream&,Digital_out);
@@ -25,6 +36,9 @@ struct Robot_outputs{
 	
 	static const unsigned DIGITAL_IOS=4;//there are really 14
 	Digital_out digital_io[DIGITAL_IOS];
+	
+	static const unsigned CAN_JAGUARS=4;
+	Jaguar_output jaguar[CAN_JAGUARS];
 	
 	//could add in some setup for the analog inputs
 	

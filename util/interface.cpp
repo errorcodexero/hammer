@@ -96,6 +96,10 @@ ostream& operator<<(ostream& o,Robot_outputs a){
 		//o<<a.digital_io[i];
 		terse(o,a.digital_io[i]);
 	}
+	o<<" jaguar:";
+	for(unsigned i=0;i<a.CAN_JAGUARS;i++){
+		o<<a.jaguar[i];
+	}
 	return o<<")";
 }
 
@@ -196,10 +200,40 @@ ostream& operator<<(ostream& o,Robot_inputs a){
 	return o<<")";
 }
 
+Jaguar_output::Jaguar_output(){
+	speed = 0;
+	voltage = 0;
+	controlSpeed = false;
+}
+ostream& operator<<(ostream& o,Jaguar_output a){
+	o<<"Jaguar_output(";
+	if(a.controlSpeed){
+		o<<"speed ="<<a.speed<<")\n";
+	} else{
+		o<<"voltage ="<<a.voltage<<")\n";
+	}
+	return o;
+}
+Jaguar_output Jaguar_output::speedOut(double a){
+	Jaguar_output j;
+	j.controlSpeed = true;
+	j.speed = a;
+	return j;
+}
+Jaguar_output Jaguar_output::voltageOut(double a){
+	Jaguar_output j;
+	j.controlSpeed = false;
+	j.voltage = a;
+	return j;
+}
+
 #ifdef INTERFACE_TEST
 int main(){
 	cout<<Robot_outputs()<<"\n";
 	cout<<Robot_inputs()<<"\n";
 	cout<<Joystick_data()<<"\n";
+	cout<<Jaguar_output()<<"\n";
+	cout<<Jaguar_output::speedOut(10)<<"\n";
+	cout<<Jaguar_output::voltageOut(1.0)<<"\n";
 }
 #endif

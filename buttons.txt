@@ -14,16 +14,16 @@ BUTTONS:
 
 AXIS:
 Left Joystick-
-up	=0 -1 0 0 0 0
-down	=0  1 0 0 0 0
-left	=-1 0 0 0 0 0
-right   =1  0 0 0 0 0
+up		= 0 -1 0 0 0 0
+down	= 0  1 0 0 0 0
+left	=-1  0 0 0 0 0
+right   = 1  0 0 0 0 0
 
 Right Joystick-
-up	=0 0 0 0 -1 0
-down	=0 0 0 0  1 0
-left 	=0 0 0 -1 0 0	
-right	=0 0 0 1  0 0
+up		=0 0 0  0 -1 0
+down	=0 0 0  0  1 0
+left 	=0 0 0 -1  0 0	
+right	=0 0 0  1  0 0
 
 LT	=0 0 -1 0 0 0
 RT	=0 0 1  0 0 0

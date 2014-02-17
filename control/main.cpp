@@ -14,6 +14,19 @@ using namespace std;
 
 enum Joystick_section{JOY_LEFT,JOY_RIGHT,JOY_UP,JOY_DOWN,JOY_CENTER};
 
+ostream& operator<<(ostream& o,Joystick_section j){
+	switch(j){
+		#define X(name) case JOY_##name: return o<<""#name;
+		X(LEFT)
+		X(RIGHT)
+		X(UP)
+		X(DOWN)
+		X(CENTER)
+		#undef X
+		default: assert(0); 
+	}
+}
+
 Joystick_section joystick_section(double x,double y){
 	static const double LIM=.25;
 	if(fabs(x)<LIM && fabs(y)<LIM){
@@ -33,9 +46,9 @@ Joystick_section divide_vertical(double y){ return joystick_section(0,y); }
 
 double convert_output(Collector_mode m){
 	switch(m){
-		case ON: return 1;
+		case ON: return -1; //Actually collecting
 		case OFF: return 0;
-		case REVERSE: return -1;
+		case REVERSE: return 1; //Ejecting
 		default: assert(0);
 	}
 }
@@ -49,7 +62,7 @@ Robot_outputs convert_output(Toplevel::Output a){
 	r.pwm[3]=convert_output(a.collector);
 	
 	r.relay[0]=(a.pump==Pump::ON)?RELAY_10:RELAY_00;
-	
+
 	r.solenoid[0]=(a.collector_tilt==Collector_tilt::OUTPUT_DOWN);
 	r.solenoid[1]=(a.collector_tilt==Collector_tilt::OUTPUT_UP);
 	r.solenoid[2]=r.solenoid[3]=(a.injector==Injector::OUTPUT_DOWN);
@@ -138,8 +151,9 @@ namespace Gamepad_button{
 	static const unsigned Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
 }
 namespace Gamepad_axis{
-	//How the axes appear in the DS; though, trigger=5 is still questionable
-	static const unsigned LEFTX=0,LEFTY=1,RIGHTX=3,RIGHTY=2,TRIGGER=5;
+	//How the axes appear in the DS; though
+	static const unsigned LEFTX=0,LEFTY=1,RIGHTX=3,RIGHTY=4,TRIGGER=2,DPADX=5;
+	//DPADY does not exist, neither does axis 6
 }
 
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
@@ -168,14 +182,17 @@ Robot_outputs Main::operator()(Robot_inputs in){
 
 	Robot_outputs r;
 	ball_collecter.update(main_joystick.button[5]);
-
+	
+	
 	double throttle = 1.0;
+	/*
 	if (main_joystick.axis[Gamepad_axis::TRIGGER] > 0.5 || 
 		main_joystick.axis[Gamepad_axis::TRIGGER] < -0.5)
 	{
 			throttle = 0.5;
 	}
-
+	*/
+	
 	//Well they said the robot needs to go full speed all the time
 	//Throttle now scales down speeds by 50% and activates when either of the triggers is pulled
 	//Start in NOT fieldRelative Mode
@@ -237,13 +254,14 @@ Robot_outputs Main::operator()(Robot_inputs in){
 
 	r=force(r);
 	
-	/*static int i=0;
+	static int i=0;
 	if(i==0){
 		stringstream ss;
 		ss<<in<<"\r\n"<<*this<<"\r\n";
 		cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
+		cerr<<subgoals_now<<high_level_outputs<<"\n";
 	}
-	i=(i+1)%100;*/
+	i=(i+1)%100;
 	if(print_button(main_joystick.button[Gamepad_button::LB])){
 		cout<<in<<"\r\n";
 		cout<<*this<<"\r\n";
@@ -375,20 +393,22 @@ Control_status::Control_status next(Control_status::Control_status status,Toplev
 	if(j.button[Gamepad_button::Y]) return DRIVE_WO_BALL;
 
 	//todo: use some sort of constants rather than 0/1 for the axes
-	switch(joystick_section(j.axis[0],j.axis[1])){
-		case JOY_LEFT: return TRUSS_TOSS_PREP;
-		case JOY_RIGHT: return PASS_PREP;
-		case JOY_UP: return SHOOT_HIGH_PREP;
-		case JOY_DOWN: return EJECT_PREP;
-		default: break;
+	if(Fire_control::target(status)==Fire_control::NO_TARGET){
+		switch(joystick_section(j.axis[0],j.axis[1])){
+			case JOY_LEFT: return TRUSS_TOSS_PREP;
+			case JOY_RIGHT: return PASS_PREP;
+			case JOY_UP: return SHOOT_HIGH_PREP;
+			case JOY_DOWN: return EJECT_PREP;
+			default: break;
+		}
 	}
-
 	bool fire_now,fire_when_ready;
 	{
 		//I think 3 is the right axis
-		Joystick_section vert=divide_vertical(j.axis[3]);
-		fire_now=vert==JOY_UP;
-		fire_when_ready=vert==JOY_DOWN;
+		Joystick_section vert=divide_vertical(j.axis[Gamepad_axis::RIGHTY]);
+		//cerr<<"vert ="<<vert<<"\n";
+		fire_now=(vert==JOY_UP);
+		fire_when_ready=(vert==JOY_DOWN);
 	}
 
 	bool ready_to_shoot=ready(part_status,subgoals(Toplevel::SHOOT_HIGH_PREP));
@@ -396,6 +416,7 @@ Control_status::Control_status next(Control_status::Control_status status,Toplev
 	bool ready_to_pass=ready(part_status,subgoals(Toplevel::PASS_PREP));
 	bool ready_to_collect=ready(part_status,subgoals(Toplevel::COLLECT));
 	bool took_shot=location_to_status(part_status.injector)==Injector::RECOVERY;
+	bool have_collected_question = false;
 	switch(status){
 		case AUTO_SPIN_UP:
 			if(autonomous_mode){
@@ -430,18 +451,68 @@ Control_status::Control_status next(Control_status::Control_status status,Toplev
 			return SHOOT_HIGH;
 		case DRIVE_W_BALL:
 		case DRIVE_WO_BALL:
-		case SHOOT_HIGH_PREP:
 			return status;
+		case COLLECT:
+			return have_collected_question?DRIVE_W_BALL:COLLECT;
+		case SHOOT_HIGH_PREP:
+			if(fire_now){
+				return SHOOT_HIGH;
+			}
+			if(fire_when_ready){
+				return SHOOT_HIGH_WHEN_READY;
+			}
+			return SHOOT_HIGH_PREP;
 		case SHOOT_HIGH: return took_shot?DRIVE_WO_BALL:SHOOT_HIGH;
 		case SHOOT_HIGH_WHEN_READY:
+			if(fire_now){
+				return SHOOT_HIGH;
+			}
+			if(!fire_when_ready){
+				return SHOOT_HIGH_PREP;
+			}
 			return ready_to_shoot?SHOOT_HIGH:SHOOT_HIGH_WHEN_READY;
-		case TRUSS_TOSS_PREP: return status;
+		case TRUSS_TOSS_PREP: 
+			if(fire_now){
+				return TRUSS_TOSS;
+			}
+			if(fire_when_ready){
+				return TRUSS_TOSS_WHEN_READY;
+			}
+			return TRUSS_TOSS_PREP;
 		case TRUSS_TOSS: return took_shot?DRIVE_WO_BALL:TRUSS_TOSS;
-		case TRUSS_TOSS_WHEN_READY: return ready_to_truss_toss?TRUSS_TOSS:TRUSS_TOSS_WHEN_READY;
-		case PASS_PREP: return status;
+		case TRUSS_TOSS_WHEN_READY: 
+			if(fire_now){
+				return TRUSS_TOSS;
+			}
+			if(!fire_when_ready){
+				return TRUSS_TOSS_PREP;
+			}
+			return ready_to_truss_toss?TRUSS_TOSS:TRUSS_TOSS_WHEN_READY;
+		case PASS_PREP: 
+			if(fire_now){
+				return PASS;
+			}
+			if(fire_when_ready){
+				return PASS_WHEN_READY;
+			}
+			return PASS_PREP;
 		case PASS: return took_shot?DRIVE_WO_BALL:PASS;
-		case PASS_WHEN_READY: return ready_to_pass?PASS:PASS_WHEN_READY;
-		case EJECT_PREP: return status;
+		case PASS_WHEN_READY: 
+			if(fire_now){
+				return PASS;
+			}
+			if(!fire_when_ready){
+				return PASS_PREP;
+			}
+			return ready_to_pass?PASS:PASS_WHEN_READY;
+		case EJECT_PREP: 
+			if(fire_now){
+				return EJECT;
+			}
+			if(fire_when_ready){
+				return EJECT_WHEN_READY;
+			}
+			return EJECT_PREP;
 		case EJECT: return (location_to_status(part_status.ejector)==Ejector::RECOVERY)?DRIVE_WO_BALL:EJECT;
 		case EJECT_WHEN_READY:
 		{

@@ -150,6 +150,7 @@ namespace Toplevel{
 				r.shooter_wheels=Shooter_wheels::X;
 				break;
 			case COLLECT:
+				r.collector=ON;
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_OPEN;
 				r.shooter_wheels=Shooter_wheels::X;

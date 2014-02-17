@@ -137,6 +137,10 @@ namespace Gamepad_button{
 	static const unsigned A=0,B=1,X=2;
 	static const unsigned Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
 }
+namespace Gamepad_axis{
+	//How the axes appear in the DS; though, trigger=5 is still questionable
+	static const unsigned LEFTX=0,LEFTY=1,RIGHTX=3,RIGHTY=2,TRIGGER=5;
+}
 
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
 Main::Main():control_status(Control_status::DRIVE_W_BALL){
@@ -166,8 +170,10 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	ball_collecter.update(main_joystick.button[5]);
 
 	double throttle = 1.0;
-	if (main_joystick.axis[0] > 0.5 || main_joystick.axis[0] < -0.5){
-		throttle = 0.5;
+	if (main_joystick.axis[Gamepad_axis::TRIGGER] > 0.5 || 
+		main_joystick.axis[Gamepad_axis::TRIGGER] < -0.5)
+	{
+			throttle = 0.5;
 	}
 
 	//Well they said the robot needs to go full speed all the time
@@ -179,10 +185,26 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		if (!isPressed) {
 			isPressed = true;
 			fieldRelative = !fieldRelative; //Turn fieldRelative on/off
+			if(fieldRelative==false){
+				cout<<"Field Relative is now OFF!"<<"\n";
+			}
+			else{
+				cout<<"Field Relative is now ON!"<<"\n";
+			}
 		}
 	} else {
 		isPressed = false;
 	}
+	
+	Drive_motors d=holonomic_mix( 
+			main_joystick.axis[Gamepad_axis::LEFTX] * throttle, 
+			-main_joystick.axis[Gamepad_axis::LEFTY] * throttle, 
+			main_joystick.axis[Gamepad_axis::RIGHTX] * throttle,
+			gyro.angle(),
+			fieldRelative);
+	r.pwm[0]=pwm_convert(d.a);
+	r.pwm[1]=pwm_convert(d.b);
+	r.pwm[2]=pwm_convert(d.c);
 	
 	//todo: double check that this is right.
 	bool tanks_full=(in.digital_io[0]==DI_1);

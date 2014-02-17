@@ -1,4 +1,4 @@
-g++ -DMAIN_TEST -I.. main.cpp \
+g++ -Wall -std=c++0x -DMAIN_TEST -I.. main.cpp \
 	octocanum.cpp \
 	force.cpp \
 	force_interface.cpp \

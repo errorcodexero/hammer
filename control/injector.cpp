@@ -46,7 +46,9 @@ namespace Injector{
 					return make_pair(Estimator::GOING_DOWN,0);
 				}
 				if(out==OUTPUT_UP){
-					static const Time RISE_TIME=2.5;
+					static const Time RISE_TIME=0.5;
+					//Chosen based on testing by regulating down the launch 
+					//Normal operation should never be as bad as ~0.4188 seconds
 					if(elapsed>RISE_TIME){
 						return make_pair(Estimator::UP,0);
 					}
@@ -62,7 +64,9 @@ namespace Injector{
 				}
 			case Estimator::GOING_DOWN:
 				if(out==OUTPUT_DOWN){
-					static const Time LOWER_TIME=1.6;
+					static const Time LOWER_TIME=0.5; 
+					//Chosen based on testing by regulating down the return 
+					//Normal operation should never be as bad as ~0.4288 seconds
 					if(elapsed>LOWER_TIME){
 						return make_pair(Estimator::DOWN_VENT,0);
 					}
@@ -80,7 +84,7 @@ namespace Injector{
 						return make_pair(Estimator::DOWN_VENT,1);
 						//return make_pair(Estimator::GOING_DOWN,0);
 					case OUTPUT_VENT:
-						static const Time VENT_TIME=1;//this is probably a little high.
+						static const Time VENT_TIME=0.5;//Probably about right now, as it is about the same time as the rest of the cycle
 						if(elapsed>VENT_TIME){
 							return make_pair(Estimator::DOWN_IDLE,0);
 						}

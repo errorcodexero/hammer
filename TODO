@@ -12,7 +12,12 @@ Shooter wheels:
 	-Determine the actual speeds to use
 	-Add option to use config file
 	-Add fallback systems
+	-Change how the shooter wheels are controlled to make one of them just on at some % and the other one in PID mode when nearly up to speed
 Main:
 	-Make isPressed/fieldRelative use Posedge_toggle
 Air:
 	-Tracking the pneumatic pressure
+Holonomic:
+	-Slight style tweaks in header file
+Other:
+	-Create an 'input' directory an move all the joystick stuff that's in the top level into it

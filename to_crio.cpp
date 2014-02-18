@@ -99,52 +99,138 @@ int demo(...){
 	cerr<<"In demo\n";
 	return 0;
 }
+
 class Jag_control
 {
+public:
 	CANJaguar *jaguar;
-	bool controlSpeed; //0 = voltage; 1 = speed
-
-	Jag_control(int CANBusAddress){	
-		static const uint8_t SYNC_GROUP=0x40; //Don't know why, maybe ask Steve later
-		jaguar = new CANJaguar(CANBusAddress);
-		jaguar->SetSafetyEnabled(false);
-		jaguar->Set(0.0, SYNC_GROUP);
-		jaguar->ChangeControlMode(CANJaguar::kSpeed);
-		controlSpeed = true;
-		jaguar->ConfigEncoderCodesPerRev(1);
-	}
 	
-	void set_output(Jaguar_output a){
-		float kP = 1.000;
-		float kI = 0.005;
-		float kD = 0.000;
-		if(a.controlSpeed != controlSpeed){
-			jaguar->ChangeControlMode(a.controlSpeed ? CANJaguar::kSpeed : CANJaguar::kPercentVbus);
-			controlSpeed = a.controlSpeed;
-			jaguar->SetPID(kP, kI, kD); //Need to add refernces to what PID is
+public:
+	enum Mode{INIT,SPEED,VOLTAGE,DISABLE};
+	//at some point we may want to remember the speed/voltage that we were driving to so that we can just send it when it changes.
+	
+private:
+	//bool controlSpeed; //0 = voltage; 1 = speed
+	Mode mode;
+	
+public:
+	void init(int CANBusAddress);
+	Jag_control();
+	explicit Jag_control(int CANBusAddress);
+	
+private:
+	Jag_control(Jag_control const&);
+	Jag_control& operator=(Jag_control const&);
+	
+public:
+	~Jag_control();
+	
+	void set(Jaguar_output,bool enable);
+	void out(ostream&)const;
+};
+
+ostream& operator<<(ostream& o,Jag_control::Mode m){
+	#define X(name) if(m==Jag_control::name) return o<<""#name;
+	X(INIT)
+	X(SPEED)
+	X(VOLTAGE)
+	X(DISABLE)
+	#undef X
+	assert(0);
+}
+
+ostream& operator<<(ostream& o,Jag_control const& j){
+	j.out(o);
+	return o;
+}
+
+void Jag_control::init(int CANBusAddress){
+	assert(!jaguar);//initialization is only allowed once.
+	assert(mode==INIT);
+	jaguar = new CANJaguar(CANBusAddress);
+	assert(jaguar);
+	jaguar->DisableControl();
+	jaguar->SetSafetyEnabled(0);
+	mode=DISABLE;
+/*	jaguar->SetSafetyEnabled(false);
+	jaguar->Set(0.0, SYNC_GROUP);
+	jaguar->ChangeControlMode(CANJaguar::kSpeed);
+	controlSpeed = true;
+	jaguar->ConfigEncoderCodesPerRev(1);*/
+}
+
+Jag_control::Jag_control():jaguar(NULL),mode(INIT){}
+
+Jag_control::Jag_control(int CANBusAddress):jaguar(NULL),mode(INIT){
+	init(CANBusAddress);
+}
+
+Jag_control::~Jag_control(){
+	delete jaguar;
+}
+	
+void Jag_control::set(Jaguar_output a,bool enable){
+	assert(mode!=INIT);
+	if(!enable){
+		if(mode==DISABLE){
+			return;
+		}else{
+			jaguar->Set(0,SYNC_GROUP);
+			//update sync group here?
+			jaguar->DisableControl();
+			jaguar->SetSafetyEnabled(0);
+			mode=DISABLE;
+			return;
+		}
+	}
+	const float kP = 1.000;
+	const float kI = 0.005;
+	const float kD = 0.000;
+	if(a.controlSpeed){
+		if(mode!=SPEED){
+			jaguar->ChangeControlMode(CANJaguar::kSpeed);
+			jaguar->SetSpeedReference(CANJaguar::kSpeedRef_Encoder);
+			jaguar->ConfigEncoderCodesPerRev(1);
+			jaguar->SetPID(kP,kI,kD);
 			jaguar->EnableControl();
 			jaguar->SetExpiration(2.0);
+			jaguar->Set(a.speed,SYNC_GROUP);
+			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
+			jaguar->SetSafetyEnabled(true);
+			mode=SPEED;
 		}
-		if(a.controlSpeed){
-			jaguar->Set(a.speed, SYNC_GROUP);
-		}else {
-			jaguar->Set(a.voltage, SYNC_GROUP);
-		}
+		jaguar->Set(a.speed,SYNC_GROUP);
+		CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 	}
-};
+	else{
+		if(mode!=VOLTAGE){
+			jaguar->ChangeControlMode(CANJaguar::kPercentVbus);
+			jaguar->EnableControl();
+			jaguar->SetExpiration(2.0);
+			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
+			jaguar->SetSafetyEnabled(true);
+		}
+		jaguar->Set(a.voltage,SYNC_GROUP);
+		CANJaguar::UpdateSyncGroup(SYNC_GROUP);
+	}
+}
+
+void Jag_control::out(ostream& o)const{
+	o<<"Jag_control(";
+	o<<"init:"<<!!jaguar;
+	o<<" "<<mode;
+	o<<")";
+}
+
 template<typename USER_CODE>
 class To_crio
 {
 	Solenoid *solenoid[Robot_outputs::SOLENOIDS];
 	DIO_control digital_io[Robot_outputs::DIGITAL_IOS];
-	//DigitalInput *digital_in[Robot_outputs::DIGITAL_IOS];
 	int error_code;
 	USER_CODE main;
 	int skipped;
-	/*
-	CANJaguar *jaguar[Robot_outputs::CAN_JAGUARS];
-	bool controlSpeed[Robot_outputs::CAN_JAGUARS]; //0 = voltage; 1 = speed
-	*/
+	Jag_control jaguar[Robot_outputs::CAN_JAGUARS];
 	
 public:
 	To_crio():error_code(0),skipped(0)
@@ -159,19 +245,13 @@ public:
 				if(!solenoid[i]) error_code|=8;
 			}
 		}
-		/*
-		static const uint8_t SYNC_GROUP=0x40; //Don't know why, maybe ask Steve later
+		
 		for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
-			jaguar[i] = new CANJaguar(i+1);
-			jaguar[1]->SetSafetyEnabled(false);
-			jaguar[i]->Set(0.0, SYNC_GROUP);
-			jaguar[i]->ChangeControlMode(CANJaguar::kSpeed);
-			controlSpeed[i] = true;
-			jaguar[i]->ConfigEncoderCodesPerRev(1);
-			
+			//it just so happens that our four jags are numbered 1-4.  This is contrary to the IO map document that we have and also contrary to the recommendations in the Jaguar documentation (which recomends not to use the number 1 because it's the factory default).  We should change this at some point.  
+			jaguar[i].init(i+1);
 		}
 		CANJaguar::UpdateSyncGroup(SYNC_GROUP);
-		*/
+		
 		for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
 			int r=digital_io[i].set_channel(i);
 			if(r) error_code|=256;
@@ -186,7 +266,7 @@ public:
 		return 0;
 	}
 
-	int set_outputs(Robot_outputs out){
+	int set_outputs(Robot_outputs out,bool enabled){
 		int error_code=0;
 		for(unsigned i=0;i<Robot_outputs::PWMS;i++){
 			int r=set_pwm(i,out.pwm[i]);
@@ -204,6 +284,17 @@ public:
 			int r=digital_io[i].set(out.digital_io[i]);
 			if(r) error_code|=512;
 		}
+		for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+			jaguar[i].set(out.jaguar[i],enabled);
+			cerr<<jaguar[i]<<"\n";
+			cerr<<"Are we enabled?"<<enabled<<"\n";
+			cerr<<out.jaguar[i]<<"\n";
+			//cerr<<jaguar[i].jaguar->GetSpeed()<<"\n";
+		}
+			cerr<<"\n"<<jaguar[0].jaguar->GetSpeed()<<"\n";
+			cerr<<jaguar[1].jaguar->GetSpeed()<<"\n";
+			cerr<<jaguar[2].jaguar->GetSpeed()<<"\n";
+			cerr<<jaguar[3].jaguar->GetSpeed()<<"\n";
 		/*
 		float kP = 1.000;
 		float kI = 0.005;
@@ -245,7 +336,7 @@ public:
 	
 	void run(Robot_inputs in){
 		Robot_outputs out=main(in);
-		set_outputs(out);
+		set_outputs(out,in.robot_mode.enabled);
 		static int i=0;
 		if(!i){
 			for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){

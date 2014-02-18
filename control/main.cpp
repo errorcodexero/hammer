@@ -80,7 +80,8 @@ Robot_outputs convert_output(Toplevel::Output a){
 	7 bottom
 	9 top
 	*/
-	
+	r.jaguar[0]=r.jaguar[1]=Jaguar_output::speedOut(a.shooter_wheels.top);
+	r.jaguar[2]=r.jaguar[3]=Jaguar_output::speedOut(a.shooter_wheels.bottom);
 	return r;
 }
 
@@ -213,16 +214,6 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		isPressed = false;
 	}
 	
-	Drive_motors d=holonomic_mix( 
-			main_joystick.axis[Gamepad_axis::LEFTX] * throttle, 
-			-main_joystick.axis[Gamepad_axis::LEFTY] * throttle, 
-			main_joystick.axis[Gamepad_axis::RIGHTX] * throttle,
-			gyro.angle(),
-			fieldRelative);
-	r.pwm[0]=pwm_convert(d.a);
-	r.pwm[1]=pwm_convert(d.b);
-	r.pwm[2]=pwm_convert(d.c);
-	
 	//todo: double check that this is right.
 	bool tanks_full=(in.digital_io[0]==DI_1);
 	r.relay[0]=tanks_full?RELAY_00:RELAY_10;
@@ -241,16 +232,14 @@ Robot_outputs Main::operator()(Robot_inputs in){
 
 	{
 		Drive_motors d=holonomic_mix( 
-			main_joystick.axis[0] * throttle, 
-			-main_joystick.axis[1] * throttle, 
-			main_joystick.axis[3] * throttle,
+			main_joystick.axis[Gamepad_axis::LEFTX] * throttle, 
+			-main_joystick.axis[Gamepad_axis::LEFTY] * throttle, 
+			main_joystick.axis[Gamepad_axis::RIGHTX] * throttle,
 			gyro.angle(),
-			fieldRelative
-		);
+			fieldRelative);
 		r.pwm[0]=pwm_convert(d.a);
 		r.pwm[1]=pwm_convert(d.b);
-		r.pwm[2]=pwm_convert(d.c);
-	}
+		r.pwm[2]=pwm_convert(d.c);	}
 
 	r=force(r);
 	
@@ -261,7 +250,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
 		cerr<<subgoals_now<<high_level_outputs<<"\n";
 	}
-	i=(i+1)%100;
+	i=(i+1)%1000;
 	if(print_button(main_joystick.button[Gamepad_button::LB])){
 		cout<<in<<"\r\n";
 		cout<<*this<<"\r\n";
@@ -384,6 +373,16 @@ void getDistance(float value){
 	else if() 
 */	
 
+Fire_control::Target to_target(Joystick_section j){
+	switch(j){
+		case JOY_LEFT: return Fire_control::TRUSS;
+		case JOY_RIGHT: return Fire_control::PASS;
+		case JOY_UP: return Fire_control::HIGH;
+		case JOY_DOWN: return Fire_control::EJECT;
+		default: return Fire_control::NO_TARGET;
+	}
+}
+
 Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	using namespace Control_status;
 	//at the top here should deal with all the buttons that put you into a specific mode.
@@ -393,13 +392,17 @@ Control_status::Control_status next(Control_status::Control_status status,Toplev
 	if(j.button[Gamepad_button::Y]) return DRIVE_WO_BALL;
 
 	//todo: use some sort of constants rather than 0/1 for the axes
-	if(Fire_control::target(status)==Fire_control::NO_TARGET){
-		switch(joystick_section(j.axis[0],j.axis[1])){
-			case JOY_LEFT: return TRUSS_TOSS_PREP;
-			case JOY_RIGHT: return PASS_PREP;
-			case JOY_UP: return SHOOT_HIGH_PREP;
-			case JOY_DOWN: return EJECT_PREP;
-			default: break;
+	{
+		Joystick_section joy_section=joystick_section(j.axis[0],j.axis[1]);
+		Fire_control::Target target=to_target(joy_section);
+		if(Fire_control::target(status)!=target && !autonomous_mode){
+			switch(target){
+				case Fire_control::TRUSS: return TRUSS_TOSS_PREP;
+				case Fire_control::PASS: return PASS_PREP;
+				case Fire_control::HIGH: return SHOOT_HIGH_PREP;
+				case Fire_control::EJECT: return EJECT_PREP;
+				default: break;
+			}
 		}
 	}
 	bool fire_now,fire_when_ready;

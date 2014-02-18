@@ -38,7 +38,7 @@ echo now running INJECTOR ARMS TEST
 rm injector_arms
 echo now running MAIN TEST
 ./main_test
-rm main_
+rm main
 echo now running OCTOCANUM TEST
 ./octocanum_test
 rm octocanum

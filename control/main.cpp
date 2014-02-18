@@ -186,13 +186,13 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	
 	
 	double throttle = 1.0;
-	/*
+	
 	if (main_joystick.axis[Gamepad_axis::TRIGGER] > 0.5 || 
 		main_joystick.axis[Gamepad_axis::TRIGGER] < -0.5)
 	{
 			throttle = 0.5;
 	}
-	*/
+	
 	
 	//Well they said the robot needs to go full speed all the time
 	//Throttle now scales down speeds by 50% and activates when either of the triggers is pulled

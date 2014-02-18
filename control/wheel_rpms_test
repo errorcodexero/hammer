@@ -1,0 +1,1 @@
+g++ -Wall -Werror -DWHEEL_RPMS_TEST wheelrpms.cpp shooter_wheels.cpp -o wheelrpms -std=c++0x 2>&1 && ./wheelrpms

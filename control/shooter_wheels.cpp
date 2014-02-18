@@ -30,8 +30,10 @@ namespace Shooter_wheels{
 	RPM target_speed_top(Goal g){
 		//this stuff eventually should come out of a config file.
 		switch(g){
-			case HIGH_GOAL:
 			case TRUSS:
+				return 1200;
+			case HIGH_GOAL:
+				return 1200;
 			case PASS:
 				return 2200;
 			case STOP:
@@ -43,8 +45,10 @@ namespace Shooter_wheels{
 
 	RPM target_speed_bottom(Goal g){
 		switch(g){
-			case HIGH_GOAL:
 			case TRUSS:
+				return 1200;
+			case HIGH_GOAL:
+				return 3000;
 			case PASS:
 				return 2200;
 			case STOP:

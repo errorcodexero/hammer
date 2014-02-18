@@ -6,7 +6,6 @@ Vision processing:
 	-Determine what the wire format is
 	-Figure out how to talk over ethernet on the robot
 Shooter wheels:
-	-Add CAN support
 	-Determine the actual speeds to use
 	-Add option to use config file
 	-Add fallback systems

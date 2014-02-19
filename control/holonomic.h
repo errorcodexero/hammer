@@ -19,6 +19,8 @@ struct Drive_motors {
 };
 std::ostream& operator<<(std::ostream&, Drive_motors);
 
+Drive_motors control(Drive_goal, float orientation);
+
 Drive_motors holonomic_mix(Pt);
 Drive_motors holonomic_mix(double x,double y,double theta, double ortientation, bool fieldRelative);
 Pt rotate_vector (double x, double y, double theta, double angle);

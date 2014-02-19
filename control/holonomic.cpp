@@ -67,6 +67,16 @@ ostream& operator<<(ostream& o, Drive_motors d){
 	return o<<"dm("<<d.a<<","<<d.b<<","<<d.c<<")";
 }
 
+Drive_motors control(Drive_goal dg, float orientation){
+/*	
+	-orientation takes care of 1 variable: float
+	-Drive_motors has 4 variables: x, y, theta, field_relative
+	-Drive_motors holonomic_mix needs in order: x, y, theta, orientation, field_relative
+*/
+	Pt a = dg.direction;
+	return holonomic_mix(a.x, a.y, a.theta, orientation, dg.field_relative);
+}
+
 #ifdef HOLONOMIC_TEST
 int main(){
 	Drive_goal dg;

@@ -64,17 +64,19 @@ namespace Toplevel{
 		o<<" eject:"<<s.ejector;
 		o<<" shoot:"<<s.shooter_wheels;
 		o<<" pump:"<<s.pump;
+		o<<" orientation:"<<s.orientation;
 		return o<<")";
 	}
 
-	Estimator::Estimator():pump(Pump::NOT_FULL){}
+	Estimator::Estimator():pump(Pump::NOT_FULL), orientation(0){}
 
-	void Estimator::update(Time time,Output out,Pump::Status pump_status){
+	void Estimator::update(Time time,Output out,Pump::Status pump_status, float orientation1){
 		collector_tilt.update(time,out.collector_tilt);
 		injector.update(time,out.injector);
 		injector_arms.update(time,out.injector_arms);
 		ejector.update(time,out.ejector);
 		pump=pump_status;
+		orientation = orientation1;
 	}
 
 	Status Estimator::estimate()const{
@@ -112,7 +114,7 @@ namespace Toplevel{
 		r.ejector=control(status.ejector,g.ejector);
 		r.shooter_wheels=control(g.shooter_wheels);
 		r.pump=control(status.pump);
-		r.drive=g.drive;
+		r.drive=control(g.drive, status.orientation);
 		return r;
 	}
 
@@ -226,8 +228,8 @@ int main(){
 	cout<<est<<"\n";
 	cout<<est.estimate()<<"\n";
 	Pump::Status ps=Pump::FULL;
-	est.update(0,Output(),ps);
-	est.update(10,Output(),ps);
+	est.update(0,Output(),ps,0);
+	est.update(10,Output(),ps,0);
 	cout<<est.estimate()<<"\n";
 	/*
 	if we choose one of the modes and use all the built-in controls then we should after some time get to a status where we're ready.  

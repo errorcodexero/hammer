@@ -9,6 +9,7 @@
 #include "ejector.h"
 #include "pump.h"
 #include "../util/point.h"
+#include "holonomic.h"
 
 namespace Toplevel{
 	struct Output{
@@ -21,7 +22,7 @@ namespace Toplevel{
 		Ejector::Output ejector;
 		Shooter_wheels::Output shooter_wheels;
 		Pump::Output pump;
-		Pt drive;
+		Drive_motors drive;
 	};
 	std::ostream& operator<<(std::ostream&,Output);
 
@@ -34,7 +35,7 @@ namespace Toplevel{
 		Injector_arms::Goal injector_arms;
 		Ejector::Goal ejector;
 		Shooter_wheels::Goal shooter_wheels;
-		Pt drive;
+		Drive_goal drive;
 		//pump omitted because it currently only has one goal.
 	};
 	std::ostream& operator<<(std::ostream&,Subgoals);
@@ -49,6 +50,7 @@ namespace Toplevel{
 		Ejector::Estimator::Location ejector;
 		Shooter_wheels::Status shooter_wheels;
 		Pump::Status pump;
+		float orientation;
 	};
 	std::ostream& operator<<(std::ostream& o,Status);
 
@@ -60,10 +62,11 @@ namespace Toplevel{
 		Ejector::Estimator ejector;
 		//no estimates for shooter wheels yet.
 		Pump::Status pump;//for now just taking the sensor's measurement as gospel.
-
+		float orientation;
+		
 		public:
 		Estimator();
-		void update(Time,Output,Pump::Status);
+		void update(Time,Output,Pump::Status,float orientation);
 		Status estimate()const;
 		void out(std::ostream&)const;
 	};

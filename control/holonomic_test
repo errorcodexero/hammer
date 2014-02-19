@@ -1,1 +1,1 @@
-g++ holonomic.cpp ../util/point.cpp -o holonomic -DHOLONOMIC_TEST && ./holonomic
+g++ -Wall -Werror holonomic.cpp ../util/point.cpp -o holonomic -DHOLONOMIC_TEST && ./holonomic

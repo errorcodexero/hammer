@@ -55,10 +55,9 @@ double convert_output(Collector_mode m){
 
 Robot_outputs convert_output(Toplevel::Output a){
 	Robot_outputs r;
-	Drive_motors d=holonomic_mix(a.drive);
-	r.pwm[0]=d.a;
-	r.pwm[1]=d.b;
-	r.pwm[2]=d.c;
+	r.pwm[0]=a.drive.a;
+	r.pwm[1]=a.drive.b;
+	r.pwm[2]=a.drive.c;
 	r.pwm[3]=convert_output(a.collector);
 	
 	r.relay[0]=(a.pump==Pump::ON)?RELAY_10:RELAY_00;
@@ -224,7 +223,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	Toplevel::Subgoals subgoals_now=subgoals(mode);
 	Toplevel::Output high_level_outputs=control(toplevel_status,subgoals_now);
 	r=convert_output(high_level_outputs);
-	est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL);
+	est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle());
 
 	{
 		Drive_motors d=holonomic_mix( 

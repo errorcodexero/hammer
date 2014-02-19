@@ -42,7 +42,7 @@ void configfile(){
 
 wheelcalib rpmsdefault(){
 	wheelcalib rpms;
-	rpms.highgoal=Shooter_wheels::Status(1200,3205);
+	rpms.highgoal=Shooter_wheels::Status(1400,3000);
 	rpms.lowgoal=Shooter_wheels::Status(3999,1);
 	rpms.overtruss=Shooter_wheels::Status(12,532);
 	rpms.passing=Shooter_wheels::Status(3025,1982);

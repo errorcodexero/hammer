@@ -34,7 +34,7 @@ namespace Toplevel{
 		Injector_arms::Goal injector_arms;
 		Ejector::Goal ejector;
 		Shooter_wheels::Goal shooter_wheels;
-		//todo: add drivebase stuff here.
+		Pt drive;
 		//pump omitted because it currently only has one goal.
 	};
 	std::ostream& operator<<(std::ostream&,Subgoals);

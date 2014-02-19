@@ -44,6 +44,7 @@ namespace Toplevel{
 		o<<" inj arm:"<<g.injector_arms;
 		o<<" eject:"<<g.ejector;
 		o<<" shoot:"<<g.shooter_wheels;
+		o<<" drive:"<<g.drive;
 		return o<<")";
 	}
 
@@ -111,6 +112,7 @@ namespace Toplevel{
 		r.ejector=control(status.ejector,g.ejector);
 		r.shooter_wheels=control(g.shooter_wheels);
 		r.pump=control(status.pump);
+		r.drive=g.drive;
 		return r;
 	}
 

@@ -9,6 +9,14 @@ double max3(double a,double b,double c){
 	return max(max(a,b),c);
 }
 
+Drive_goal::Drive_goal(){
+	field_relative = 0;
+}
+
+std::ostream& operator<<(std::ostream& o, Drive_goal g){
+	return o<<"dg("<<g.direction<<","<<g.field_relative<<")";
+}
+
 Drive_motors func_inner(double x, double y, double theta){	
 	Drive_motors r;
 	r.a=-double(1)/3* theta- double(1)/3* x -(double(1)/sqrt(3))*y;
@@ -61,6 +69,7 @@ ostream& operator<<(ostream& o, Drive_motors d){
 
 #ifdef HOLONOMIC_TEST
 int main(){
-	
+	Drive_goal dg;
+	cout<<dg;
 }
 #endif

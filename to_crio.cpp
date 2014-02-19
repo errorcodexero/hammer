@@ -2,8 +2,7 @@
 #include "DigitalModule.h"
 #include "control/main.h"
 #include "dio_control.h"
-
-static const uint8_t SYNC_GROUP=0x40; //Don't know why, maybe ask Steve later
+#include "jag_control.h"
 
 Joystick_data read_joystick(DriverStation& ds,int port){
 	//I don't know what the DriverStation does when port is out of range.
@@ -100,128 +99,6 @@ int demo(...){
 	return 0;
 }
 
-class Jag_control
-{
-public:
-	CANJaguar *jaguar;
-	
-public:
-	enum Mode{INIT,SPEED,VOLTAGE,DISABLE};
-	//at some point we may want to remember the speed/voltage that we were driving to so that we can just send it when it changes.
-	
-private:
-	//bool controlSpeed; //0 = voltage; 1 = speed
-	Mode mode;
-	
-public:
-	void init(int CANBusAddress);
-	Jag_control();
-	explicit Jag_control(int CANBusAddress);
-	
-private:
-	Jag_control(Jag_control const&);
-	Jag_control& operator=(Jag_control const&);
-	
-public:
-	~Jag_control();
-	
-	void set(Jaguar_output,bool enable);
-	void out(ostream&)const;
-};
-
-ostream& operator<<(ostream& o,Jag_control::Mode m){
-	#define X(name) if(m==Jag_control::name) return o<<""#name;
-	X(INIT)
-	X(SPEED)
-	X(VOLTAGE)
-	X(DISABLE)
-	#undef X
-	assert(0);
-}
-
-ostream& operator<<(ostream& o,Jag_control const& j){
-	j.out(o);
-	return o;
-}
-
-void Jag_control::init(int CANBusAddress){
-	assert(!jaguar);//initialization is only allowed once.
-	assert(mode==INIT);
-	jaguar = new CANJaguar(CANBusAddress);
-	assert(jaguar);
-	jaguar->DisableControl();
-	jaguar->SetSafetyEnabled(0);
-	mode=DISABLE;
-/*	jaguar->SetSafetyEnabled(false);
-	jaguar->Set(0.0, SYNC_GROUP);
-	jaguar->ChangeControlMode(CANJaguar::kSpeed);
-	controlSpeed = true;
-	jaguar->ConfigEncoderCodesPerRev(1);*/
-}
-
-Jag_control::Jag_control():jaguar(NULL),mode(INIT){}
-
-Jag_control::Jag_control(int CANBusAddress):jaguar(NULL),mode(INIT){
-	init(CANBusAddress);
-}
-
-Jag_control::~Jag_control(){
-	delete jaguar;
-}
-	
-void Jag_control::set(Jaguar_output a,bool enable){
-	assert(mode!=INIT);
-	if(!enable){
-		if(mode==DISABLE){
-			return;
-		}else{
-			jaguar->Set(0,SYNC_GROUP);
-			//update sync group here?
-			jaguar->DisableControl();
-			jaguar->SetSafetyEnabled(0);
-			mode=DISABLE;
-			return;
-		}
-	}
-	const float kP = 1.000;
-	const float kI = 0.005;
-	const float kD = 0.000;
-	if(a.controlSpeed){
-		if(mode!=SPEED){
-			jaguar->ChangeControlMode(CANJaguar::kSpeed);
-			jaguar->SetSpeedReference(CANJaguar::kSpeedRef_Encoder);
-			jaguar->ConfigEncoderCodesPerRev(1);
-			jaguar->SetPID(kP,kI,kD);
-			jaguar->EnableControl();
-			jaguar->SetExpiration(2.0);
-			jaguar->Set(a.speed,SYNC_GROUP);
-			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
-			jaguar->SetSafetyEnabled(true);
-			mode=SPEED;
-		}
-		jaguar->Set(a.speed,SYNC_GROUP);
-		CANJaguar::UpdateSyncGroup(SYNC_GROUP);
-	}
-	else{
-		if(mode!=VOLTAGE){
-			jaguar->ChangeControlMode(CANJaguar::kPercentVbus);
-			jaguar->EnableControl();
-			jaguar->SetExpiration(2.0);
-			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
-			jaguar->SetSafetyEnabled(true);
-		}
-		jaguar->Set(a.voltage,SYNC_GROUP);
-		CANJaguar::UpdateSyncGroup(SYNC_GROUP);
-	}
-}
-
-void Jag_control::out(ostream& o)const{
-	o<<"Jag_control(";
-	o<<"init:"<<!!jaguar;
-	o<<" "<<mode;
-	o<<")";
-}
-
 template<typename USER_CODE>
 class To_crio
 {
@@ -250,7 +127,7 @@ public:
 			//it just so happens that our four jags are numbered 1-4.  This is contrary to the IO map document that we have and also contrary to the recommendations in the Jaguar documentation (which recomends not to use the number 1 because it's the factory default).  We should change this at some point.  
 			jaguar[i].init(i+1);
 		}
-		CANJaguar::UpdateSyncGroup(SYNC_GROUP);
+		CANJaguar::UpdateSyncGroup(Jag_control::SYNC_GROUP);
 		
 		for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
 			int r=digital_io[i].set_channel(i);

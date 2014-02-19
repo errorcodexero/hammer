@@ -1,0 +1,44 @@
+#ifndef JAG_CONTROL_H
+#define JAG_CONTROL_H
+
+#include<iosfwd>
+#include<stdint.h> //for uint8_t
+#include "util/interface.h"
+
+class CANJaguar;
+
+class Jag_control
+{
+public:
+	static const uint8_t SYNC_GROUP=0x40;
+
+	CANJaguar *jaguar;
+	
+public:
+	enum Mode{INIT,SPEED,VOLTAGE,DISABLE};
+	//at some point we may want to remember the speed/voltage that we were driving to so that we can just send it when it changes.
+	
+private:
+	//bool controlSpeed; //0 = voltage; 1 = speed
+	Mode mode;
+	
+public:
+	void init(int CANBusAddress);
+	Jag_control();
+	explicit Jag_control(int CANBusAddress);
+	
+private:
+	Jag_control(Jag_control const&);
+	Jag_control& operator=(Jag_control const&);
+	
+public:
+	~Jag_control();
+	
+	void set(Jaguar_output,bool enable);
+	void out(std::ostream&)const;
+};
+
+std::ostream& operator<<(std::ostream&,Jag_control::Mode);
+std::ostream& operator<<(std::ostream&,Jag_control const&);
+
+#endif

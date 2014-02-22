@@ -1,4 +1,4 @@
-#include "joystick_linux.h"
+#include "../input/joystick_linux.h"
 
 //This ifdef is here because I haven't found a good way to tell Wind River Workbench not to compile a file.
 
@@ -11,7 +11,7 @@
 #include<sys/types.h>
 #include<linux/joystick.h>
 #include<dirent.h>
-#include "util/util.h"
+#include "../util/util.h"
 #include <unistd.h>
 #include<cassert>
 
@@ -24,7 +24,7 @@ vector<string> dir(string name){
 	vector<string> r;
 	while(1){
 		struct dirent *ent=readdir(d);
-		if(!ent){
+		if(!ent){oldues
 			int cr=closedir(d);
 			assert(!cr);
 			return r;

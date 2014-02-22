@@ -1,8 +1,9 @@
 set -e
+cd input
 echo now running CYBORG TEST
 ./cyborg_joystick_test
 rm cyborg_joystick
-cd control
+cd ../control
 echo now running WHEEL RPMs TEST
 ./wheel_rpms_test
 rm wheelrpms

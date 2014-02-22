@@ -2,8 +2,10 @@
 #define JAG_CONTROL_H
 
 #include<iosfwd>
+#ifndef _WRS_KERNEL
 #include<stdint.h> //for uint8_t
-#include "util/interface.h"
+#endif
+#include"util/interface.h"
 
 class CANJaguar;
 

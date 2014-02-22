@@ -160,7 +160,7 @@ namespace Gamepad_axis{
 Main::Main():control_status(Control_status::DRIVE_W_BALL){
 	
 	fieldRelative = false;
-	isPressed = false;
+	//isPressed = false;
 }
 
 Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch);
@@ -191,8 +191,10 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	}
 	//Well they said the robot needs to go full speed all the time
 	//Throttle now scales down speeds by 50% and activates when either of the triggers is pulled
-	//Start in NOT fieldRelative Mode
 	
+	/*
+	//Start in NOT fieldRelative Mode
+	fieldRelative = false;
 	//Check to see if somebody pushed the field relative button and turn on/off the mode
 	if (main_joystick.button[Gamepad_button::X]) {
 		if (!isPressed) {
@@ -208,6 +210,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	} else {
 		isPressed = false;
 	}
+	*/
 	
 	//todo: double check that this is right.
 	bool tanks_full=(in.digital_io[0]==DI_1);
@@ -224,7 +227,8 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	Toplevel::Output high_level_outputs=control(toplevel_status,subgoals_now);
 	r=convert_output(high_level_outputs);
 	est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle());
-
+	relative.update(main_joystick.button[Gamepad_button::X]);
+	fieldRelative = relative.get();
 	{
 		Drive_motors d=holonomic_mix( 
 			main_joystick.axis[Gamepad_axis::LEFTX] * throttle, 

@@ -24,8 +24,9 @@ struct Main{
 	Posedge_toggle ball_collecter;
 	Posedge_trigger print_button;
 
-	bool isPressed;
+	Posedge_toggle relative;
 	bool fieldRelative;
+	//bool isPressed;
 	
 	Main();
 	Robot_outputs operator()(Robot_inputs);

@@ -57,7 +57,7 @@ namespace Shooter_wheels{
 			default: assert(0);
 		}
 	}
-
+	
 	Output control(Goal g){
 		Output r;
 		r.top=target_speed_top(g);

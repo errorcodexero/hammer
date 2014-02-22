@@ -76,12 +76,30 @@ wheelcalib readconfig(){
 			if(c==8)newcrow.passing.top=atoi(postequalstr(s).c_str());
 			if(c==9)newcrow.passing.bottom=atoi(postequalstr(s).c_str());
 		}
-		c++;	
+		c++;
 	}
 	f.close();
 	return newcrow;
 }
+#if 0 
+wheelcalib nullvalues(){
+	wheelcalib n;
+	n.highgoal=NULL;
+	n.lowgoal=NULL;
+	n.overtruss=NULL;
+	n.passing=NULL;
+	return n;
+}
 
+wheelcalib zerovalues(){
+	wheelcalib z;
+	z.highgoal=Shooter_wheels::Status(0,0);
+	z.lowgoal=Shooter_wheels::Status(0,0);
+	z.overtruss=Shooter_wheels::Status(0,0);
+	z.passing=Shooter_wheels::Status(0,0);
+	return z;
+}
+#endif
 void writeconfig(wheelcalib input){
 	wheelcalib rpms;
 	rpms.highgoal.top=input.highgoal.top;

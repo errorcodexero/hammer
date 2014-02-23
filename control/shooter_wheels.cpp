@@ -2,6 +2,7 @@
 #include<iostream>
 #include<cassert>
 #include<stdlib.h>
+#include"wheelrpms.h"
 
 using namespace std;
 
@@ -18,24 +19,22 @@ namespace Shooter_wheels{
 			default: assert(0);
 		}
 	}
-
-	Status::Status():top(0),bottom(0){}
-
-	Status::Status(RPM a,RPM b):top(a),bottom(b){}
-
-	ostream& operator<<(ostream& o,Status s){
-		return o<<"Shooter_wheels::Status("<<s.top<<","<<s.bottom<<")";
-	}
-
-	RPM target_speed_top(Goal g){
+	
+	Shooter::Shooter(){
+		calib = readconfig();
+		if(calib.highgoal.top == 0)
+			calib = rpmsdefault();
+		}
+	
+	RPM target_speed_top(Goal g, wheelcalib c){
 		//this stuff eventually should come out of a config file.
 		switch(g){
 			case TRUSS:
-				return 1200;
+				return c.overtruss.top; //Previously 1200
 			case HIGH_GOAL:
-				return 1200;
+				return c.highgoal.top; //Previously 1200
 			case PASS:
-				return 2200;
+				return c.highgoal.top; //Previously 2200
 			case STOP:
 			case X:
 				return 0;
@@ -43,28 +42,35 @@ namespace Shooter_wheels{
 		}
 	}
 
-	RPM target_speed_bottom(Goal g){
+	RPM target_speed_bottom(Goal g, wheelcalib c){
 		switch(g){
 			case TRUSS:
-				return 1200;
+				return c.overtruss.bottom; //Previously 1200
 			case HIGH_GOAL:
-				return 3000;
+				return c.highgoal.bottom; //Previously 3000
 			case PASS:
-				return 2200;
+				return c.lowgoal.bottom; //Previously 2200
 			case STOP:
 			case X:
 				return 0;
 			default: assert(0);
 		}
 	}
-
+	
+	Output Shooter::control(Goal g){
+			Output r;
+			r.top=target_speed_top(g);
+			r.bottom=target_speed_bottom(g);
+			return r;
+	}
+	/*
 	Output control(Goal g){
 		Output r;
 		r.top=target_speed_top(g);
 		r.bottom=target_speed_bottom(g);
 		return r;
 	}
-
+	*/
 	bool ready(Goal g,RPM top_speed,RPM bottom_speed){
 		RPM error_top=top_speed-target_speed_top(g);
 		RPM error_bot=bottom_speed-target_speed_bottom(g);

@@ -42,10 +42,11 @@ void configfile(){
 
 wheelcalib rpmsdefault(){
 	wheelcalib rpms;
+	//Values copied from shooter_wheels.cpp or estimated
 	rpms.highgoal=Shooter_wheels::Status(1400,3000);
-	rpms.lowgoal=Shooter_wheels::Status(3999,1);
-	rpms.overtruss=Shooter_wheels::Status(12,532);
-	rpms.passing=Shooter_wheels::Status(3025,1982);
+	rpms.lowgoal=Shooter_wheels::Status(1150,1300);
+	rpms.overtruss=Shooter_wheels::Status(1400,1200);
+	rpms.passing=Shooter_wheels::Status(1100,1100);
 	return rpms;
 }
 
@@ -75,12 +76,30 @@ wheelcalib readconfig(){
 			if(c==8)newcrow.passing.top=atoi(postequalstr(s).c_str());
 			if(c==9)newcrow.passing.bottom=atoi(postequalstr(s).c_str());
 		}
-		c++;	
+		c++;
 	}
 	f.close();
 	return newcrow;
 }
+#if 0 
+wheelcalib nullvalues(){
+	wheelcalib n;
+	n.highgoal=NULL;
+	n.lowgoal=NULL;
+	n.overtruss=NULL;
+	n.passing=NULL;
+	return n;
+}
 
+wheelcalib zerovalues(){
+	wheelcalib z;
+	z.highgoal=Shooter_wheels::Status(0,0);
+	z.lowgoal=Shooter_wheels::Status(0,0);
+	z.overtruss=Shooter_wheels::Status(0,0);
+	z.passing=Shooter_wheels::Status(0,0);
+	return z;
+}
+#endif
 void writeconfig(wheelcalib input){
 	wheelcalib rpms;
 	rpms.highgoal.top=input.highgoal.top;

@@ -24,7 +24,7 @@ vector<string> dir(string name){
 	vector<string> r;
 	while(1){
 		struct dirent *ent=readdir(d);
-		if(!ent){oldues
+		if(!ent){
 			int cr=closedir(d);
 			assert(!cr);
 			return r;

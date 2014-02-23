@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Negedge_trigger::Negedge_trigger():last(1){}
+Negedge_trigger::Negedge_trigger():last(0){}
 
 bool Negedge_trigger::operator()(bool b){
 	bool r=last && !b;

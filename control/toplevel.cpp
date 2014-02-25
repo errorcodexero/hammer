@@ -105,21 +105,31 @@ namespace Toplevel{
 		return o;
 	}
 
-	Output control(Status status,Subgoals g){
+	Output Control::control(Status status,Subgoals g)const{
 		Output r;
 		r.collector=g.collector;
-		r.collector_tilt=control(g.collector_tilt);
-		r.injector=control(status.injector,g.injector);
-		r.injector_arms=control(status.injector_arms,g.injector_arms);
-		r.ejector=control(status.ejector,g.ejector);
-		r.shooter_wheels=control(g.shooter_wheels);
-		r.pump=control(status.pump);
-		r.drive=control(g.drive, status.orientation);
+		r.collector_tilt=Collector_tilt::control(g.collector_tilt);
+		r.injector=Injector::control(status.injector,g.injector);
+		r.injector_arms=Injector_arms::control(status.injector_arms,g.injector_arms);
+		r.ejector=Ejector::control(status.ejector,g.ejector);
+		r.shooter_wheels=shooter_wheels.control(g.shooter_wheels);
+		r.pump=Pump::control(status.pump);
+		r.drive=::control(g.drive, status.orientation);
 		return r;
 	}
 
-	bool ready(Status status,Subgoals g){
-		return ready(status.collector_tilt,g.collector_tilt) && ready(status.injector,g.injector) && ready(status.injector_arms,g.injector_arms) && ready(status.ejector,g.ejector) && ready(status.shooter_wheels,g.shooter_wheels);
+	bool Control::ready(Status status,Subgoals g)const{
+		return Collector_tilt::ready(status.collector_tilt,g.collector_tilt) && 
+			Injector::ready(status.injector,g.injector) && 
+			Injector_arms::ready(status.injector_arms,g.injector_arms) && 
+			Ejector::ready(status.ejector,g.ejector) && 
+			shooter_wheels.ready(status.shooter_wheels,g.shooter_wheels);
+	}
+	
+	ostream& operator<<(ostream& o,Control a){
+		o<<"Toplevel::Control(";
+		o<<a.shooter_wheels;
+		return o<<")";
 	}
 
 	ostream& operator<<(ostream& o,Mode m){
@@ -217,12 +227,13 @@ int main(){
 	};
 	Toplevel::Status status;
 	cout<<status<<"\n";
+	Toplevel::Control control;
 	for(auto mode:MODES){
 		cout<<mode<<":\n";
 		auto g=subgoals(mode);
 		cout<<"\t"<<g<<"\n";
-		cout<<"\t"<<control(status,g)<<"\n";
-		cout<<"\t"<<ready(status,g)<<"\n";
+		cout<<"\t"<<control.control(status,g)<<"\n";
+		cout<<"\t"<<control.ready(status,g)<<"\n";
 	}
 	Estimator est;
 	cout<<est<<"\n";

@@ -163,7 +163,7 @@ Main::Main():control_status(Control_status::DRIVE_W_BALL){
 	//isPressed = false;
 }
 
-Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch);
+Control_status::Control_status next(Toplevel::Control,Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch);
 
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
@@ -220,11 +220,11 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	
 	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	Toplevel::Status toplevel_status=est.estimate();
-	control_status=next(control_status,toplevel_status,in.joystick[1],in.robot_mode.autonomous,since_switch.elapsed());
+	control_status=next(control,control_status,toplevel_status,in.joystick[1],in.robot_mode.autonomous,since_switch.elapsed());
 
 	Toplevel::Mode mode=to_mode(control_status);
 	Toplevel::Subgoals subgoals_now=subgoals(mode);
-	Toplevel::Output high_level_outputs=control(toplevel_status,subgoals_now);
+	Toplevel::Output high_level_outputs=control.control(toplevel_status,subgoals_now);
 	r=convert_output(high_level_outputs);
 	est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle());
 	relative.update(main_joystick.button[Gamepad_button::X]);
@@ -290,7 +290,14 @@ ostream& operator<<(ostream& o,Main m){
 	o<<m.force;
 	o<<m.perf;
 	o<<m.gyro;
+	o<<m.est;
 	o<<m.control_status;
+	o<<m.since_switch;
+	o<<m.control;
+	//ball collector
+	//print button
+	//relative
+	//field relative
 	return o<<")";
 }
 
@@ -382,7 +389,7 @@ Fire_control::Target to_target(Joystick_section j){
 	}
 }
 
-Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
+Control_status::Control_status next(Toplevel::Control control,Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	using namespace Control_status;
 	//at the top here should deal with all the buttons that put you into a specific mode.
 	if(j.button[Gamepad_button::A]) return Control_status::CATCH;
@@ -413,10 +420,10 @@ Control_status::Control_status next(Control_status::Control_status status,Toplev
 		fire_when_ready=(vert==JOY_DOWN);
 	}
 
-	bool ready_to_shoot=ready(part_status,subgoals(Toplevel::SHOOT_HIGH_PREP));
-	bool ready_to_truss_toss=ready(part_status,subgoals(Toplevel::TRUSS_TOSS_PREP));
-	bool ready_to_pass=ready(part_status,subgoals(Toplevel::PASS_PREP));
-	bool ready_to_collect=ready(part_status,subgoals(Toplevel::COLLECT));
+	bool ready_to_shoot=control.ready(part_status,subgoals(Toplevel::SHOOT_HIGH_PREP));
+	bool ready_to_truss_toss=control.ready(part_status,subgoals(Toplevel::TRUSS_TOSS_PREP));
+	bool ready_to_pass=control.ready(part_status,subgoals(Toplevel::PASS_PREP));
+	bool ready_to_collect=control.ready(part_status,subgoals(Toplevel::COLLECT));
 	bool took_shot=location_to_status(part_status.injector)==Injector::RECOVERY;
 	bool have_collected_question = false;
 	switch(status){

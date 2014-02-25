@@ -10,21 +10,23 @@ namespace Shooter_wheels{
 	enum Goal{HIGH_GOAL,TRUSS,PASS,STOP,X};
 	std::ostream& operator<<(std::ostream&,Goal);
 	
-	RPM target_speed_top(Goal);
-	RPM target_speed_bottom(Goal);
-
 	typedef Status Output;
 	Output control(Goal);
 
-	bool ready(Goal,RPM top_speed,RPM bottom_speed);
-	bool ready(Status,Goal);
-	
-	class Shooter{
-		Shooter();
+	struct Control{
 		wheelcalib calib;
-		Output control(Goal g);
+		
+		Control();
+		
+		RPM target_speed_top(Goal)const;
+		RPM target_speed_bottom(Goal)const;
+
+		bool ready(Goal,RPM top_speed,RPM bottom_speed)const;
+		bool ready(Status,Goal)const;
+		
+		Output control(Goal g)const;
 	};
-	std::ostream& operator<<(std::ostream&,Shooter);
+	std::ostream& operator<<(std::ostream&,Control);
 }
 
 #endif

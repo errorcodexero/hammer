@@ -20,13 +20,14 @@ namespace Shooter_wheels{
 		}
 	}
 	
-	Shooter::Shooter(){
+	Control::Control(){
 		calib = readconfig();
-		if(calib.highgoal.top == 0)
+		if(calib.highgoal.top == 0){
 			calib = rpmsdefault();
 		}
+	}
 	
-	RPM target_speed_top(Goal g, wheelcalib c){
+	RPM target_speed_top(Goal g,wheelcalib c){
 		//this stuff eventually should come out of a config file.
 		switch(g){
 			case TRUSS:
@@ -42,6 +43,10 @@ namespace Shooter_wheels{
 		}
 	}
 
+	RPM Control::target_speed_top(Goal g)const{
+		return Shooter_wheels::target_speed_top(g,calib);
+	}
+	
 	RPM target_speed_bottom(Goal g, wheelcalib c){
 		switch(g){
 			case TRUSS:
@@ -57,11 +62,15 @@ namespace Shooter_wheels{
 		}
 	}
 	
-	Output Shooter::control(Goal g){
-			Output r;
-			r.top=target_speed_top(g);
-			r.bottom=target_speed_bottom(g);
-			return r;
+	RPM Control::target_speed_bottom(Goal g)const{
+		return Shooter_wheels::target_speed_bottom(g,calib);
+	}
+	
+	Output Control::control(Goal g)const{
+		Output r;
+		r.top=target_speed_top(g);
+		r.bottom=target_speed_bottom(g);
+		return r;
 	}
 	/*
 	Output control(Goal g){
@@ -71,7 +80,7 @@ namespace Shooter_wheels{
 		return r;
 	}
 	*/
-	bool ready(Goal g,RPM top_speed,RPM bottom_speed){
+	bool Control::ready(Goal g,RPM top_speed,RPM bottom_speed)const{
 		RPM error_top=top_speed-target_speed_top(g);
 		RPM error_bot=bottom_speed-target_speed_bottom(g);
 		RPM worst_error=max(abs(error_top),abs(error_bot));
@@ -88,8 +97,12 @@ namespace Shooter_wheels{
 		}
 	}
 
-	bool ready(Status status,Goal goal){
+	bool Control::ready(Status status,Goal goal)const{
 		return ready(goal,status.top,status.bottom);
+	}
+	
+	ostream& operator<<(ostream& o,Control c){
+		return o<<"Shooter_wheels::Control("<<c.calib<<")";
 	}
 }
 
@@ -101,7 +114,8 @@ int main(){
 
 	static const vector<Goal> GOALS{HIGH_GOAL,TRUSS,PASS,STOP,X};
 	for(auto goal:GOALS){
-		assert(ready(goal,target_speed_top(goal),target_speed_bottom(goal)));
+		Control control;
+		assert(control.ready(goal,target_speed_top(goal,rpmsdefault()),target_speed_bottom(goal,rpmsdefault())));
 	}
 }
 #endif

@@ -72,9 +72,14 @@ namespace Toplevel{
 	};
 	std::ostream& operator<<(std::ostream& o,Estimator);
 
-	Output control(Status,Subgoals);
-	bool ready(Status,Subgoals);
-
+	struct Control{
+		Shooter_wheels::Control shooter_wheels;
+		
+		Output control(Status,Subgoals)const;
+		bool ready(Status,Subgoals)const;
+	};
+	std::ostream& operator<<(std::ostream&,Control);
+	
 	//all this mode stuff really belongs elsewhere
 	enum Mode{
 		DRIVE_WO_BALL,DRIVE_W_BALL,

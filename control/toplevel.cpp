@@ -1,6 +1,7 @@
 #include "toplevel.h"
 #include<iostream>
 #include<cassert>
+#include<math.h>
 
 using namespace std;
 
@@ -150,8 +151,9 @@ namespace Toplevel{
 		assert(0);
 	}
 	
-	Subgoals subgoals(Mode m){
+	Subgoals subgoals(Mode m,Drive_goal d){
 		Subgoals r;
+		r.drive=d;
 		switch(m){
 			case DRIVE_WO_BALL:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
@@ -230,7 +232,7 @@ int main(){
 	Toplevel::Control control;
 	for(auto mode:MODES){
 		cout<<mode<<":\n";
-		auto g=subgoals(mode);
+		auto g=subgoals(mode,Drive_goal());
 		cout<<"\t"<<g<<"\n";
 		cout<<"\t"<<control.control(status,g)<<"\n";
 		cout<<"\t"<<control.ready(status,g)<<"\n";

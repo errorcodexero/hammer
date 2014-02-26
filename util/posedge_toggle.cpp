@@ -2,7 +2,7 @@
 #include<iostream>
 
 Posedge_toggle::Posedge_toggle():value(0),last(1){}
-	
+
 void Posedge_toggle::update(bool sample){
 	if(!last && sample) value=!value;
 	last=sample;

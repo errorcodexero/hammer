@@ -92,7 +92,7 @@ namespace Toplevel{
 	};
 	std::ostream& operator<<(std::ostream& o,Mode);
 
-	Subgoals subgoals(Mode);
+	Subgoals subgoals(Mode,Drive_goal);
 }
 
 #endif

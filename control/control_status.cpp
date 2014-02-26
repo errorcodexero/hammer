@@ -64,6 +64,9 @@ namespace Control_status{
 	bool autonomous(Control_status s){
 		return s==AUTO_SPIN_UP || s==AUTO_FIRE || s==AUTO_TO_COLLECT || s==AUTO_COLLECT || s==AUTO_SPIN_UP2 || s==AUTO_FIRE;
 	}
+	bool teleop(Control_status s){
+		return !autonomous(s);
+	}
 }
 
 #ifdef CONTROL_STATUS_TEST

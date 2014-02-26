@@ -13,6 +13,8 @@ Drive_goal::Drive_goal(){
 	field_relative = 0;
 }
 
+Drive_goal::Drive_goal(Pt p,bool b):direction(p),field_relative(b){}
+
 std::ostream& operator<<(std::ostream& o, Drive_goal g){
 	return o<<"dg("<<g.direction<<","<<g.field_relative<<")";
 }

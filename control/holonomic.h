@@ -7,7 +7,9 @@
 struct Drive_goal {
 	Pt direction;
 	bool field_relative;
+	
 	Drive_goal();
+	Drive_goal(Pt,bool);
 };
 std::ostream& operator<<(std::ostream&, Drive_goal);
 

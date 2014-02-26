@@ -55,9 +55,9 @@ double convert_output(Collector_mode m){
 
 Robot_outputs convert_output(Toplevel::Output a){
 	Robot_outputs r;
-	r.pwm[0]=a.drive.a;
-	r.pwm[1]=a.drive.b;
-	r.pwm[2]=a.drive.c;
+	r.pwm[0]=pwm_convert(a.drive.a);
+	r.pwm[1]=pwm_convert(a.drive.b);
+	r.pwm[2]=pwm_convert(a.drive.c);
 	r.pwm[3]=convert_output(a.collector);
 	
 	r.relay[0]=(a.pump==Pump::ON)?RELAY_10:RELAY_00;
@@ -157,13 +157,21 @@ namespace Gamepad_axis{
 }
 
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
-Main::Main():control_status(Control_status::DRIVE_W_BALL){
-	
-	fieldRelative = false;
-	//isPressed = false;
-}
+Main::Main():control_status(Control_status::DRIVE_W_BALL){}
 
 Control_status::Control_status next(Toplevel::Control,Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch);
+
+Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
+	assert(fabs(joy_x)<=1);
+	assert(fabs(joy_y)<=1);
+	assert(fabs(joy_theta)<=1);
+	assert(fabs(joy_throttle)<=1);
+	double throttle=(fabs(joy_throttle)<.25)?1:.5;
+	joy_x*=throttle;
+	joy_y*=-throttle;//invert y.
+	joy_theta*=throttle;
+	return Drive_goal(Pt(joy_x,joy_y,joy_theta),field_relative);
+}
 
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
@@ -180,66 +188,38 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		main_joystick.button[2]
 	);
 
-	Robot_outputs r;
 	ball_collecter.update(main_joystick.button[5]);
-	
-	double throttle = 1.0;
-	if (main_joystick.axis[Gamepad_axis::TRIGGER] > 0.5 || 
-		main_joystick.axis[Gamepad_axis::TRIGGER] < -0.5)
-	{
-			throttle = 0.5;
-	}
-	//Well they said the robot needs to go full speed all the time
-	//Throttle now scales down speeds by 50% and activates when either of the triggers is pulled
-	
-	/*
-	//Start in NOT fieldRelative Mode
-	fieldRelative = false;
-	//Check to see if somebody pushed the field relative button and turn on/off the mode
-	if (main_joystick.button[Gamepad_button::X]) {
-		if (!isPressed) {
-			isPressed = true;
-			fieldRelative = !fieldRelative; //Turn fieldRelative on/off
-			if(fieldRelative==false){
-				cout<<"Field Relative is now OFF!"<<"\n";
-			}
-			else{
-				cout<<"Field Relative is now ON!"<<"\n";
-			}
-		}
-	} else {
-		isPressed = false;
-	}
-	*/
-	
-	//todo: double check that this is right.
 	bool tanks_full=(in.digital_io[0]==DI_1);
-	r.relay[0]=tanks_full?RELAY_00:RELAY_10;
-	r.pwm[3]=(ball_collecter.get());
-	//r.pwm[3] = main_joystick.button[5]?1:(main_joystick.button[6?-1:0]);
 	
 	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	Toplevel::Status toplevel_status=est.estimate();
 	control_status=next(control,control_status,toplevel_status,in.joystick[1],in.robot_mode.autonomous,since_switch.elapsed());
 
 	Toplevel::Mode mode=to_mode(control_status);
-	Toplevel::Subgoals subgoals_now=subgoals(mode);
+	Drive_goal drive_goal;
+	if(teleop(control_status)){
+		drive_goal=teleop_drive_goal(
+			main_joystick.axis[Gamepad_axis::LEFTX],
+			main_joystick.axis[Gamepad_axis::LEFTY],
+			main_joystick.axis[Gamepad_axis::RIGHTX],
+			main_joystick.axis[Gamepad_axis::TRIGGER],
+			field_relative.get()
+		);
+	}else{
+		switch(control_status){
+			case Control_status::AUTO_COLLECT:
+				drive_goal.direction.y=-.5;
+				break;
+			default:
+				//otherwise leave at the default, which is 0.
+				break;
+		}
+	}
+	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal);
 	Toplevel::Output high_level_outputs=control.control(toplevel_status,subgoals_now);
-	r=convert_output(high_level_outputs);
+	Robot_outputs r=convert_output(high_level_outputs);
 	est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle());
-	relative.update(main_joystick.button[Gamepad_button::X]);
-	fieldRelative = relative.get();
-	{
-		Drive_motors d=holonomic_mix( 
-			main_joystick.axis[Gamepad_axis::LEFTX] * throttle, 
-			-main_joystick.axis[Gamepad_axis::LEFTY] * throttle, 
-			main_joystick.axis[Gamepad_axis::RIGHTX] * throttle,
-			gyro.angle(),
-			fieldRelative);
-		r.pwm[0]=pwm_convert(d.a);
-		r.pwm[1]=pwm_convert(d.b);
-		r.pwm[2]=pwm_convert(d.c);	}
-
+	field_relative.update(main_joystick.button[Gamepad_button::X]);
 	r=force(r);
 	
 	static int i=0;
@@ -420,10 +400,10 @@ Control_status::Control_status next(Toplevel::Control control,Control_status::Co
 		fire_when_ready=(vert==JOY_DOWN);
 	}
 
-	bool ready_to_shoot=control.ready(part_status,subgoals(Toplevel::SHOOT_HIGH_PREP));
-	bool ready_to_truss_toss=control.ready(part_status,subgoals(Toplevel::TRUSS_TOSS_PREP));
-	bool ready_to_pass=control.ready(part_status,subgoals(Toplevel::PASS_PREP));
-	bool ready_to_collect=control.ready(part_status,subgoals(Toplevel::COLLECT));
+	bool ready_to_shoot=control.ready(part_status,subgoals(Toplevel::SHOOT_HIGH_PREP,Drive_goal()));
+	bool ready_to_truss_toss=control.ready(part_status,subgoals(Toplevel::TRUSS_TOSS_PREP,Drive_goal()));
+	bool ready_to_pass=control.ready(part_status,subgoals(Toplevel::PASS_PREP,Drive_goal()));
+	bool ready_to_collect=control.ready(part_status,subgoals(Toplevel::COLLECT,Drive_goal()));
 	bool took_shot=location_to_status(part_status.injector)==Injector::RECOVERY;
 	bool have_collected_question = false;
 	switch(status){
@@ -608,5 +588,6 @@ int main(){
 	for(Control_status::Control_status control_status:Control_status::all()){
 		cout<<control_status<<" "<<to_mode(control_status)<<"\n";
 	}
+	m(Robot_inputs());
 }
 #endif

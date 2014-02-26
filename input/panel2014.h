@@ -29,14 +29,16 @@ struct Panel{
 
 	//standard override section
 	Maybe<Collector_mode> collector;
-	Maybe<Collector_tilt::Goal> collector_tilt;
-	Injector::Goal injector;
-	Injector_arms::Goal injector_arms;
-	Ejector::Goal ejector;
+	Maybe<Collector_tilt::Output> collector_tilt;
+	Maybe<Injector::Output> injector;
+	Maybe<Injector_arms::Output> injector_arms;
+	Maybe<Ejector::Output> ejector;
 	//Maybe<Pump::Output> pump;//this probably doesn't need to exist.
 
 	Panel();
 };
 std::ostream& operator<<(std::ostream&,Panel);
+
+Panel interpret(Driver_station_input);
 
 #endif

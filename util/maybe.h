@@ -13,7 +13,21 @@ class Maybe{
 
 	explicit Maybe(T const& t1):t(new T(t1)){}
 
-	Maybe& operator=(Maybe const&);
+	Maybe& operator=(Maybe const& m){
+		if(t){
+			if(m.t){
+				*t=*m.t;
+			}else{
+				delete t;
+				t=NULL;
+			}
+		}else{
+			if(m.t){
+				t=new T(*m.t);
+			}
+		}
+		return *this;
+	}
 
 	~Maybe(){
 		delete t;

@@ -42,6 +42,28 @@ std::ostream& operator<<(std::ostream& o,Relay_output a){
 	}
 }
 
+Driver_station_output::Driver_station_output(){
+	for(unsigned i=0;i<DIGITAL_OUTPUTS;i++){
+		digital[i]=0;
+	}
+}
+
+ostream& operator<<(ostream& o,Driver_station_output a){
+	o<<"Driver_station_output(";
+	o<<"digital:";
+	for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
+		o<<a.digital[i];
+	}
+	o<<" lcd:";
+	for(unsigned i=0;i<Driver_station_output::LCD_HEIGHT;i++){
+		o<<a.lcd[i];
+		if(i+1!=Driver_station_output::LCD_HEIGHT){
+			o<<"/";
+		}
+	}
+	return o<<")";
+}
+
 void terse(ostream& o,Relay_output a){
 	switch(a){
 		case RELAY_00:
@@ -100,6 +122,7 @@ ostream& operator<<(ostream& o,Robot_outputs a){
 	for(unsigned i=0;i<a.CAN_JAGUARS;i++){
 		o<<a.jaguar[i];
 	}
+	o<<a.driver_station;
 	return o<<")";
 }
 
@@ -121,6 +144,24 @@ ostream& operator<<(ostream& o,Joystick_data a){
 	o<<"buttons:";
 	for(unsigned i=0;i<Joystick_data::BUTTONS;i++){
 		o<<a.button[i]<<" ";
+	}
+	return o<<")";
+}
+
+Driver_station_input::Driver_station_input(){
+	for(unsigned i=0;i<ANALOG_INPUTS;i++) analog[i]=0;
+	for(unsigned i=0;i<DIGITAL_INPUTS;i++) digital[i]=0;
+}
+
+ostream& operator<<(ostream& o,Driver_station_input a){
+	o<<"Driver_station_input(";
+	o<<"analog:";
+	for(unsigned i=0;i<Driver_station_input::ANALOG_INPUTS;i++){
+		o<<a.analog[i]<<" ";
+	}
+	o<<"digital:";
+	for(unsigned i=0;i<Driver_station_input::DIGITAL_INPUTS;i++){
+		o<<a.digital[i];
 	}
 	return o<<")";
 }
@@ -201,6 +242,7 @@ ostream& operator<<(ostream& o,Robot_inputs a){
 	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
 		o<<a.jaguar[i];
 	}
+	o<<a.driver_station;
 	return o<<")";
 }
 
@@ -227,9 +269,9 @@ Jaguar_output Jaguar_output::voltageOut(double a){
 ostream& operator<<(ostream& o,Jaguar_output a){
 	o<<"Jaguar_output(";
 	if(a.controlSpeed){
-		o<<"speed ="<<a.speed<<")\n";
+		o<<"speed="<<a.speed<<")\n";
 	} else{
-		o<<"voltage ="<<a.voltage<<")\n";
+		o<<"voltage="<<a.voltage<<")\n";
 	}
 	return o;
 }

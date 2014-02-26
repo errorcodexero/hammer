@@ -2,6 +2,7 @@
 #define MAYBE_H
 
 #include<cassert>
+#include<iostream>
 
 template<typename T>
 class Maybe{
@@ -13,6 +14,11 @@ class Maybe{
 	explicit Maybe(T const& t1):t(new T(t1)){}
 
 	Maybe& operator=(Maybe const&);
+
+	~Maybe(){
+		delete t;
+		t=NULL;
+	}
 
 	operator bool()const{ return !!t; }
 

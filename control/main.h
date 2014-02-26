@@ -20,7 +20,6 @@ struct Main{
 
 	Control_status::Control_status control_status;
 	Countup_timer since_switch;
-	//Toplevel::Control control;
 
 	Posedge_toggle ball_collecter;
 	Posedge_trigger print_button;

@@ -53,6 +53,9 @@ double convert_output(Collector_mode m){
 	}
 }
 
+static const int JAG_TOP_FEEDBACK=1;
+static const int JAG_BOTTOM_FEEDBACK=3;
+
 Robot_outputs convert_output(Toplevel::Output a){
 	Robot_outputs r;
 	r.pwm[0]=pwm_convert(a.drive.a);
@@ -82,9 +85,9 @@ Robot_outputs convert_output(Toplevel::Output a){
 //	r.jaguar[0]=r.jaguar[1]=Jaguar_output::speedOut(a.shooter_wheels.top);
 //	r.jaguar[2]=r.jaguar[3]=Jaguar_output::speedOut(a.shooter_wheels.bottom);
 	//r.jaguar[0]=a.shooter_wheels.top[Shooter_wheels::Output::OPEN_LOOP];
-	r.jaguar[1]=a.shooter_wheels.top[Shooter_wheels::Output::FEEDBACK];
+	r.jaguar[JAG_TOP_FEEDBACK]=a.shooter_wheels.top[Shooter_wheels::Output::FEEDBACK];
 	//r.jaguar[2]=a.shooter_wheels.bottom[Shooter_wheels::Output::OPEN_LOOP];
-	r.jaguar[3]=a.shooter_wheels.bottom[Shooter_wheels::Output::FEEDBACK];
+	r.jaguar[JAG_BOTTOM_FEEDBACK]=a.shooter_wheels.bottom[Shooter_wheels::Output::FEEDBACK];
 	return r;
 }
 
@@ -222,7 +225,10 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal,rpmsdefault());
 	Toplevel::Output high_level_outputs=control(toplevel_status,subgoals_now);
 	Robot_outputs r=convert_output(high_level_outputs);
-	est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle());
+	Shooter_wheels::Status wheel;
+	wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;
+	wheel.bottom=in.jaguar[JAG_BOTTOM_FEEDBACK].speed;
+	est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel);
 	field_relative.update(main_joystick.button[Gamepad_button::X]);
 	r=force(r);
 	

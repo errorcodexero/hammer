@@ -6,6 +6,7 @@
 typedef double Time;
 typedef unsigned char Pwm_output;
 typedef bool Solenoid_output;
+
 struct Jaguar_output{
 	double speed,voltage;
 	bool controlSpeed;
@@ -17,6 +18,13 @@ struct Jaguar_output{
 	static Jaguar_output voltageOut(double);
 };
 std::ostream& operator<<(std::ostream&,Jaguar_output);
+
+struct Jaguar_input{
+	double speed,current;
+
+	Jaguar_input();
+};
+std::ostream& operator<<(std::ostream&,Jaguar_input);
 
 typedef enum{DIO_INPUT,DIO_1,DIO_0} Digital_out;
 std::ostream& operator<<(std::ostream&,Digital_out);
@@ -85,6 +93,8 @@ struct Robot_inputs{
 	
 	static const unsigned ANALOG_INPUTS=8;
 	Volt analog[ANALOG_INPUTS];
+
+	Jaguar_input jaguar[Robot_outputs::CAN_JAGUARS];
 	
 	Robot_inputs();
 };

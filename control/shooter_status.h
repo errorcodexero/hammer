@@ -1,5 +1,6 @@
 #ifndef SHOOTER_STATUS
 #define SHOOTER_STATUS
+
 #include<iosfwd>
 
 namespace Shooter_wheels{
@@ -13,4 +14,5 @@ namespace Shooter_wheels{
 	};
 	std::ostream& operator<<(std::ostream&,Status);
 }
+
 #endif

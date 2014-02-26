@@ -60,13 +60,13 @@ namespace Toplevel{
 		Injector::Estimator injector;
 		Injector_arms::Estimator injector_arms;
 		Ejector::Estimator ejector;
-		//no estimates for shooter wheels yet.
+		Shooter_wheels::Status shooter_wheels;
 		Pump::Status pump;//for now just taking the sensor's measurement as gospel.
 		float orientation;
 		
 		public:
 		Estimator();
-		void update(Time,Output,Pump::Status,float orientation);
+		void update(Time,Output,Pump::Status,float orientation,Shooter_wheels::Status);
 		Status estimate()const;
 		void out(std::ostream&)const;
 	};

@@ -197,6 +197,10 @@ ostream& operator<<(ostream& o,Robot_inputs a){
 	for(unsigned i=0;i<a.ANALOG_INPUTS;i++){
 		o<<(i+1)<<" "<<a.analog[i]<<' ';
 	}
+	o<<" jaguar:";
+	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+		o<<a.jaguar[i];
+	}
 	return o<<")";
 }
 
@@ -205,6 +209,21 @@ Jaguar_output::Jaguar_output(){
 	voltage = 0;
 	controlSpeed = false;
 }
+
+Jaguar_output Jaguar_output::speedOut(double a){
+	Jaguar_output j;
+	j.controlSpeed = true;
+	j.speed = a;
+	return j;
+}
+
+Jaguar_output Jaguar_output::voltageOut(double a){
+	Jaguar_output j;
+	j.controlSpeed = false;
+	j.voltage = a;
+	return j;
+}
+
 ostream& operator<<(ostream& o,Jaguar_output a){
 	o<<"Jaguar_output(";
 	if(a.controlSpeed){
@@ -214,17 +233,14 @@ ostream& operator<<(ostream& o,Jaguar_output a){
 	}
 	return o;
 }
-Jaguar_output Jaguar_output::speedOut(double a){
-	Jaguar_output j;
-	j.controlSpeed = true;
-	j.speed = a;
-	return j;
-}
-Jaguar_output Jaguar_output::voltageOut(double a){
-	Jaguar_output j;
-	j.controlSpeed = false;
-	j.voltage = a;
-	return j;
+
+Jaguar_input::Jaguar_input():speed(0),current(0){}
+
+ostream& operator<<(ostream& o,Jaguar_input a){
+	o<<"Jaguar_input(";
+	o<<"speed:"<<a.speed;
+	o<<" current:"<<a.current;
+	return o<<")";
 }
 
 #ifdef INTERFACE_TEST

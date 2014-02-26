@@ -9,40 +9,9 @@
 #include "toplevel.h"
 #include "fire_control.h"
 #include "control_status.h"
+#include "../input/util.h"
 
 using namespace std;
-
-enum Joystick_section{JOY_LEFT,JOY_RIGHT,JOY_UP,JOY_DOWN,JOY_CENTER};
-
-ostream& operator<<(ostream& o,Joystick_section j){
-	switch(j){
-		#define X(name) case JOY_##name: return o<<""#name;
-		X(LEFT)
-		X(RIGHT)
-		X(UP)
-		X(DOWN)
-		X(CENTER)
-		#undef X
-		default: assert(0); 
-	}
-}
-
-Joystick_section joystick_section(double x,double y){
-	static const double LIM=.25;
-	if(fabs(x)<LIM && fabs(y)<LIM){
-		return JOY_CENTER;
-	}
-	if(x<y){
-		if(x>-y){
-			return JOY_DOWN;
-		}
-		return JOY_LEFT;
-	}
-	if(x>-y) return JOY_RIGHT;
-	return JOY_UP;
-}
-
-Joystick_section divide_vertical(double y){ return joystick_section(0,y); }
 
 double convert_output(Collector_mode m){
 	switch(m){
@@ -118,49 +87,6 @@ Toplevel::Mode to_mode(Control_status::Control_status status){
 		default:
 			assert(0);
 	}
-}
-
-unsigned interpret_10_turn_pot(Volt v){
-	/*measured values, measured on the Fall 2013 mecanum base:
-	0.005
-	0.56
-	1.116
-	1.66
-	2.22
-	2.77
-	3.33
-	3.89
-	4.44
-	5.01
-	limits are halfway between each value.
-	*/
-	Volt limits[]={
-		0.2825,
-		0.838,
-		1.388,
-		1.94,
-		2.495,
-		3.05,
-		3.61,
-		4.165,
-		4.725,
-		5.01
-	};
-	for(unsigned i=0;i<10;i++){
-		if(v<limits[i]) return i;
-	}
-	return 9;
-}
-
-namespace Gamepad_button{
-	//how the logitech gamepads appear in the driver station
-	static const unsigned A=0,B=1,X=2;
-	static const unsigned Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
-}
-namespace Gamepad_axis{
-	//How the axes appear in the DS; though
-	static const unsigned LEFTX=0,LEFTY=1,RIGHTX=3,RIGHTY=4,TRIGGER=2,DPADX=5;
-	//DPADY does not exist, neither does axis 6
 }
 
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
@@ -358,17 +284,6 @@ void getDistance(float value){
 	cout<<converttodistance(value)<<"m\n";
 }
 
-/*enum WallCommand{
-	OFF,RIGHT,LEFT,FRONT
-};*/
-
-/*WallCommand wallstop(double x,double y){
-	if(x>=-0.2&&x<=0.2&&y>=-0.2&&y<=0.2){
-		return OFF;
-	}
-	else if() 
-*/	
-
 Fire_control::Target to_target(Joystick_section j){
 	switch(j){
 		case JOY_LEFT: return Fire_control::TRUSS;
@@ -525,48 +440,7 @@ Control_status::Control_status next(Control_status::Control_status status,Toplev
 	}
 }
 
-/*struct Gunner_input{
-	//this could happen in a more elegant way.
-	Posedge_trigger drive_w_ball,drive_wo_ball,catch_mode,collect,prep_high,prep_toss,prep_pass,prep_eject,high,toss,pass,eject;
-	Mode current;
-	
-	Gunner_input():current(DRIVE_W_BALL){}
-	
-	void update(Joystick_data j){
-		using namespace Gamepad_button;
-		using namespace Toplevel;
-		if(drive_w_ball.update(j.button[X])){
-			current=DRIVE_W_BALL;
-		}
-		if(drive_wo_ball.update(j.button[Y])){
-			current=DRIVE_WO_BALL;
-		}
-		if(catch_mode.update(j.button[B])) current=CATCH;
-		if(collect.update(j.button[A])) current=COLLECT;
-		
-		Joystick_section ls=joystick_section(j.axis[0],j.axis[1]);
-		if(prep_high.update(ls==JOY_UP)) current=SHOOT_HIGH_PREP;
-		if(prep_toss.update(ls==JOY_LEFT)) current=TRUSS_TOSS_PREP;
-		if(prep_eject.update(ls==JOY_DOWN)) current=EJECT_PREP;
-		if(prep_pass.update(ls==JOY_RIGHT)) current=PASS_PREP;
-		
-		Joystick_section rs=joystick_section(j.axis[2],j.axis[3]);
-		if(high.update(rs==JOY_UP)) current=SHOOT_HIGH;
-		if(toss.update(rs==JOY_LEFT)) current=TRUSS_TOSS;
-		if(eject.update(rs==JOY_DOWN)) current=EJECT;
-		if(pass.update(rs==JOY_RIGHT)) current=PASS;
-	}
-};*/
-
 #ifdef MAIN_TEST
-void joystick_section_test(){
-	assert(joystick_section(0,0)==JOY_CENTER);
-	assert(joystick_section(-1,0)==JOY_LEFT);
-	assert(joystick_section(1,0)==JOY_RIGHT);
-	assert(joystick_section(0,-1)==JOY_UP);
-	assert(joystick_section(0,1)==JOY_DOWN);
-}
-
 int main(){
 	/*Main m;
 	cout<<m<<"\n";
@@ -593,7 +467,6 @@ int main(){
 	cout<<func(-1, 0, 0)<<"\n";
 	cout<<func(0, 0, 0)<<"\n";
 	*/
-	joystick_section_test();
 	Main m;
 	cout<<m<<"\n";
 	for(Control_status::Control_status control_status:Control_status::all()){

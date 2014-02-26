@@ -108,9 +108,9 @@ class To_crio
 	USER_CODE main;
 	int skipped;
 	Jag_control jaguar[Robot_outputs::CAN_JAGUARS];
-	
+	DriverStationLCD *lcd;
 public:
-	To_crio():error_code(0),skipped(0)
+	To_crio():error_code(0),skipped(0),lcd(NULL)
 	{
 		int solenoid_module=find_solenoid_module();
 		for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
@@ -134,6 +134,9 @@ public:
 			if(r) error_code|=256;
 			//digital_in[i]=new DigitalInput(i+1);
 		}
+		
+		lcd=DriverStationLCD::GetInstance();
+		if(!lcd) error_code|=512;
 	}
 	
 	int set_solenoid(unsigned i,Solenoid_output v){
@@ -149,6 +152,12 @@ public:
 			int r=set_pwm(i,out.pwm[i]);
 			if(r) error_code|=2;
 		}
+		
+		/*if(lcd){
+			lcd->Printf(DriverStationLCD::kMain_Line2,1,"hello");
+		}else{
+			cerr<<"lcd is null\r\n";
+		}*/
 		for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
 			int r=set_solenoid(i,out.solenoid[i]);
 			if(r) error_code|=16;
@@ -163,15 +172,15 @@ public:
 		}
 		for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
 			jaguar[i].set(out.jaguar[i],enabled);
-			cerr<<jaguar[i]<<"\n";
-			cerr<<"Are we enabled?"<<enabled<<"\n";
-			cerr<<out.jaguar[i]<<"\n";
+			//cerr<<jaguar[i]<<"\n";
+			//cerr<<"Are we enabled?"<<enabled<<"\n";
+			//cerr<<out.jaguar[i]<<"\n";
 			//cerr<<jaguar[i].jaguar->GetSpeed()<<"\n";
 		}
-			cerr<<"\n"<<jaguar[0].jaguar->GetSpeed()<<"\n";
+/*			cerr<<"\n"<<jaguar[0].jaguar->GetSpeed()<<"\n";
 			cerr<<jaguar[1].jaguar->GetSpeed()<<"\n";
 			cerr<<jaguar[2].jaguar->GetSpeed()<<"\n";
-			cerr<<jaguar[3].jaguar->GetSpeed()<<"\n";
+			cerr<<jaguar[3].jaguar->GetSpeed()<<"\n";*/
 		/*
 		float kP = 1.000;
 		float kI = 0.005;

@@ -72,13 +72,8 @@ namespace Toplevel{
 	};
 	std::ostream& operator<<(std::ostream& o,Estimator);
 
-	struct Control{
-		Shooter_wheels::Control shooter_wheels;
-		
-		Output control(Status,Subgoals)const;
-		bool ready(Status,Subgoals)const;
-	};
-	std::ostream& operator<<(std::ostream&,Control);
+	Output control(Status,Subgoals);
+	bool ready(Status,Subgoals);
 	
 	//all this mode stuff really belongs elsewhere
 	enum Mode{
@@ -92,7 +87,7 @@ namespace Toplevel{
 	};
 	std::ostream& operator<<(std::ostream& o,Mode);
 
-	Subgoals subgoals(Mode,Drive_goal);
+	Subgoals subgoals(Mode,Drive_goal,wheelcalib);
 }
 
 #endif

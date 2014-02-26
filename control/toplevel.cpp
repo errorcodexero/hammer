@@ -33,8 +33,8 @@ namespace Toplevel{
 		collector_tilt(Collector_tilt::GOAL_UP),
 		injector(Injector::WAIT),
 		injector_arms(Injector_arms::GOAL_X),
-		ejector(Ejector::WAIT),
-		shooter_wheels(Shooter_wheels::X)
+		ejector(Ejector::WAIT)
+		//shooter_wheels(Shooter_wheels:)
 	{}
 
 	ostream& operator<<(ostream& o,Subgoals g){
@@ -106,32 +106,32 @@ namespace Toplevel{
 		return o;
 	}
 
-	Output Control::control(Status status,Subgoals g)const{
+	Output control(Status status,Subgoals g){
 		Output r;
 		r.collector=g.collector;
 		r.collector_tilt=Collector_tilt::control(g.collector_tilt);
 		r.injector=Injector::control(status.injector,g.injector);
 		r.injector_arms=Injector_arms::control(status.injector_arms,g.injector_arms);
 		r.ejector=Ejector::control(status.ejector,g.ejector);
-		r.shooter_wheels=shooter_wheels.control(g.shooter_wheels);
+		r.shooter_wheels=control(status.shooter_wheels,g.shooter_wheels);
 		r.pump=Pump::control(status.pump);
 		r.drive=::control(g.drive, status.orientation);
 		return r;
 	}
 
-	bool Control::ready(Status status,Subgoals g)const{
+	bool ready(Status status,Subgoals g){
 		return Collector_tilt::ready(status.collector_tilt,g.collector_tilt) && 
 			Injector::ready(status.injector,g.injector) && 
 			Injector_arms::ready(status.injector_arms,g.injector_arms) && 
 			Ejector::ready(status.ejector,g.ejector) && 
-			shooter_wheels.ready(status.shooter_wheels,g.shooter_wheels);
+			ready(status.shooter_wheels,g.shooter_wheels);
 	}
 	
-	ostream& operator<<(ostream& o,Control a){
+	/*ostream& operator<<(ostream& o,Control a){
 		o<<"Toplevel::Control(";
 		o<<a.shooter_wheels;
 		return o<<")";
-	}
+	}*/
 
 	ostream& operator<<(ostream& o,Mode m){
 		#define X(name) if(m==name) return o<<""#name;
@@ -151,31 +151,31 @@ namespace Toplevel{
 		assert(0);
 	}
 	
-	Subgoals subgoals(Mode m,Drive_goal d){
+	Subgoals subgoals(Mode m,Drive_goal d,wheelcalib calib){
 		Subgoals r;
 		r.drive=d;
 		switch(m){
 			case DRIVE_WO_BALL:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_X;
-				r.shooter_wheels=Shooter_wheels::X;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
 				break;
 			case DRIVE_W_BALL:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
-				r.shooter_wheels=Shooter_wheels::X;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
 				break;
 			case COLLECT:
 				r.collector=ON;
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_OPEN;
-				r.shooter_wheels=Shooter_wheels::X;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
 				break;
 			case SHOOT_HIGH_PREP:
 			case SHOOT_HIGH:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
-				r.shooter_wheels=Shooter_wheels::HIGH_GOAL;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::HIGH_GOAL);
 				if(m==SHOOT_HIGH){
 					r.injector=Injector::START;
 				}
@@ -184,14 +184,14 @@ namespace Toplevel{
 			case TRUSS_TOSS:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
-				r.shooter_wheels=Shooter_wheels::TRUSS;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::TRUSS);
 				if(m==TRUSS_TOSS) r.injector=Injector::START;
 				break;
 			case PASS_PREP:
 			case PASS:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
-				r.shooter_wheels=Shooter_wheels::PASS;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::PASS);
 				if(m==PASS) r.injector=Injector::START;
 				break;
 			case EJECT_PREP:
@@ -203,7 +203,7 @@ namespace Toplevel{
 			case CATCH:
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;//not sure that this matters
-				r.shooter_wheels=Shooter_wheels::STOP;//could also have a reverse mode here
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::STOP);//could also have a reverse mode here
 				break;
 			default:assert(0);
 		}
@@ -229,13 +229,13 @@ int main(){
 	};
 	Toplevel::Status status;
 	cout<<status<<"\n";
-	Toplevel::Control control;
+	//Toplevel::Control control;
 	for(auto mode:MODES){
 		cout<<mode<<":\n";
-		auto g=subgoals(mode,Drive_goal());
+		auto g=subgoals(mode,Drive_goal(),wheelcalib());
 		cout<<"\t"<<g<<"\n";
-		cout<<"\t"<<control.control(status,g)<<"\n";
-		cout<<"\t"<<control.ready(status,g)<<"\n";
+		cout<<"\t"<<control(status,g)<<"\n";
+		cout<<"\t"<<ready(status,g)<<"\n";
 	}
 	Estimator est;
 	cout<<est<<"\n";

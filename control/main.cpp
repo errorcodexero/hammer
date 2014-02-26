@@ -79,8 +79,12 @@ Robot_outputs convert_output(Toplevel::Output a){
 	7 bottom
 	9 top
 	*/
-	r.jaguar[0]=r.jaguar[1]=Jaguar_output::speedOut(a.shooter_wheels.top);
-	r.jaguar[2]=r.jaguar[3]=Jaguar_output::speedOut(a.shooter_wheels.bottom);
+//	r.jaguar[0]=r.jaguar[1]=Jaguar_output::speedOut(a.shooter_wheels.top);
+//	r.jaguar[2]=r.jaguar[3]=Jaguar_output::speedOut(a.shooter_wheels.bottom);
+	//r.jaguar[0]=a.shooter_wheels.top[Shooter_wheels::Output::OPEN_LOOP];
+	r.jaguar[1]=a.shooter_wheels.top[Shooter_wheels::Output::FEEDBACK];
+	//r.jaguar[2]=a.shooter_wheels.bottom[Shooter_wheels::Output::OPEN_LOOP];
+	r.jaguar[3]=a.shooter_wheels.bottom[Shooter_wheels::Output::FEEDBACK];
 	return r;
 }
 
@@ -159,7 +163,7 @@ namespace Gamepad_axis{
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
 Main::Main():control_status(Control_status::DRIVE_W_BALL){}
 
-Control_status::Control_status next(Toplevel::Control,Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch);
+Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch);
 
 Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
 	assert(fabs(joy_x)<=1);
@@ -193,7 +197,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	
 	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	Toplevel::Status toplevel_status=est.estimate();
-	control_status=next(control,control_status,toplevel_status,in.joystick[1],in.robot_mode.autonomous,since_switch.elapsed());
+	control_status=next(control_status,toplevel_status,in.joystick[1],in.robot_mode.autonomous,since_switch.elapsed());
 
 	Toplevel::Mode mode=to_mode(control_status);
 	Drive_goal drive_goal;
@@ -215,8 +219,8 @@ Robot_outputs Main::operator()(Robot_inputs in){
 				break;
 		}
 	}
-	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal);
-	Toplevel::Output high_level_outputs=control.control(toplevel_status,subgoals_now);
+	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal,rpmsdefault());
+	Toplevel::Output high_level_outputs=control(toplevel_status,subgoals_now);
 	Robot_outputs r=convert_output(high_level_outputs);
 	est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle());
 	field_relative.update(main_joystick.button[Gamepad_button::X]);
@@ -273,7 +277,7 @@ ostream& operator<<(ostream& o,Main m){
 	o<<m.est;
 	o<<m.control_status;
 	o<<m.since_switch;
-	o<<m.control;
+	//o<<m.control;
 	//ball collector
 	//print button
 	//relative
@@ -369,7 +373,7 @@ Fire_control::Target to_target(Joystick_section j){
 	}
 }
 
-Control_status::Control_status next(Toplevel::Control control,Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
+Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	using namespace Control_status;
 	//at the top here should deal with all the buttons that put you into a specific mode.
 	if(j.button[Gamepad_button::A]) return Control_status::CATCH;
@@ -400,10 +404,11 @@ Control_status::Control_status next(Toplevel::Control control,Control_status::Co
 		fire_when_ready=(vert==JOY_DOWN);
 	}
 
-	bool ready_to_shoot=control.ready(part_status,subgoals(Toplevel::SHOOT_HIGH_PREP,Drive_goal()));
-	bool ready_to_truss_toss=control.ready(part_status,subgoals(Toplevel::TRUSS_TOSS_PREP,Drive_goal()));
-	bool ready_to_pass=control.ready(part_status,subgoals(Toplevel::PASS_PREP,Drive_goal()));
-	bool ready_to_collect=control.ready(part_status,subgoals(Toplevel::COLLECT,Drive_goal()));
+	wheelcalib d=rpmsdefault();
+	bool ready_to_shoot=ready(part_status,subgoals(Toplevel::SHOOT_HIGH_PREP,Drive_goal(),d));
+	bool ready_to_truss_toss=ready(part_status,subgoals(Toplevel::TRUSS_TOSS_PREP,Drive_goal(),d));
+	bool ready_to_pass=ready(part_status,subgoals(Toplevel::PASS_PREP,Drive_goal(),d));
+	bool ready_to_collect=ready(part_status,subgoals(Toplevel::COLLECT,Drive_goal(),d));
 	bool took_shot=location_to_status(part_status.injector)==Injector::RECOVERY;
 	bool have_collected_question = false;
 	switch(status){

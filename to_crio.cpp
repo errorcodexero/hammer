@@ -99,6 +99,10 @@ int demo(...){
 	return 0;
 }
 
+string space_out(string s){
+	return s+"                                     ";
+}
+
 template<typename USER_CODE>
 class To_crio
 {
@@ -153,11 +157,17 @@ public:
 			if(r) error_code|=2;
 		}
 		
-		/*if(lcd){
-			lcd->Printf(DriverStationLCD::kMain_Line2,1,"hello");
+		if(lcd){
+			lcd->Printf(DriverStationLCD::kUser_Line1,1,"%s",space_out(out.driver_station.lcd[0]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line2,1,"%s",space_out(out.driver_station.lcd[1]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line3,1,"%s",space_out(out.driver_station.lcd[2]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line4,1,"%s",space_out(out.driver_station.lcd[3]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line5,1,"%s",space_out(out.driver_station.lcd[4]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line6,1,"%s",space_out(out.driver_station.lcd[5]).c_str());
+			lcd->UpdateLCD();
 		}else{
 			cerr<<"lcd is null\r\n";
-		}*/
+		}
 		for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
 			int r=set_solenoid(i,out.solenoid[i]);
 			if(r) error_code|=16;

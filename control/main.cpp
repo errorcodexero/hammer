@@ -134,6 +134,13 @@ Toplevel::Output panel_override(Panel p,Toplevel::Output out){
 	return out;
 }
 
+template<typename T>
+string as_string(T t){
+	stringstream ss;
+	ss<<t;
+	return ss.str();
+}
+
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
@@ -178,7 +185,15 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	}
 	field_relative.update(main_joystick.button[Gamepad_button::X]);
 	r=force(r);
-
+	
+	r.driver_station.lcd[1]=as_string(r.jaguar[0]).substr(13, 20);
+	r.driver_station.lcd[2]=as_string(r.jaguar[1]).substr(13, 20);
+	r.driver_station.lcd[3]=as_string(r.jaguar[2]).substr(13, 20);
+	r.driver_station.lcd[4]=as_string(r.jaguar[3]).substr(13, 20);
+	stringstream strin;
+	strin<<toplevel_status.shooter_wheels;
+	r.driver_station.lcd[5]="Speeds:"+strin.str().substr(22, 20);
+	
 	{	
 		static int i=0;
 		if(i==0){

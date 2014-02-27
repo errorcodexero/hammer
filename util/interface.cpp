@@ -269,9 +269,9 @@ Jaguar_output Jaguar_output::voltageOut(double a){
 ostream& operator<<(ostream& o,Jaguar_output a){
 	o<<"Jaguar_output(";
 	if(a.controlSpeed){
-		o<<"speed="<<a.speed<<")\n";
+		o<<"speed="<<a.speed<<")";
 	} else{
-		o<<"voltage="<<a.voltage<<")\n";
+		o<<"voltage="<<a.voltage<<")";
 	}
 	return o;
 }

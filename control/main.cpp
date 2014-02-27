@@ -107,6 +107,22 @@ Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double j
 	return Drive_goal(Pt(joy_x,joy_y,joy_theta),field_relative);
 }
 
+Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
+	if(teleop(control_status)){
+		return teleop_drive_goal(joy_x,joy_y,joy_theta,joy_throttle,field_relative);
+	}
+	Drive_goal r;
+	switch(control_status){
+		case Control_status::AUTO_COLLECT:
+			r.direction.y=-.5;
+			break;
+		default:
+			//otherwise leave at the default, which is 0.
+			break;
+	}
+	return r;
+}
+
 Toplevel::Output panel_override(Panel p,Toplevel::Output out){
 	#define X(name) if(p.name) out.name=*p.name;
 	X(collector)
@@ -142,26 +158,15 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	control_status=next(control_status,toplevel_status,in.joystick[1],panel,in.robot_mode.autonomous,since_switch.elapsed());
 
 	Toplevel::Mode mode=to_mode(control_status);
-	Drive_goal drive_goal;
-	if(teleop(control_status)){
-		drive_goal=teleop_drive_goal(
-			main_joystick.axis[Gamepad_axis::LEFTX],
-			main_joystick.axis[Gamepad_axis::LEFTY],
-			main_joystick.axis[Gamepad_axis::RIGHTX],
-			main_joystick.axis[Gamepad_axis::TRIGGER],
-			field_relative.get()
-		);
-	}else{
-		switch(control_status){
-			case Control_status::AUTO_COLLECT:
-				drive_goal.direction.y=-.5;
-				break;
-			default:
-				//otherwise leave at the default, which is 0.
-				break;
-		}
-	}
-	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal,rpmsdefault());
+	Drive_goal drive_goal1=drive_goal(
+		control_status,
+		main_joystick.axis[Gamepad_axis::LEFTX],
+		main_joystick.axis[Gamepad_axis::LEFTY],
+		main_joystick.axis[Gamepad_axis::RIGHTX],
+		main_joystick.axis[Gamepad_axis::TRIGGER],
+		field_relative.get()
+	);
+	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal1,rpmsdefault());
 	Toplevel::Output high_level_outputs=control(toplevel_status,subgoals_now);
 	high_level_outputs=panel_override(panel,high_level_outputs);
 	Robot_outputs r=convert_output(high_level_outputs);
@@ -173,44 +178,23 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	}
 	field_relative.update(main_joystick.button[Gamepad_button::X]);
 	r=force(r);
-	
-	static int i=0;
-	if(i==0){
-		stringstream ss;
-		ss<<in<<"\r\n"<<*this<<"\r\n";
-		cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
-		cerr<<subgoals_now<<high_level_outputs<<"\n";
+
+	{	
+		static int i=0;
+		if(i==0){
+			stringstream ss;
+			ss<<in<<"\r\n"<<*this<<"\r\n";
+			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
+			cerr<<subgoals_now<<high_level_outputs<<"\n";
+		}
+		i=(i+1)%1000;
 	}
-	i=(i+1)%1000;
+
 	if(print_button(main_joystick.button[Gamepad_button::LB])){
 		cout<<in<<"\r\n";
 		cout<<*this<<"\r\n";
 		cout<<"\r\n";
 	}
-	
-	string filename="demo.tmp";
-	string data="lien1\nline2";
-	/*if(i==10){
-		int r=write_file(filename,data);
-		if(r){
-			cerr<<"Error while writing file:"<<r<<"\r\n";
-		}
-	}*/
-	
-	/*if(i==12){
-		string out;
-		int r=read_file(filename,out);
-		if(r) cerr<<"Error during read:"<<r<<"\r";
-		cerr<<"Got from file:"<<out<<"\r\n";
-		cerr<<"Eqal?"<<(out==data)<<"\n";
-	}*/
-	
-	/*if(i==20){
-		string line;
-		cerr<<"Getting line:";
-		getline(cin,line);
-		cerr<<"Got line:"<<line<<"\n";
-	}*/
 	
 	return r;
 }

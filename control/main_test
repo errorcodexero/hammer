@@ -28,4 +28,5 @@ g++ -Wall -std=c++0x -DMAIN_TEST -I.. main.cpp \
 	shooter_status.cpp \
 	wheelrpms.cpp \
 	../input/util.cpp \
+	../input/panel2014.cpp \
 	-o main 2>&1 && ./main

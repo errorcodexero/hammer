@@ -10,6 +10,7 @@
 #include "fire_control.h"
 #include "control_status.h"
 #include "../input/util.h"
+#include "../input/panel2014.h"
 
 using namespace std;
 
@@ -92,7 +93,7 @@ Toplevel::Mode to_mode(Control_status::Control_status status){
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
 Main::Main():control_status(Control_status::DRIVE_W_BALL){}
 
-Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch);
+Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,Time since_switch);
 
 Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
 	assert(fabs(joy_x)<=1);
@@ -104,6 +105,17 @@ Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double j
 	joy_y*=-throttle;//invert y.
 	joy_theta*=throttle;
 	return Drive_goal(Pt(joy_x,joy_y,joy_theta),field_relative);
+}
+
+Toplevel::Output panel_override(Panel p,Toplevel::Output out){
+	#define X(name) if(p.name) out.name=*p.name;
+	X(collector)
+	X(collector_tilt)
+	X(injector)
+	X(injector_arms)
+	X(ejector)
+	#undef X
+	return out;
 }
 
 Robot_outputs Main::operator()(Robot_inputs in){
@@ -123,10 +135,11 @@ Robot_outputs Main::operator()(Robot_inputs in){
 
 	ball_collecter.update(main_joystick.button[5]);
 	bool tanks_full=(in.digital_io[0]==DI_1);
-	
+
+	Panel panel=interpret(in.driver_station);	
 	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	Toplevel::Status toplevel_status=est.estimate();
-	control_status=next(control_status,toplevel_status,in.joystick[1],in.robot_mode.autonomous,since_switch.elapsed());
+	control_status=next(control_status,toplevel_status,in.joystick[1],panel,in.robot_mode.autonomous,since_switch.elapsed());
 
 	Toplevel::Mode mode=to_mode(control_status);
 	Drive_goal drive_goal;
@@ -150,11 +163,14 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	}
 	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal,rpmsdefault());
 	Toplevel::Output high_level_outputs=control(toplevel_status,subgoals_now);
+	high_level_outputs=panel_override(panel,high_level_outputs);
 	Robot_outputs r=convert_output(high_level_outputs);
-	Shooter_wheels::Status wheel;
-	wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;
-	wheel.bottom=in.jaguar[JAG_BOTTOM_FEEDBACK].speed;
-	est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel);
+	{
+		Shooter_wheels::Status wheel;
+		wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;
+		wheel.bottom=in.jaguar[JAG_BOTTOM_FEEDBACK].speed;
+		est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel);
+	}
 	field_relative.update(main_joystick.button[Gamepad_button::X]);
 	r=force(r);
 	
@@ -284,28 +300,40 @@ void getDistance(float value){
 	cout<<converttodistance(value)<<"m\n";
 }
 
-Fire_control::Target to_target(Joystick_section j){
+Fire_control::Target to_target(Joystick_section j,Mode_buttons mode_buttons){
 	switch(j){
 		case JOY_LEFT: return Fire_control::TRUSS;
 		case JOY_RIGHT: return Fire_control::PASS;
 		case JOY_UP: return Fire_control::HIGH;
 		case JOY_DOWN: return Fire_control::EJECT;
-		default: return Fire_control::NO_TARGET;
+		default: break;
 	}
+	if(mode_buttons.truss_toss) return Fire_control::TRUSS;
+	if(mode_buttons.shoot_high) return Fire_control::HIGH;
+	if(mode_buttons.pass) return Fire_control::PASS;
+	if(mode_buttons.eject) return Fire_control::EJECT;
+	return Fire_control::NO_TARGET;
 }
 
-Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
+Control_status::Control_status next(
+	Control_status::Control_status status,
+	Toplevel::Status part_status,
+	Joystick_data j,
+	Panel panel,
+	bool autonomous_mode,
+	Time since_switch
+){
 	using namespace Control_status;
 	//at the top here should deal with all the buttons that put you into a specific mode.
-	if(j.button[Gamepad_button::A]) return Control_status::CATCH;
-	if(j.button[Gamepad_button::B]) return COLLECT;
-	if(j.button[Gamepad_button::X]) return DRIVE_W_BALL;
-	if(j.button[Gamepad_button::Y]) return DRIVE_WO_BALL;
+	if(j.button[Gamepad_button::A] || panel.mode_buttons.catch_mode) return Control_status::CATCH;
+	if(j.button[Gamepad_button::B] || panel.mode_buttons.collect) return COLLECT;
+	if(j.button[Gamepad_button::X] || panel.mode_buttons.drive_w_ball) return DRIVE_W_BALL;
+	if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return DRIVE_WO_BALL;
 
 	//todo: use some sort of constants rather than 0/1 for the axes
 	{
 		Joystick_section joy_section=joystick_section(j.axis[0],j.axis[1]);
-		Fire_control::Target target=to_target(joy_section);
+		Fire_control::Target target=to_target(joy_section,panel.mode_buttons);
 		if(Fire_control::target(status)!=target && !autonomous_mode){
 			switch(target){
 				case Fire_control::TRUSS: return TRUSS_TOSS_PREP;
@@ -318,11 +346,9 @@ Control_status::Control_status next(Control_status::Control_status status,Toplev
 	}
 	bool fire_now,fire_when_ready;
 	{
-		//I think 3 is the right axis
 		Joystick_section vert=divide_vertical(j.axis[Gamepad_axis::RIGHTY]);
-		//cerr<<"vert ="<<vert<<"\n";
-		fire_now=(vert==JOY_UP);
-		fire_when_ready=(vert==JOY_DOWN);
+		fire_now=(vert==JOY_UP) || panel.fire;
+		fire_when_ready=(vert==JOY_DOWN); //No equivalent on the switchpanel.
 	}
 
 	wheelcalib d=rpmsdefault();

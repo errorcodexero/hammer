@@ -82,7 +82,8 @@ struct Joystick_data{
 std::ostream& operator<<(std::ostream&,Joystick_data);
 
 struct Driver_station_input{
-	static const unsigned ANALOG_INPUTS=4;
+	//In the traditional mode of the Cybress board there are only 4 available, but there are 8 in the 'enhanced' mode
+	static const unsigned ANALOG_INPUTS=8;
 	double analog[ANALOG_INPUTS];
 
 	static const unsigned DIGITAL_INPUTS=8;

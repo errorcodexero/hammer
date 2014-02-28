@@ -44,6 +44,24 @@ int read_analog(Robot_inputs& r){
 	}
 }
 
+DriverStationEnhandedIO *get_driver_station(){
+	DriverStation *ds=DriverStation::GetInstance();
+	if(!ds) return NULL;
+	return ds->GetEnhancedIO();
+}
+
+int read_driver_station(Driver_station& r){
+	DriverStationEnhancedIO *en=get_driver_station();
+	if(!en) return 2048;
+	for(unsigned i=0;i<r.ANALOG_INPUTS;i++){
+		r.analog[i]=en->GetAnalogIn(i+1);
+	}
+	for(unsigned i=0;i<r.DIGITAL_INPUTS;i++){
+		r.digital[i]=en->GetDigital(i+1);
+	}
+	return 0;
+}
+
 //it might make sense to put this in the Robot_inputs structure.  
 Volt battery_voltage(){
 	AnalogModule *am=AnalogModule::GetInstance(DriverStation::kBatteryModuleNumber);
@@ -62,6 +80,7 @@ pair<Robot_inputs,int> read(Robot_mode robot_mode){
 	r.now=Timer::GetFPGATimestamp();
 	error_code|=read_joysticks(r);
 	error_code|=read_analog(r);
+	error_code|=read_driver_station(r.driver_station);
 	return make_pair(r,error_code);
 }
 
@@ -180,6 +199,18 @@ public:
 			int r=digital_io[i].set(out.digital_io[i]);
 			if(r) error_code|=512;
 		}
+
+		{
+			DriverStationEnhancedIO *ds=get_driver_station();
+			if(ds){
+				for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
+					ds->SetDigitalOutput(i+1,out.digital[i]);
+				}
+			}else{
+				error_code|=2048;
+			}
+		}
+
 		for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
 			jaguar[i].set(out.jaguar[i],enabled);
 			//cerr<<jaguar[i]<<"\n";

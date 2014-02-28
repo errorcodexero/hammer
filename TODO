@@ -1,7 +1,6 @@
 Drivebase:
-	-Check that the throttle stuff that was added works as expected on the robot
-	-Move some of the control of this into the toplevel structs
-	-Write location estimate code
+	-Test the control in the toplevel structs
+	-Complete location estimate code
 Vision processing:
 	-Determine what the wire format is
 	-Figure out how to talk over ethernet on the robot
@@ -12,9 +11,18 @@ Shooter wheels:
 	-Determine the actual speeds to use
 	-Add option to use config file
 	-Add fallback systems
+	-Revise jag code
 	-Change how the shooter wheels are controlled to make one of them just on at some % and the other one in PID mode when nearly up to speed
+	-Add joystick set mode
 Main:
 	-Make isPressed/fieldRelative use Posedge_toggle
+AutoMode:
+	-Test existing code
+	-Create different modes
+OI:
+	-Selector for AutoModes
+	-On/Off
+	-Emergency stop
 Air:
 	-Tracking the pneumatic pressure
 Holonomic:

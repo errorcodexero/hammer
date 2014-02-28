@@ -2,6 +2,7 @@ Drivebase:
 	-Test the control in the toplevel structs
 	-Complete location estimate code
 Vision processing:
+	-Integrate vision code	
 	-Determine what the wire format is
 	-Figure out how to talk over ethernet on the robot
 	-Make the controls work as if we had the data
@@ -24,7 +25,7 @@ OI:
 	-On/Off
 	-Emergency stop
 Air:
-	-Tracking the pneumatic pressure
+	-FINISH TRACKING PNEUMATIC PRESSURE!
 Holonomic:
 	-Slight style tweaks in header file
 Other:

@@ -46,7 +46,7 @@ vector< pair<Toplevel::Output,Time> > bist_steps(){
 	g.ejector=Ejector::OUTPUT_DOWN;
 	r|=make_pair(g,2.0);
 
-	g.shooter_wheels.top=1000;
+/*	g.shooter_wheels.top=1000;
 	r|=make_pair(g,1.0);
 
 	g.shooter_wheels.top=0;
@@ -56,7 +56,7 @@ vector< pair<Toplevel::Output,Time> > bist_steps(){
 	r|=make_pair(g,1.0);
 
 	g.shooter_wheels.bottom=0;
-	r|=make_pair(g,1.0);
+	r|=make_pair(g,1.0);*/
 
 	return r;
 }

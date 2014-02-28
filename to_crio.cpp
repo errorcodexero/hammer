@@ -44,6 +44,24 @@ int read_analog(Robot_inputs& r){
 	}
 }
 
+DriverStationEnhandedIO *get_driver_station(){
+	DriverStation *ds=DriverStation::GetInstance();
+	if(!ds) return NULL;
+	return ds->GetEnhancedIO();
+}
+
+int read_driver_station(Driver_station& r){
+	DriverStationEnhancedIO *en=get_driver_station();
+	if(!en) return 2048;
+	for(unsigned i=0;i<r.ANALOG_INPUTS;i++){
+		r.analog[i]=en->GetAnalogIn(i+1);
+	}
+	for(unsigned i=0;i<r.DIGITAL_INPUTS;i++){
+		r.digital[i]=en->GetDigital(i+1);
+	}
+	return 0;
+}
+
 //it might make sense to put this in the Robot_inputs structure.  
 Volt battery_voltage(){
 	AnalogModule *am=AnalogModule::GetInstance(DriverStation::kBatteryModuleNumber);
@@ -62,6 +80,7 @@ pair<Robot_inputs,int> read(Robot_mode robot_mode){
 	r.now=Timer::GetFPGATimestamp();
 	error_code|=read_joysticks(r);
 	error_code|=read_analog(r);
+	error_code|=read_driver_station(r.driver_station);
 	return make_pair(r,error_code);
 }
 
@@ -99,6 +118,10 @@ int demo(...){
 	return 0;
 }
 
+string space_out(string s){
+	return s+"                                     ";
+}
+
 template<typename USER_CODE>
 class To_crio
 {
@@ -108,9 +131,9 @@ class To_crio
 	USER_CODE main;
 	int skipped;
 	Jag_control jaguar[Robot_outputs::CAN_JAGUARS];
-	
+	DriverStationLCD *lcd;
 public:
-	To_crio():error_code(0),skipped(0)
+	To_crio():error_code(0),skipped(0),lcd(NULL)
 	{
 		int solenoid_module=find_solenoid_module();
 		for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
@@ -134,6 +157,9 @@ public:
 			if(r) error_code|=256;
 			//digital_in[i]=new DigitalInput(i+1);
 		}
+		
+		lcd=DriverStationLCD::GetInstance();
+		if(!lcd) error_code|=512;
 	}
 	
 	int set_solenoid(unsigned i,Solenoid_output v){
@@ -149,6 +175,18 @@ public:
 			int r=set_pwm(i,out.pwm[i]);
 			if(r) error_code|=2;
 		}
+		
+		if(lcd){
+			lcd->Printf(DriverStationLCD::kUser_Line1,1,"%s",space_out(out.driver_station.lcd[0]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line2,1,"%s",space_out(out.driver_station.lcd[1]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line3,1,"%s",space_out(out.driver_station.lcd[2]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line4,1,"%s",space_out(out.driver_station.lcd[3]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line5,1,"%s",space_out(out.driver_station.lcd[4]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line6,1,"%s",space_out(out.driver_station.lcd[5]).c_str());
+			lcd->UpdateLCD();
+		}else{
+			cerr<<"lcd is null\r\n";
+		}
 		for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
 			int r=set_solenoid(i,out.solenoid[i]);
 			if(r) error_code|=16;
@@ -161,17 +199,29 @@ public:
 			int r=digital_io[i].set(out.digital_io[i]);
 			if(r) error_code|=512;
 		}
+
+		{
+			DriverStationEnhancedIO *ds=get_driver_station();
+			if(ds){
+				for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
+					ds->SetDigitalOutput(i+1,out.digital[i]);
+				}
+			}else{
+				error_code|=2048;
+			}
+		}
+
 		for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
 			jaguar[i].set(out.jaguar[i],enabled);
-			cerr<<jaguar[i]<<"\n";
-			cerr<<"Are we enabled?"<<enabled<<"\n";
-			cerr<<out.jaguar[i]<<"\n";
+			//cerr<<jaguar[i]<<"\n";
+			//cerr<<"Are we enabled?"<<enabled<<"\n";
+			//cerr<<out.jaguar[i]<<"\n";
 			//cerr<<jaguar[i].jaguar->GetSpeed()<<"\n";
 		}
-			cerr<<"\n"<<jaguar[0].jaguar->GetSpeed()<<"\n";
+/*			cerr<<"\n"<<jaguar[0].jaguar->GetSpeed()<<"\n";
 			cerr<<jaguar[1].jaguar->GetSpeed()<<"\n";
 			cerr<<jaguar[2].jaguar->GetSpeed()<<"\n";
-			cerr<<jaguar[3].jaguar->GetSpeed()<<"\n";
+			cerr<<jaguar[3].jaguar->GetSpeed()<<"\n";*/
 		/*
 		float kP = 1.000;
 		float kI = 0.005;

@@ -3,6 +3,12 @@ cd input
 echo now running CYBORG TEST
 ./cyborg_joystick_test
 rm cyborg_joystick
+echo now running PANEL2014
+./panel2014_test
+rm panel2014
+echo now running INPUT UTIL
+./util_test
+rm util
 cd ../control
 echo now running WHEEL RPMs TEST
 ./wheel_rpms_test

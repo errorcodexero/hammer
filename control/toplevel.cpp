@@ -1,6 +1,7 @@
 #include "toplevel.h"
 #include<iostream>
 #include<cassert>
+#include<math.h>
 
 using namespace std;
 
@@ -32,8 +33,8 @@ namespace Toplevel{
 		collector_tilt(Collector_tilt::GOAL_UP),
 		injector(Injector::WAIT),
 		injector_arms(Injector_arms::GOAL_X),
-		ejector(Ejector::WAIT),
-		shooter_wheels(Shooter_wheels::X)
+		ejector(Ejector::WAIT)
+		//shooter_wheels(Shooter_wheels:)
 	{}
 
 	ostream& operator<<(ostream& o,Subgoals g){
@@ -70,11 +71,12 @@ namespace Toplevel{
 
 	Estimator::Estimator():pump(Pump::NOT_FULL), orientation(0){}
 
-	void Estimator::update(Time time,Output out,Pump::Status pump_status, float orientation1){
+	void Estimator::update(Time time,Output out,Pump::Status pump_status, float orientation1,Shooter_wheels::Status wheels_in){
 		collector_tilt.update(time,out.collector_tilt);
 		injector.update(time,out.injector);
 		injector_arms.update(time,out.injector_arms);
 		ejector.update(time,out.ejector);
+		shooter_wheels=wheels_in;
 		pump=pump_status;
 		orientation = orientation1;
 	}
@@ -95,7 +97,7 @@ namespace Toplevel{
 		o<<" inject:"<<injector;
 		o<<" inj arm:"<<injector_arms;
 		o<<" eject:"<<ejector;
-		//o<<" shoot:"<<e.shoot;
+		o<<" shooter_wheels:"<<shooter_wheels;
 		o<<" pump:"<<pump;
 		o<<")";
 	}
@@ -108,19 +110,29 @@ namespace Toplevel{
 	Output control(Status status,Subgoals g){
 		Output r;
 		r.collector=g.collector;
-		r.collector_tilt=control(g.collector_tilt);
-		r.injector=control(status.injector,g.injector);
-		r.injector_arms=control(status.injector_arms,g.injector_arms);
-		r.ejector=control(status.ejector,g.ejector);
-		r.shooter_wheels=control(g.shooter_wheels);
-		r.pump=control(status.pump);
-		r.drive=control(g.drive, status.orientation);
+		r.collector_tilt=Collector_tilt::control(g.collector_tilt);
+		r.injector=Injector::control(status.injector,g.injector);
+		r.injector_arms=Injector_arms::control(status.injector_arms,g.injector_arms);
+		r.ejector=Ejector::control(status.ejector,g.ejector);
+		r.shooter_wheels=control(status.shooter_wheels,g.shooter_wheels);
+		r.pump=Pump::control(status.pump);
+		r.drive=::control(g.drive, status.orientation);
 		return r;
 	}
 
 	bool ready(Status status,Subgoals g){
-		return ready(status.collector_tilt,g.collector_tilt) && ready(status.injector,g.injector) && ready(status.injector_arms,g.injector_arms) && ready(status.ejector,g.ejector) && ready(status.shooter_wheels,g.shooter_wheels);
+		return Collector_tilt::ready(status.collector_tilt,g.collector_tilt) && 
+			Injector::ready(status.injector,g.injector) && 
+			Injector_arms::ready(status.injector_arms,g.injector_arms) && 
+			Ejector::ready(status.ejector,g.ejector) && 
+			ready(status.shooter_wheels,g.shooter_wheels);
 	}
+	
+	/*ostream& operator<<(ostream& o,Control a){
+		o<<"Toplevel::Control(";
+		o<<a.shooter_wheels;
+		return o<<")";
+	}*/
 
 	ostream& operator<<(ostream& o,Mode m){
 		#define X(name) if(m==name) return o<<""#name;
@@ -140,30 +152,31 @@ namespace Toplevel{
 		assert(0);
 	}
 	
-	Subgoals subgoals(Mode m){
+	Subgoals subgoals(Mode m,Drive_goal d,wheelcalib calib){
 		Subgoals r;
+		r.drive=d;
 		switch(m){
 			case DRIVE_WO_BALL:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_X;
-				r.shooter_wheels=Shooter_wheels::X;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
 				break;
 			case DRIVE_W_BALL:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
-				r.shooter_wheels=Shooter_wheels::X;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
 				break;
 			case COLLECT:
 				r.collector=ON;
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_OPEN;
-				r.shooter_wheels=Shooter_wheels::X;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
 				break;
 			case SHOOT_HIGH_PREP:
 			case SHOOT_HIGH:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
-				r.shooter_wheels=Shooter_wheels::HIGH_GOAL;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::HIGH_GOAL);
 				if(m==SHOOT_HIGH){
 					r.injector=Injector::START;
 				}
@@ -172,14 +185,14 @@ namespace Toplevel{
 			case TRUSS_TOSS:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
-				r.shooter_wheels=Shooter_wheels::TRUSS;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::TRUSS);
 				if(m==TRUSS_TOSS) r.injector=Injector::START;
 				break;
 			case PASS_PREP:
 			case PASS:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
-				r.shooter_wheels=Shooter_wheels::PASS;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::PASS);
 				if(m==PASS) r.injector=Injector::START;
 				break;
 			case EJECT_PREP:
@@ -191,7 +204,7 @@ namespace Toplevel{
 			case CATCH:
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;//not sure that this matters
-				r.shooter_wheels=Shooter_wheels::STOP;//could also have a reverse mode here
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::STOP);//could also have a reverse mode here
 				break;
 			default:assert(0);
 		}
@@ -217,9 +230,10 @@ int main(){
 	};
 	Toplevel::Status status;
 	cout<<status<<"\n";
+	//Toplevel::Control control;
 	for(auto mode:MODES){
 		cout<<mode<<":\n";
-		auto g=subgoals(mode);
+		auto g=subgoals(mode,Drive_goal(),wheelcalib());
 		cout<<"\t"<<g<<"\n";
 		cout<<"\t"<<control(status,g)<<"\n";
 		cout<<"\t"<<ready(status,g)<<"\n";
@@ -228,8 +242,8 @@ int main(){
 	cout<<est<<"\n";
 	cout<<est.estimate()<<"\n";
 	Pump::Status ps=Pump::FULL;
-	est.update(0,Output(),ps,0);
-	est.update(10,Output(),ps,0);
+	est.update(0,Output(),ps,0,Shooter_wheels::Status());
+	est.update(10,Output(),ps,0,Shooter_wheels::Status());
 	cout<<est.estimate()<<"\n";
 	/*
 	if we choose one of the modes and use all the built-in controls then we should after some time get to a status where we're ready.  

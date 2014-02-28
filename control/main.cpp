@@ -25,6 +25,8 @@ double convert_output(Collector_mode m){
 
 static const int JAG_TOP_FEEDBACK=1;
 static const int JAG_BOTTOM_FEEDBACK=3;
+static const int JAG_TOP_OPEN_LOOP=0;
+static const int JAG_BOTTOM_OPEN_LOOP=2;
 
 Robot_outputs convert_output(Toplevel::Output a){
 	Robot_outputs r;
@@ -52,12 +54,15 @@ Robot_outputs convert_output(Toplevel::Output a){
 	7 bottom
 	9 top
 	*/
-//	r.jaguar[0]=r.jaguar[1]=Jaguar_output::speedOut(a.shooter_wheels.top);
-//	r.jaguar[2]=r.jaguar[3]=Jaguar_output::speedOut(a.shooter_wheels.bottom);
-	//r.jaguar[0]=a.shooter_wheels.top[Shooter_wheels::Output::OPEN_LOOP];
+	cerr<<a.shooter_wheels<<"\r\n";
 	r.jaguar[JAG_TOP_FEEDBACK]=a.shooter_wheels.top[Shooter_wheels::Output::FEEDBACK];
-	//r.jaguar[2]=a.shooter_wheels.bottom[Shooter_wheels::Output::OPEN_LOOP];
 	r.jaguar[JAG_BOTTOM_FEEDBACK]=a.shooter_wheels.bottom[Shooter_wheels::Output::FEEDBACK];
+	r.jaguar[JAG_TOP_OPEN_LOOP]=a.shooter_wheels.top[Shooter_wheels::Output::OPEN_LOOP];
+	r.jaguar[JAG_BOTTOM_OPEN_LOOP]=a.shooter_wheels.bottom[Shooter_wheels::Output::OPEN_LOOP];
+	for(unsigned i=0;i<4;i++){
+		r.jaguar[i];
+		cerr<<r.jaguar[i]<<"\r\n";
+	}
 	return r;
 }
 

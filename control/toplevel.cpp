@@ -88,6 +88,7 @@ namespace Toplevel{
 		r.injector_arms=injector_arms.estimate();
 		r.ejector=ejector.estimate();
 		r.pump=pump;
+		r.shooter_wheels = shooter_wheels;
 		return r;
 	}
 
@@ -197,7 +198,7 @@ namespace Toplevel{
 				break;
 			case EJECT_PREP:
 			case EJECT:
-				r.collector_tilt=Collector_tilt::GOAL_DOWN;
+				r.collector_tilt=Collector_tilt::GOAL_UP;//was down, but with the current ejector geometry works better this way.
 				r.injector_arms=Injector_arms::GOAL_OPEN;
 				if(m==EJECT) r.ejector=Ejector::START;
 				break;

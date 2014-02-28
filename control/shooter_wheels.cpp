@@ -89,9 +89,10 @@ namespace Shooter_wheels{
 	Output control(Status status,Goal goal){
 		Output r;
 		//Jaguar_output top=Jaguar_output::voltageOut(.25),bottom=Jaguar_output::voltageOut(.6);
-		r.top[Output::FEEDBACK]=Jaguar_output::speedOut(goal.top);
+		bool all_open_loop=0;
+		r.top[Output::FEEDBACK]=all_open_loop?open_loop(status.top,goal.top):Jaguar_output::speedOut(goal.top);
 		r.top[Output::OPEN_LOOP]=open_loop(status.top,goal.top);
-		r.bottom[Output::FEEDBACK]=Jaguar_output::speedOut(goal.bottom);
+		r.bottom[Output::FEEDBACK]=all_open_loop?open_loop(status.bottom,goal.bottom):Jaguar_output::speedOut(goal.bottom);
 		r.bottom[Output::OPEN_LOOP]=open_loop(status.bottom,goal.bottom);
 		return r;
 	}

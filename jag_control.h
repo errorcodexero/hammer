@@ -13,7 +13,7 @@ class Jag_control
 {
 public:
 	static const uint8_t SYNC_GROUP=0x40;
-
+private:
 	CANJaguar *jaguar;
 	
 public:

@@ -15,8 +15,8 @@ Shooter wheels:
 	-Revise jag code
 	-Change how the shooter wheels are controlled to make one of them just on at some % and the other one in PID mode when nearly up to speed
 	-Add joystick set mode
-Main:
-	-Make isPressed/fieldRelative use Posedge_toggle
+	-Analyse the speed data Jeff has
+	-Check that the ready function does the right thing
 AutoMode:
 	-Test existing code
 	-Create different modes
@@ -24,9 +24,14 @@ OI:
 	-Selector for AutoModes
 	-On/Off
 	-Emergency stop
+	-Make it so that can detect when the Cypress board is present or not
 Air:
 	-FINISH TRACKING PNEUMATIC PRESSURE!
 Holonomic:
 	-Slight style tweaks in header file
-Other:
-	-Create an 'input' directory an move all the joystick stuff that's in the top level into it
+Ejector:
+	-Test ejector mode change that makes it keep the collector up
+Collector:
+	-Time movements & adjust code appropriately
+Collector arms:
+	-Time movements & adjust code appropriately

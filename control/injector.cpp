@@ -157,6 +157,14 @@ namespace Injector{
 		}
 	}
 
+	bool operator==(Estimator a,Estimator b){
+		return a.location==b.location && a.timer==b.timer;
+	}
+
+	bool operator!=(Estimator a,Estimator b){
+		return !(a==b);
+	}
+
 	ostream& operator<<(ostream& o,Estimator est){
 		est.out(o);
 		return o;

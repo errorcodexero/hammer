@@ -52,6 +52,8 @@ namespace Toplevel{
 		Pump::Status pump;
 		float orientation;
 	};
+	bool operator==(Status,Status);
+	bool operator!=(Status,Status);
 	std::ostream& operator<<(std::ostream& o,Status);
 
 	class Estimator{
@@ -69,8 +71,13 @@ namespace Toplevel{
 		void update(Time,Output,Pump::Status,float orientation,Shooter_wheels::Status);
 		Status estimate()const;
 		void out(std::ostream&)const;
+
+		friend bool operator==(Estimator,Estimator);
 	};
+	bool operator==(Estimator,Estimator);
+	bool operator!=(Estimator,Estimator);
 	std::ostream& operator<<(std::ostream& o,Estimator);
+	bool approx_equal(Estimator,Estimator);
 
 	Output control(Status,Subgoals);
 	bool ready(Status,Subgoals);

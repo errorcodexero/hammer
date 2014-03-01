@@ -1,5 +1,6 @@
 #include "gyro_tracker.h"
 #include<iostream>
+#include<cassert>
 
 using namespace std;
 
@@ -11,6 +12,10 @@ void Integrator::update(Time t,double value){
 		total+=elapsed*value;
 	}
 	last=t;
+}
+
+bool operator==(Integrator a,Integrator b){
+	return a.last==b.last && a.total==b.total;
 }
 
 ostream& operator<<(ostream& o,Integrator a){
@@ -38,6 +43,18 @@ void Gyro_tracker::update(Time now,Volt v){
 //it might make more sense to do the unit convertion in here instead of in update.
 Degree Gyro_tracker::angle()const{ 
 	return integrator.total; 
+}
+
+bool operator==(Gyro_tracker a,Gyro_tracker b){
+	return a.cal_accumulated==b.cal_accumulated && a.cal_samples==b.cal_samples && a.cal_start==b.cal_start && a.center==b.center && a.integrator==b.integrator;
+}
+
+bool operator!=(Gyro_tracker a,Gyro_tracker b){
+	return !(a==b);
+}
+
+bool approx_equal(Gyro_tracker a,Gyro_tracker b){
+	return a.cal_accumulated==b.cal_accumulated /*&& a.cal_samples==b.cal_samples*/ && a.cal_start==b.cal_start && a.center==b.center && a.integrator.total==b.integrator.total;
 }
 
 ostream& operator<<(ostream& o,Gyro_tracker a){

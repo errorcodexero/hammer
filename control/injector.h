@@ -27,7 +27,11 @@ namespace Injector{
 		Location estimate()const;
 		Status status()const;
 		void out(std::ostream&)const;
+
+		friend bool operator==(Estimator,Estimator);
 	};
+	bool operator==(Estimator,Estimator);
+	bool operator!=(Estimator,Estimator);
 	std::ostream& operator<<(std::ostream&,Estimator::Location);
 	std::ostream& operator<<(std::ostream&,Estimator);
 

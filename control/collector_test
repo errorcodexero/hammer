@@ -1,1 +1,1 @@
-g++ -DCOLLECTOR_TEST -Wall collector.cpp ../util/posedge_trigger.cpp ../util/negedge_trigger.cpp -o collector && ./collector
+g++ -DCOLLECTOR_TEST -Wall -Werror collector.cpp ../util/posedge_trigger.cpp ../util/negedge_trigger.cpp -o collector && ./collector

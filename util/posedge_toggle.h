@@ -12,8 +12,10 @@ class Posedge_toggle{
 	bool get()const;
 	
 	friend std::ostream& operator<<(std::ostream&,Posedge_toggle);
+	friend bool operator==(Posedge_toggle,Posedge_toggle);
 };
-
+bool operator==(Posedge_toggle,Posedge_toggle);
+bool operator!=(Posedge_toggle,Posedge_toggle);
 std::ostream& operator<<(std::ostream&,Posedge_toggle);
 
 #endif

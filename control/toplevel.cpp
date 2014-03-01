@@ -57,6 +57,23 @@ namespace Toplevel{
 		pump(Pump::NOT_FULL)
 	{}
 
+	bool operator==(Status a,Status b){
+		#define X(name) if(a.name!=b.name) return 0;
+		X(collector_tilt)
+		X(injector)
+		X(injector_arms)
+		X(ejector)
+		X(shooter_wheels)
+		X(pump)
+		X(orientation)
+		#undef X
+		return 1;
+	}
+
+	bool operator!=(Status a,Status b){
+		return !(a==b);
+	}
+
 	ostream& operator<<(ostream& o,Status s){
 		o<<"Status(";
 		o<<"colct_tlt:"<<s.collector_tilt;
@@ -103,9 +120,30 @@ namespace Toplevel{
 		o<<")";
 	}
 
+	bool operator==(Estimator a,Estimator b){
+		#define X(name) if(a.name!=b.name) return 0;
+		X(collector_tilt)
+		X(injector)
+		X(injector_arms)
+		X(ejector)
+		X(shooter_wheels)
+		X(pump)
+		X(orientation)
+		#undef X
+		return 1;
+	}
+
+	bool operator!=(Estimator a,Estimator b){
+		return !(a==b);
+	}
+
 	ostream& operator<<(ostream& o,Estimator e){
 		e.out(o);
 		return o;
+	}
+
+	bool approx_equal(Estimator a,Estimator b){
+		return a.estimate()==b.estimate();
 	}
 
 	Output control(Status status,Subgoals g){

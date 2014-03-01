@@ -28,6 +28,8 @@ namespace Ejector{
 		Status status()const;
 		void out(std::ostream&)const;
 	};
+	bool operator==(Estimator,Estimator);
+	bool operator!=(Estimator,Estimator);
 	std::ostream& operator<<(std::ostream&,Estimator::Location);
 	std::ostream& operator<<(std::ostream&,Estimator);
 

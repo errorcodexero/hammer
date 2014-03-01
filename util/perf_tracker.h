@@ -18,8 +18,12 @@ class Perf_tracker{
 	Time average()const;
 	
 	friend std::ostream& operator<<(std::ostream&,Perf_tracker);
+	friend bool operator==(Perf_tracker,Perf_tracker);
 };
 
+bool operator==(Perf_tracker,Perf_tracker);
+bool operator!=(Perf_tracker,Perf_tracker);
 std::ostream& operator<<(std::ostream&,Perf_tracker);
+bool approx_equal(Perf_tracker,Perf_tracker);
 
 #endif

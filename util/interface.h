@@ -18,6 +18,8 @@ struct Jaguar_output{
 	static Jaguar_output speedOut(double);
 	static Jaguar_output voltageOut(double);
 };
+bool operator==(Jaguar_output,Jaguar_output);
+bool operator!=(Jaguar_output,Jaguar_output);
 std::ostream& operator<<(std::ostream&,Jaguar_output);
 
 struct Jaguar_input{
@@ -42,6 +44,7 @@ struct Driver_station_output{
 
 	Driver_station_output();
 };
+bool operator==(Driver_station_output,Driver_station_output);
 std::ostream& operator<<(std::ostream&,Driver_station_output);
 
 struct Robot_outputs{
@@ -67,6 +70,8 @@ struct Robot_outputs{
 	Robot_outputs();
 };
 
+bool operator==(Robot_outputs,Robot_outputs);
+bool operator!=(Robot_outputs,Robot_outputs);
 std::ostream& operator<<(std::ostream& o,Robot_outputs);
 
 struct Joystick_data{

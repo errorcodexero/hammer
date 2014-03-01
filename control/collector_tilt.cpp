@@ -89,6 +89,14 @@ namespace Collector_tilt{
 		o<<"Estimator("<<est<<","<<timer<<")";
 	}
 
+	bool operator==(Estimator a,Estimator b){
+		return a.est==b.est && a.timer==b.timer;
+	}
+
+	bool operator!=(Estimator a,Estimator b){
+		return !(a==b);
+	}
+
 	ostream& operator<<(ostream& o,Estimator e){
 		e.out(o);
 		return o;

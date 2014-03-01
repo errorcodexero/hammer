@@ -74,6 +74,9 @@ rm countup_timer
 echo new running INTERFACE TEST
 ./interface_test
 rm interface
+echo now running JAG INTERFACE TEST
+./jag_interface_test
+rm jag_interface
 echo now running NEGEDGE TRIGGER TEST
 ./negedge_trigger_test
 rm negedge_trigger

@@ -1,1 +1,1 @@
-g++ -Wall -Werror -DWHEEL_RPMS_TEST wheelrpms.cpp shooter_wheels.cpp ../util/interface.cpp shooter_status.cpp -o wheelrpms -std=c++0x 2>&1 && ./wheelrpms
+g++ -Wall -Werror -DWHEEL_RPMS_TEST wheelrpms.cpp shooter_wheels.cpp ../util/interface.cpp shooter_status.cpp ../util/jag_interface.cpp -o wheelrpms -std=c++0x 2>&1 && ./wheelrpms

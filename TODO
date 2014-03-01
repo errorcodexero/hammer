@@ -35,3 +35,9 @@ Collector:
 	-Time movements & adjust code appropriately
 Collector arms:
 	-Time movements & adjust code appropriately
+Low level:
+	-Deal more systematically with when the robot is disabled
+		-Make it so that you can do a round trip between Toplevel::Outputs and Robot_outputs
+		-Feed Toplevel::Outputs based on robot outputs into the estimators
+	-Move some of the parts of interface.h into their own files
+	-Add jag_control to runall

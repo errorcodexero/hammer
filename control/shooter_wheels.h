@@ -4,7 +4,7 @@
 #include<iosfwd>
 #include"shooter_status.h"
 #include"wheelrpms.h"
-#include "../util/interface.h"
+#include "../util/jag_interface.h"
 
 namespace Shooter_wheels{
 	enum High_level_goal{HIGH_GOAL,TRUSS,PASS,STOP,X};

@@ -29,4 +29,5 @@ g++ -Wall -Werror -std=c++0x -DMAIN_TEST -I.. main.cpp \
 	wheelrpms.cpp \
 	../input/util.cpp \
 	../input/panel2014.cpp \
+	../util/jag_interface.cpp \
 	-o main 2>&1 && ./main

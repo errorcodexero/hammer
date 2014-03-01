@@ -1,7 +1,7 @@
 #ifndef CONTROL_STATUS_H
 #define CONTROL_STATUS_H
+
 #include <iosfwd>
-#include <assert.h>
 #include<vector>
 
 namespace Control_status{

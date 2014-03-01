@@ -8,7 +8,6 @@
 #include "shooter_wheels.h"
 #include "ejector.h"
 #include "pump.h"
-#include "../util/point.h"
 #include "holonomic.h"
 
 namespace Toplevel{

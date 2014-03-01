@@ -7,6 +7,5 @@ g++ -Wall -Werror -DPANEL2014_TEST panel2014.cpp ../control/fire_control.cpp \
 	../util/posedge_trigger.cpp \
 	../util/negedge_trigger.cpp \
 	../control/collector_tilt.cpp \
-	../util/interface.cpp \
-	../util/jag_interface.cpp \
+	../util/driver_station_interface.cpp \
 	-o panel2014 && ./panel2014

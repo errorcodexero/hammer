@@ -1,37 +1,30 @@
 Drivebase:
-	-Test the control in the toplevel structs
-	-Complete location estimate code
+	-Complete location estimate code (DYLAN)
 Vision processing:
-	-Integrate vision code	
-	-Determine what the wire format is
-	-Figure out how to talk over ethernet on the robot
+	-Integrate vision code(THOMAS)
+	-Determine what the wire format is (THOMAS)
+	-Figure out how to talk over ethernet on the robot (TOM/THOMAS)
 	-Make the controls work as if we had the data
 		~For targets
 		~For ball locations
 Shooter wheels:
-	-Determine the actual speeds to use
-	-Add option to use config file
+	-Determine the actual speeds to use 
+	-Add option to use config file (AUSTIN)
 	-Add fallback systems
-	-Revise jag code
-	-Change how the shooter wheels are controlled to make one of them just on at some % and the other one in PID mode when nearly up to speed
-	-Add joystick set mode
-	-Analyse the speed data Jeff has
+	-Revise jag code (STEVE)
+	-Add joystick set mode (ADRIAN)
+	-Analyse the speed data Jeff has (JACOB)
 	-Check that the ready function does the right thing
 AutoMode:
 	-Test existing code
-	-Create different modes
+	-Create different modes (THOMAS)
 OI:
 	-Selector for AutoModes
 	-On/Off
-	-Emergency stop
-	-Make it so that can detect when the Cypress board is present or not
+	-Make it so that can detect when the Cypress board is present or not (STEVE?)
 Air:
-	-FINISH TRACKING PNEUMATIC PRESSURE!
-Holonomic:
-	-Slight style tweaks in header file
+	-FINISH TRACKING PNEUMATIC PRESSURE! (JACOB)
 Ejector:
 	-Test ejector mode change that makes it keep the collector up
-Collector:
-	-Time movements & adjust code appropriately
 Collector arms:
 	-Time movements & adjust code appropriately

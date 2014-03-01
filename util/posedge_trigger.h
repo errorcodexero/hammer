@@ -12,7 +12,8 @@ struct Posedge_trigger{
 	bool operator()(bool);
 	//If previous value was 0, and new value is one, return one
 };
-
+bool operator==(Posedge_trigger,Posedge_trigger);
+bool operator!=(Posedge_trigger,Posedge_trigger);
 std::ostream& operator<<(std::ostream& o,Posedge_trigger);
 
 #endif

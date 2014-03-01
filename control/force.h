@@ -16,7 +16,8 @@ struct Force{
 	
 	Robot_outputs operator()(Robot_outputs)const;
 };
-
+bool operator==(Force,Force);
+bool operator!=(Force,Force);
 std::ostream& operator<<(std::ostream&,Force);
 
 #endif

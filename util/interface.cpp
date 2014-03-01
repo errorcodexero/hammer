@@ -48,6 +48,20 @@ Driver_station_output::Driver_station_output(){
 	}
 }
 
+bool operator==(Driver_station_output a,Driver_station_output b){
+	for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
+		if(a.digital[i]!=b.digital[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Driver_station_output::LCD_HEIGHT;i++){
+		if(a.lcd[i]!=b.lcd[i]){
+			return 0;
+		}
+	}
+	return 1;
+}
+
 ostream& operator<<(ostream& o,Driver_station_output a){
 	o<<"Driver_station_output(";
 	o<<"digital:";
@@ -222,6 +236,39 @@ Robot_inputs::Robot_inputs():
 	}
 }
 
+bool operator==(Robot_outputs a,Robot_outputs b){
+	for(unsigned i=0;i<Robot_outputs::PWMS;i++){
+		if(a.pwm[i]!=b.pwm[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
+		if(a.solenoid[i]!=b.solenoid[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::RELAYS;i++){
+		if(a.relay[i]!=b.relay[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
+		if(a.digital_io[i]!=b.digital_io[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+		if(a.jaguar[i]!=b.jaguar[i]){
+			return 0;
+		}
+	}
+	return a.driver_station==b.driver_station;
+}
+
+bool operator!=(Robot_outputs a,Robot_outputs b){
+	return !(a==b);
+}
+
 ostream& operator<<(ostream& o,Robot_inputs a){
 	o<<"Robot_inputs(\n";
 	o<<"  mode="<<a.robot_mode<<"\n";
@@ -264,6 +311,14 @@ Jaguar_output Jaguar_output::voltageOut(double a){
 	j.controlSpeed = false;
 	j.voltage = a;
 	return j;
+}
+
+bool operator==(Jaguar_output a,Jaguar_output b){
+	return a.speed==b.speed && a.voltage==b.voltage && a.controlSpeed==b.controlSpeed;
+}
+
+bool operator!=(Jaguar_output a,Jaguar_output b){
+	return !(a==b);
 }
 
 ostream& operator<<(ostream& o,Jaguar_output a){

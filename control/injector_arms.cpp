@@ -87,6 +87,10 @@ namespace Injector_arms{
 		return est;
 	}
 
+	bool operator!=(Estimator a,Estimator b){
+		assert(0);
+	}
+
 	void Estimator::out(ostream& o)const{
 		o<<"Estimator(";
 		o<<est<<" "<<timer;

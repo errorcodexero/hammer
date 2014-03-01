@@ -47,22 +47,14 @@ Robot_outputs convert_output(Toplevel::Output a){
 	//pressure switch
 	r.digital_io[0]=DIO_INPUT;
 
-	/*
-	TODO: CAN bus stuff
-	2 bottom
-	6 top
-	7 bottom
-	9 top
-	*/
-	cerr<<a.shooter_wheels<<"\r\n";
+	//cerr<<a.shooter_wheels<<"\r\n";
 	r.jaguar[JAG_TOP_FEEDBACK]=a.shooter_wheels.top[Shooter_wheels::Output::FEEDBACK];
 	r.jaguar[JAG_BOTTOM_FEEDBACK]=a.shooter_wheels.bottom[Shooter_wheels::Output::FEEDBACK];
 	r.jaguar[JAG_TOP_OPEN_LOOP]=a.shooter_wheels.top[Shooter_wheels::Output::OPEN_LOOP];
 	r.jaguar[JAG_BOTTOM_OPEN_LOOP]=a.shooter_wheels.bottom[Shooter_wheels::Output::OPEN_LOOP];
-	for(unsigned i=0;i<4;i++){
-		r.jaguar[i];
+	/*for(unsigned i=0;i<4;i++){
 		cerr<<r.jaguar[i]<<"\r\n";
-	}
+	}*/
 	return r;
 }
 
@@ -219,7 +211,13 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	return r;
 }
 
+bool operator==(Main a,Main b){
+	return a.force==b.force && a.perf==b.perf && a.gyro==b.gyro && a.est==b.est && a.control_status==b.control_status && a.since_switch==b.since_switch && a.ball_collecter==b.ball_collecter && a.print_button==b.print_button && a.field_relative==b.field_relative;
+}
 
+bool operator!=(Main a,Main b){
+	return !(a==b);
+}
 
 ostream& operator<<(ostream& o,Main m){
 	o<<"Main(";
@@ -328,6 +326,12 @@ Control_status::Control_status next(
 	Time since_switch
 ){
 	using namespace Control_status;
+
+	if(autonomous_mode && !autonomous(status)){
+		//TODO: Put the code to select which autonomous mode here.
+		return AUTO_SPIN_UP;
+	}
+
 	//at the top here should deal with all the buttons that put you into a specific mode.
 	if(j.button[Gamepad_button::A] || panel.mode_buttons.catch_mode) return Control_status::CATCH;
 	if(j.button[Gamepad_button::B] || panel.mode_buttons.collect) return COLLECT;
@@ -470,6 +474,69 @@ Control_status::Control_status next(
 	}
 }
 
+template<typename T>
+void print_diff(T a,T b){
+	if(a!=b){
+		cout<<"From "<<a<<" to "<<b<<"\n";
+	}
+}
+
+template<typename T>
+void print_diff_approx(T a,T b){
+	if(!approx_equal(a,b)){
+		cout<<"From "<<a<<" to "<<b<<"\n";
+	}
+}
+
+void print_diff(Gyro_tracker a,Gyro_tracker b){ print_diff_approx(a,b); }
+
+void print_diff(Toplevel::Status a,Toplevel::Status b){
+	#define X(name) print_diff(a.name,b.name);
+	X(collector_tilt)
+	X(injector)
+	X(injector_arms)
+	X(ejector)
+	X(shooter_wheels)
+	X(pump)
+	X(orientation)
+	#undef X
+}
+
+void print_diff(Toplevel::Estimator a,Toplevel::Estimator b){
+	print_diff(a.estimate(),b.estimate());
+}
+
+void print_diff(Main a,Main b){
+	print_diff(a.force,b.force);
+	print_diff(a.gyro,b.gyro);
+	print_diff(a.est,b.est);
+	print_diff(a.control_status,b.control_status);
+	print_diff(a.ball_collecter,b.ball_collecter);
+	print_diff(a.field_relative,b.field_relative);
+}
+
+//void print_diff(Robot_outputs a,Robot_outputs b){
+	//for(unsigned i=0;i<Robot_outputs::PWMS;i++){
+	//assert(0);
+//}
+
+bool approx_equal(Main a,Main b){
+	//cout<<"a\n";
+	if(a.force!=b.force) return 0;
+	//cout<<"b\n";
+	//if(!approx_equal(a.perf,b.perf)) return 0;
+	if(!approx_equal(a.gyro,b.gyro)) return 0;
+	//cout<<"1\n";
+	if(!approx_equal(a.est,b.est)) return 0;
+	//cout<<"a\n";
+	if(a.control_status!=b.control_status) return 0;
+	if(a.ball_collecter!=b.ball_collecter) return 0;
+	//cout<<"b\n";
+	if(a.print_button!=b.print_button) return 0;
+	if(a.field_relative!=b.field_relative) return 0;
+	return 1;
+}
+
 #ifdef MAIN_TEST
 int main(){
 	/*Main m;
@@ -502,6 +569,28 @@ int main(){
 	for(Control_status::Control_status control_status:Control_status::all()){
 		cout<<control_status<<" "<<to_mode(control_status)<<"\n";
 	}
-	m(Robot_inputs());
+	Robot_outputs out;
+	Main old_main;
+	for(unsigned i=0;i<15;i++){
+		Robot_inputs in;
+		in.now=i/10.0;
+		in.robot_mode.autonomous=1;
+		auto out_now=m(in);
+
+		if(!approx_equal(m,old_main)){
+			//cout<<"M="<<m<<"\n";
+		}
+		print_diff(old_main,m);
+		old_main=m;
+
+		if(out_now!=out){
+			cout<<in<<"\n";
+			print_diff(out,out_now);
+			cout<<"\n\n";
+			out=out_now;
+		}else{
+			cout<<"same\n";
+		}
+	}
 }
 #endif

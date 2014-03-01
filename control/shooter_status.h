@@ -12,6 +12,8 @@ namespace Shooter_wheels{
 	
 		RPM top,bottom;
 	};
+	bool operator==(Status,Status);
+	bool operator!=(Status,Status);
 	std::ostream& operator<<(std::ostream&,Status);
 }
 

@@ -30,6 +30,8 @@ struct Main{
 	Robot_outputs operator()(Robot_inputs);
 };
 
+bool operator==(Main,Main);
+bool operator!=(Main,Main);
 std::ostream& operator<<(std::ostream&,Main);
 
 #endif

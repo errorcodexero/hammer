@@ -1,4 +1,5 @@
 #include "WPILib.h"
+#include "DriverStationEnhancedIO.h"
 #include "DigitalModule.h"
 #include "control/main.h"
 #include "dio_control.h"
@@ -44,20 +45,21 @@ int read_analog(Robot_inputs& r){
 	}
 }
 
-DriverStationEnhandedIO *get_driver_station(){
+/*DriverStationEnhancedIO &get_driver_station(){
 	DriverStation *ds=DriverStation::GetInstance();
 	if(!ds) return NULL;
 	return ds->GetEnhancedIO();
-}
+}*/
 
-int read_driver_station(Driver_station& r){
-	DriverStationEnhancedIO *en=get_driver_station();
-	if(!en) return 2048;
+int read_driver_station(Driver_station_input& r){
+	DriverStation *ds=DriverStation::GetInstance();
+	if(!ds) return 2048;
+	DriverStationEnhancedIO &en=ds->GetEnhancedIO();
 	for(unsigned i=0;i<r.ANALOG_INPUTS;i++){
-		r.analog[i]=en->GetAnalogIn(i+1);
+		//r.analog[i]=en.GetAnalogIn(i+1);
 	}
 	for(unsigned i=0;i<r.DIGITAL_INPUTS;i++){
-		r.digital[i]=en->GetDigital(i+1);
+		//r.digital[i]=en.GetDigital(i+1);
 	}
 	return 0;
 }
@@ -201,10 +203,10 @@ public:
 		}
 
 		{
-			DriverStationEnhancedIO *ds=get_driver_station();
+			DriverStation *ds=DriverStation::GetInstance();
 			if(ds){
 				for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
-					ds->SetDigitalOutput(i+1,out.digital[i]);
+					//ds->GetEnhancedIO().SetDigitalOutput(i+1,out.driver_station.digital[i]);
 				}
 			}else{
 				error_code|=2048;
@@ -299,6 +301,9 @@ public:
 		pair<Robot_inputs,int> in1=read(mode);
 		Robot_inputs in=in1.first;
 		error_code|=in1.second;
+		for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+			in.jaguar[i]=jaguar[i].get();
+		}
 		for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
 			in.digital_io[i]=digital_io[i].get();
 		}

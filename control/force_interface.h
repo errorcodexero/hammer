@@ -31,6 +31,8 @@ class Force_interface{
 	friend std::ostream& operator<<(std::ostream&,Force_interface const&);
 };
 
+bool operator==(Force_interface,Force_interface);
+bool operator!=(Force_interface,Force_interface);
 std::ostream& operator<<(std::ostream&,Force_interface::Button);
 std::ostream& operator<<(std::ostream&,Force_interface const&);
 

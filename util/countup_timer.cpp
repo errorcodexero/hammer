@@ -24,6 +24,10 @@ void Countup_timer::out(ostream& o)const{
 	o<<")";
 }
 
+bool operator==(Countup_timer a,Countup_timer b){
+	return a.start==b.start && a.latest==b.latest;
+}
+
 ostream& operator<<(ostream& o,Countup_timer c){
 	c.out(o);
 	return o;

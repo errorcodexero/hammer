@@ -87,7 +87,7 @@ Maybe<Collector_mode> interpret_collector(double analog){
 }
 
 pair<int,int> demux_3x3(double analog){
-	int x=(int)analog*9;
+	int x=(int)analog;//todo: fix scaling.
 	if(x==9) x=8;
 	return make_pair(x%3,x/3);
 }

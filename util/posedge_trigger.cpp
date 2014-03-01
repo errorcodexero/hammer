@@ -1,5 +1,6 @@
 #include "posedge_trigger.h"
 #include<iostream>
+#include<cassert>
 
 using namespace std;
 
@@ -9,6 +10,14 @@ bool Posedge_trigger::operator()(bool b){
 	bool r=!last && b;
 	last=b;
 	return r;
+}
+
+bool operator==(Posedge_trigger a,Posedge_trigger b){
+	return a.last==b.last;
+}
+
+bool operator!=(Posedge_trigger a,Posedge_trigger b){
+	return !(a==b);
 }
 
 ostream& operator<<(ostream& o,Posedge_trigger p){

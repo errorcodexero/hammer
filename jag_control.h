@@ -13,7 +13,7 @@ class Jag_control
 {
 public:
 	static const uint8_t SYNC_GROUP=0x40;
-
+private:
 	CANJaguar *jaguar;
 	
 public:
@@ -37,6 +37,7 @@ public:
 	~Jag_control();
 	
 	void set(Jaguar_output,bool enable);
+	Jaguar_input get() const;
 	void out(std::ostream&)const;
 };
 

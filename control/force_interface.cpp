@@ -208,6 +208,25 @@ Robot_outputs Force_interface::operator()(Robot_outputs a)const{
 
 Force const& Force_interface::get()const{ return force; }
 
+bool operator==(Force_interface a,Force_interface b){
+	if(a.force!=b.force) return 0;
+	for(unsigned i=0;i<Force_interface::BUTTONS;i++){
+		if(a.button[i]!=b.button[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Force_interface::LEN;i++){
+		if(a.recent[i]!=b.recent[i]){
+			return 0;
+		}
+	}
+	return 1;
+}
+
+bool operator!=(Force_interface a,Force_interface b){
+	return !(a==b);
+}
+
 ostream& operator<<(ostream& o,Force_interface::Button b){
 	switch(b){
 		#define X(name) case Force_interface::name: return o<<""#name;

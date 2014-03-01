@@ -91,6 +91,12 @@ void Jag_control::set(Jaguar_output a,bool enable){
 	}
 }
 
+Jaguar_input Jag_control::get()const{
+	Jaguar_input x;
+	x.speed = jaguar -> GetSpeed();
+	return x;
+}
+
 void Jag_control::out(ostream& o)const{
 	o<<"Jag_control(";
 	o<<"init:"<<!!jaguar;

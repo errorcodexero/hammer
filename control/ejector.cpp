@@ -116,6 +116,10 @@ namespace Ejector{
 		}
 	}
 
+	bool operator!=(Estimator,Estimator){
+		assert(0);
+	}
+
 	ostream& operator<<(ostream& o,Estimator est){
 		est.out(o);
 		return o;

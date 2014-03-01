@@ -1,4 +1,4 @@
-g++ -Wall -std=c++0x -DFIRE_CONTROL_TEST \
+g++ -Wall -Werror -std=c++0x -DFIRE_CONTROL_TEST \
 \
 fire_control.cpp \
 control_status.cpp \

@@ -88,9 +88,9 @@ Toplevel::Mode to_mode(Control_status::Control_status status){
 }
 
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
-Main::Main():control_status(Control_status::DRIVE_W_BALL){}
+Main::Main():control_status(Control_status::DRIVE_W_BALL),autonomous_start(0){}
 
-Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,Time since_switch);
+Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch);
 
 Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
 	assert(fabs(joy_x)<=1);
@@ -159,7 +159,12 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	Panel panel=interpret(in.driver_station);	
 	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	Toplevel::Status toplevel_status=est.estimate();
-	control_status=next(control_status,toplevel_status,in.joystick[1],panel,in.robot_mode.autonomous,since_switch.elapsed());
+	control_status=next(
+		control_status,toplevel_status,in.joystick[1],panel,
+		in.robot_mode.autonomous,
+		autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled),
+		since_switch.elapsed()
+	);
 
 	Toplevel::Mode mode=to_mode(control_status);
 	Drive_goal drive_goal1=drive_goal(
@@ -323,11 +328,13 @@ Control_status::Control_status next(
 	Joystick_data j,
 	Panel panel,
 	bool autonomous_mode,
+	bool autonomous_mode_start,
 	Time since_switch
 ){
 	using namespace Control_status;
 
-	if(autonomous_mode && !autonomous(status)){
+	//if(autonomous_mode && !autonomous(status)){
+	if(autonomous_mode_start){
 		//TODO: Put the code to select which autonomous mode here.
 		return AUTO_SPIN_UP;
 	}
@@ -475,10 +482,15 @@ Control_status::Control_status next(
 }
 
 template<typename T>
-void print_diff(T a,T b){
+void print_diff(string s,T a,T b){
 	if(a!=b){
-		cout<<"From "<<a<<" to "<<b<<"\n";
+		cout<<s<<"From "<<a<<" to "<<b<<"\n";
 	}
+}
+
+template<typename T>
+void print_diff(T a,T b){
+	print_diff("",a,b);
 }
 
 template<typename T>
@@ -488,10 +500,14 @@ void print_diff_approx(T a,T b){
 	}
 }
 
+void print_diff(unsigned char a,unsigned char b){
+	print_diff((int)a,(int)b);
+}
+
 void print_diff(Gyro_tracker a,Gyro_tracker b){ print_diff_approx(a,b); }
 
 void print_diff(Toplevel::Status a,Toplevel::Status b){
-	#define X(name) print_diff(a.name,b.name);
+	#define X(name) print_diff(""#name ": ",a.name,b.name);
 	X(collector_tilt)
 	X(injector)
 	X(injector_arms)
@@ -507,18 +523,66 @@ void print_diff(Toplevel::Estimator a,Toplevel::Estimator b){
 }
 
 void print_diff(Main a,Main b){
-	print_diff(a.force,b.force);
-	print_diff(a.gyro,b.gyro);
-	print_diff(a.est,b.est);
-	print_diff(a.control_status,b.control_status);
-	print_diff(a.ball_collecter,b.ball_collecter);
-	print_diff(a.field_relative,b.field_relative);
+	#define X(name) print_diff(""#name ": ",a.name,b.name);
+	#define Y(name) print_diff(a.name,b.name);
+	X(force)
+	Y(gyro);
+	Y(est)
+	X(control_status)
+	X(ball_collecter)
+	X(field_relative)
+	#undef Y
+	#undef X
 }
 
-//void print_diff(Robot_outputs a,Robot_outputs b){
-	//for(unsigned i=0;i<Robot_outputs::PWMS;i++){
-	//assert(0);
-//}
+void print_diff(Robot_outputs a,Robot_outputs b){
+	for(unsigned i=0;i<Robot_outputs::PWMS;i++){
+		if(a.pwm[i]!=b.pwm[i]){
+			cout<<"pwm"<<i<<" "<<(int)a.pwm[i]<<"->"<<(int)b.pwm[i]<<"\n";
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
+		if(a.solenoid[i]!=b.solenoid[i]){
+			cout<<"solenoid"<<i<<" "<<a.solenoid[i]<<"->"<<b.solenoid[i]<<"\n";
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::RELAYS;i++){
+		if(a.relay[i]!=b.relay[i]){
+			cout<<"relay"<<i<<" "<<a.relay[i]<<"->"<<b.relay[i]<<"\n";
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
+		if(a.digital_io[i]!=b.digital_io[i]){
+			cout<<"digital_io"<<i<<" "<<a.digital_io[i]<<"->"<<b.digital_io[i]<<"\n";
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+		if(a.jaguar[i]!=b.jaguar[i]){
+			cout<<"jaguar"<<i<<" "<<a.jaguar[i]<<"->"<<b.jaguar[i]<<"\n";
+		}
+	}
+	print_diff(a.driver_station,b.driver_station);
+}
+
+void print_diff(Robot_inputs a,Robot_inputs b){
+	#define X(name) print_diff(""#name ": ",a.name,b.name);
+	X(robot_mode)
+	//X(now)
+	for(unsigned i=0;i<Robot_inputs::JOYSTICKS;i++){
+		X(joystick[i])
+	}
+	for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
+		X(digital_io[i])
+	}
+	for(unsigned i=0;i<Robot_inputs::ANALOG_INPUTS;i++){
+		X(analog[i])
+	}
+	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+		X(jaguar[i])
+	}
+	X(driver_station)
+	#undef X
+}
 
 bool approx_equal(Main a,Main b){
 	//cout<<"a\n";
@@ -538,6 +602,35 @@ bool approx_equal(Main a,Main b){
 }
 
 #ifdef MAIN_TEST
+
+template<typename T>
+struct Monitor{
+	T data;
+
+	void update(T t){
+		print_diff(data,t);
+		data=t;
+	}
+};
+
+void auto_test(){
+	Main m;
+	Monitor<Robot_inputs> inputs;
+	Monitor<Main> state;
+	Monitor<Robot_outputs> outputs;
+	for(unsigned i=0;i<150;i++){
+		Robot_inputs in;
+		in.now=i/10.0;
+		in.robot_mode.autonomous=1;
+		in.robot_mode.enabled=1;
+		auto out_now=m(in);
+		cout<<"Now="<<in.now<<"\n";
+		inputs.update(in);
+		state.update(m);
+		outputs.update(out_now);
+	}
+}
+
 int main(){
 	/*Main m;
 	cout<<m<<"\n";
@@ -564,33 +657,12 @@ int main(){
 	cout<<func(-1, 0, 0)<<"\n";
 	cout<<func(0, 0, 0)<<"\n";
 	*/
-	Main m;
-	cout<<m<<"\n";
-	for(Control_status::Control_status control_status:Control_status::all()){
-		cout<<control_status<<" "<<to_mode(control_status)<<"\n";
-	}
-	Robot_outputs out;
-	Main old_main;
-	for(unsigned i=0;i<15;i++){
-		Robot_inputs in;
-		in.now=i/10.0;
-		in.robot_mode.autonomous=1;
-		auto out_now=m(in);
-
-		if(!approx_equal(m,old_main)){
-			//cout<<"M="<<m<<"\n";
-		}
-		print_diff(old_main,m);
-		old_main=m;
-
-		if(out_now!=out){
-			cout<<in<<"\n";
-			print_diff(out,out_now);
-			cout<<"\n\n";
-			out=out_now;
-		}else{
-			cout<<"same\n";
+	bool test_control_status=1;
+	if(test_control_status){
+		for(Control_status::Control_status control_status:Control_status::all()){
+			cout<<control_status<<" "<<to_mode(control_status)<<"\n";
 		}
 	}
+	auto_test();
 }
 #endif

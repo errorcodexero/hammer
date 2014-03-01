@@ -1,5 +1,6 @@
 #include "interface.h"
 #include<iostream>
+#include<cassert>
 
 using namespace std;
 
@@ -62,6 +63,10 @@ bool operator==(Driver_station_output a,Driver_station_output b){
 	return 1;
 }
 
+bool operator!=(Driver_station_output a,Driver_station_output b){
+	return !(a==b);
+}
+
 ostream& operator<<(ostream& o,Driver_station_output a){
 	o<<"Driver_station_output(";
 	o<<"digital:";
@@ -112,6 +117,39 @@ Robot_outputs::Robot_outputs(){
 	}
 }
 
+bool operator==(Robot_outputs a,Robot_outputs b){
+	for(unsigned i=0;i<Robot_outputs::PWMS;i++){
+		if(a.pwm[i]!=b.pwm[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
+		if(a.solenoid[i]!=b.solenoid[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::RELAYS;i++){
+		if(a.relay[i]!=b.relay[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
+		if(a.digital_io[i]!=b.digital_io[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+		if(a.jaguar[i]!=b.jaguar[i]){
+			return 0;
+		}
+	}
+	return a.driver_station==b.driver_station;
+}
+
+bool operator!=(Robot_outputs a,Robot_outputs b){
+	return !(a==b);
+}
+
 ostream& operator<<(ostream& o,Robot_outputs a){
 	o<<"Robot_outputs(";
 	o<<"pwm:";
@@ -149,6 +187,24 @@ Joystick_data::Joystick_data(){
 	}
 }
 
+bool operator==(Joystick_data a,Joystick_data b){
+	for(unsigned i=0;i<Joystick_data::AXES;i++){
+		if(a.axis[i]!=b.axis[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Joystick_data::BUTTONS;i++){
+		if(a.button[i]!=b.button[i]){
+			return 0;
+		}
+	}
+	return 1;
+}
+
+bool operator!=(Joystick_data a,Joystick_data b){
+	return !(a==b);
+}
+
 ostream& operator<<(ostream& o,Joystick_data a){
 	o<<"Joystick_data(";
 	o<<"axes:";
@@ -167,6 +223,24 @@ Driver_station_input::Driver_station_input(){
 	for(unsigned i=0;i<DIGITAL_INPUTS;i++) digital[i]=0;
 }
 
+bool operator==(Driver_station_input a,Driver_station_input b){
+	for(unsigned i=0;i<Driver_station_input::ANALOG_INPUTS;i++){
+		if(a.analog[i]!=b.analog[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Driver_station_input::DIGITAL_INPUTS;i++){
+		if(a.digital[i]!=b.digital[i]){
+			return 0;
+		}
+	}
+	return 1;
+}
+
+bool operator!=(Driver_station_input a,Driver_station_input b){
+	return !(a==b);
+}
+
 ostream& operator<<(ostream& o,Driver_station_input a){
 	o<<"Driver_station_input(";
 	o<<"analog:";
@@ -181,6 +255,14 @@ ostream& operator<<(ostream& o,Driver_station_input a){
 }
 
 Robot_mode::Robot_mode():autonomous(0),enabled(0){}
+
+bool operator==(Robot_mode a,Robot_mode b){
+	return a.autonomous==b.autonomous && a.enabled==b.enabled;
+}
+
+bool operator!=(Robot_mode a,Robot_mode b){
+	return !(a==b);
+}
 
 ostream& operator<<(ostream& o,Robot_mode m){
 	/*switch(m){
@@ -236,24 +318,19 @@ Robot_inputs::Robot_inputs():
 	}
 }
 
-bool operator==(Robot_outputs a,Robot_outputs b){
-	for(unsigned i=0;i<Robot_outputs::PWMS;i++){
-		if(a.pwm[i]!=b.pwm[i]){
-			return 0;
-		}
-	}
-	for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
-		if(a.solenoid[i]!=b.solenoid[i]){
-			return 0;
-		}
-	}
-	for(unsigned i=0;i<Robot_outputs::RELAYS;i++){
-		if(a.relay[i]!=b.relay[i]){
-			return 0;
-		}
+bool operator==(Robot_inputs a,Robot_inputs b){
+	if(a.robot_mode!=b.robot_mode) return 0;
+	if(a.now!=b.now) return 0;
+	for(unsigned i=0;i<Robot_inputs::JOYSTICKS;i++){
+		if(a.joystick[i]!=b.joystick[i]) return 0;
 	}
 	for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
 		if(a.digital_io[i]!=b.digital_io[i]){
+			return 0;
+		}
+	}
+	for(unsigned i=0;i<Robot_inputs::ANALOG_INPUTS;i++){
+		if(a.analog[i]!=b.analog[i]){
 			return 0;
 		}
 	}
@@ -265,7 +342,7 @@ bool operator==(Robot_outputs a,Robot_outputs b){
 	return a.driver_station==b.driver_station;
 }
 
-bool operator!=(Robot_outputs a,Robot_outputs b){
+bool operator!=(Robot_inputs a,Robot_inputs b){
 	return !(a==b);
 }
 
@@ -332,6 +409,14 @@ ostream& operator<<(ostream& o,Jaguar_output a){
 }
 
 Jaguar_input::Jaguar_input():speed(0),current(0){}
+
+bool operator==(Jaguar_input a,Jaguar_input b){
+	return a.speed==b.speed && a.current==b.current;
+}
+
+bool operator!=(Jaguar_input a,Jaguar_input b){
+	return !(a==b);
+}
 
 ostream& operator<<(ostream& o,Jaguar_input a){
 	o<<"Jaguar_input(";

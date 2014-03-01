@@ -27,6 +27,8 @@ struct Jaguar_input{
 
 	Jaguar_input();
 };
+bool operator==(Jaguar_input,Jaguar_input);
+bool operator!=(Jaguar_input,Jaguar_input);
 std::ostream& operator<<(std::ostream&,Jaguar_input);
 
 typedef enum{DIO_INPUT,DIO_1,DIO_0} Digital_out;
@@ -45,6 +47,7 @@ struct Driver_station_output{
 	Driver_station_output();
 };
 bool operator==(Driver_station_output,Driver_station_output);
+bool operator!=(Driver_station_output,Driver_station_output);
 std::ostream& operator<<(std::ostream&,Driver_station_output);
 
 struct Robot_outputs{
@@ -83,7 +86,8 @@ struct Joystick_data{
 	
 	Joystick_data();
 };
-
+bool operator==(Joystick_data,Joystick_data);
+bool operator!=(Joystick_data,Joystick_data);
 std::ostream& operator<<(std::ostream&,Joystick_data);
 
 struct Driver_station_input{
@@ -96,6 +100,8 @@ struct Driver_station_input{
 
 	Driver_station_input();
 };
+bool operator==(Driver_station_input,Driver_station_input);
+bool operator!=(Driver_station_input,Driver_station_input);
 std::ostream& operator<<(std::ostream&,Driver_station_input);
 
 //We may need to add support for other modes at some point.
@@ -105,7 +111,8 @@ struct Robot_mode{
 	
 	Robot_mode();
 };
-
+bool operator==(Robot_mode,Robot_mode);
+bool operator!=(Robot_mode,Robot_mode);
 std::ostream& operator<<(std::ostream&,Robot_mode);
 
 typedef enum{DI_OUTPUT,DI_0,DI_1} Digital_in;
@@ -130,7 +137,8 @@ struct Robot_inputs{
 
 	Robot_inputs();
 };
-
+bool operator==(Robot_inputs,Robot_inputs);
+bool operator!=(Robot_inputs,Robot_inputs);
 std::ostream& operator<<(std::ostream& o,Robot_inputs);
 
 #endif

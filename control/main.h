@@ -25,6 +25,7 @@ struct Main{
 	Posedge_trigger print_button;
 
 	Posedge_toggle field_relative;
+	Posedge_trigger autonomous_start;
 	
 	Main();
 	Robot_outputs operator()(Robot_inputs);

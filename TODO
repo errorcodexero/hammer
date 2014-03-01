@@ -20,6 +20,7 @@ Main:
 AutoMode:
 	-Test existing code
 	-Create different modes
+	-Make sure that all of the states can be disabled
 OI:
 	-Selector for AutoModes
 	-On/Off

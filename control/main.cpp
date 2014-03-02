@@ -174,6 +174,9 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		field_relative.get()
 	);
 	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal1,rpmsdefault());
+	if(toplevel_status.injector!=Injector::Estimator::DOWN_IDLE&&toplevel_status.injector!=Injector::Estimator::DOWN_VENT){
+		subgoals_now.injector_arms=Injector_arms::GOAL_CLOSE;
+	}
 	Toplevel::Output high_level_outputs=control(toplevel_status,subgoals_now);
 	high_level_outputs=panel_override(panel,high_level_outputs);
 	Robot_outputs r=convert_output(high_level_outputs);

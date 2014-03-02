@@ -14,7 +14,6 @@ Shooter wheels:
 	-Add fallback systems
 	-Revise jag code (STEVE)
 	-Add joystick set mode (ADRIAN)
-	-Analyse the speed data Jeff has (JACOB)
 	-Check that the ready function does the right thing
 AutoMode:
 	-Test existing code
@@ -26,7 +25,7 @@ OI:
 Air:
 	-FINISH TRACKING PNEUMATIC PRESSURE! (JACOB)
 Ejector:
-	-Test ejector mode change that makes it keep the collector up
+	-Make second eject mode work (AUSTIN)
 Collector arms:
 	-Time movements & adjust code appropriately
 	-Add a reverse mode

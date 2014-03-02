@@ -28,4 +28,5 @@ Ejector:
 	-Make second eject mode work (AUSTIN)
 Collector arms:
 	-Time movements & adjust code appropriately
+Collector:
 	-Add a reverse mode

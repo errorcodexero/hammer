@@ -2,7 +2,6 @@
 #define HOLONOMIC_H
 
 #include "../util/point.h"
-#include "gyro_tracker.h"
 
 struct Drive_goal {
 	Pt direction;

@@ -8,7 +8,6 @@
 #include "shooter_wheels.h"
 #include "ejector.h"
 #include "pump.h"
-#include "../util/point.h"
 #include "holonomic.h"
 
 namespace Toplevel{
@@ -68,7 +67,7 @@ namespace Toplevel{
 		
 		public:
 		Estimator();
-		void update(Time,Output,Pump::Status,float orientation,Shooter_wheels::Status);
+		void update(Time,bool enabled,Output,Pump::Status,float orientation,Shooter_wheels::Status);
 		Status estimate()const;
 		void out(std::ostream&)const;
 

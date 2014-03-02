@@ -10,6 +10,7 @@ struct Driver_station_output{
 	
 	struct Lcd{
 		static const unsigned HEIGHT=6;
+		static const unsigned WIDTH=25;//this has not been tested.
 		std::string line[HEIGHT];
 	};
 	Lcd lcd;
@@ -21,6 +22,8 @@ std::ostream& operator<<(std::ostream&,Driver_station_output::Lcd);
 bool operator==(Driver_station_output,Driver_station_output);
 bool operator!=(Driver_station_output,Driver_station_output);
 std::ostream& operator<<(std::ostream&,Driver_station_output);
+
+Driver_station_output::Lcd format_for_lcd(std::string const&);
 
 struct Driver_station_input{
 	//In the traditional mode of the Cybress board there are only 4 available, but there are 8 in the 'enhanced' mode

@@ -1,5 +1,6 @@
 #include "driver_station_interface.h"
 #include<iostream>
+#include<sstream>
 
 using namespace std;
 
@@ -48,6 +49,34 @@ bool operator==(Driver_station_output::Lcd a,Driver_station_output::Lcd b){
 	return 1;
 }
 
+ostream& operator<<(ostream& o,Driver_station_output::Lcd a){
+	o<<"lcd(";
+	for(unsigned i=0;i<Driver_station_output::Lcd::HEIGHT;i++){
+		o<<a.line[i];
+		if(i+1!=Driver_station_output::Lcd::HEIGHT){
+			o<<"/";
+		}
+	}
+	return o<<")";
+}
+
+Driver_station_output::Lcd format_for_lcd(string const& s){
+	Driver_station_output::Lcd r;
+	unsigned at=0;
+	for(unsigned i=0;i<r.HEIGHT && at<s.size();i++){
+		cout<<"start line "<<i<<"\n";
+		stringstream ss;
+		for(unsigned j=0;j<r.WIDTH && at<s.size() && s[at]!='\n';j++){
+			ss<<s[at++];
+		}
+		if(s[at]=='\n'){
+			at++;
+		}
+		r.line[i]=ss.str();
+	}
+	return r;
+}
+
 Driver_station_output::Driver_station_output(){
 	for(unsigned i=0;i<DIGITAL_OUTPUTS;i++){
 		digital[i]=0;
@@ -67,17 +96,6 @@ bool operator!=(Driver_station_output a,Driver_station_output b){
 	return !(a==b);
 }
 
-ostream& operator<<(ostream& o,Driver_station_output::Lcd a){
-	o<<"lcd(";
-	for(unsigned i=0;i<Driver_station_output::Lcd::HEIGHT;i++){
-		o<<a.line[i];
-		if(i+1!=Driver_station_output::Lcd::HEIGHT){
-			o<<"/";
-		}
-	}
-	return o<<")";
-}
-
 ostream& operator<<(ostream& o,Driver_station_output a){
 	o<<"Driver_station_output(";
 	o<<"digital:";
@@ -92,5 +110,6 @@ ostream& operator<<(ostream& o,Driver_station_output a){
 int main(){
 	Driver_station_input a;
 	Driver_station_output b;
+	cout<<format_for_lcd("this\nthat dsf ljkdskjl sdjlf kljsdfkjl sklj djkl v dkljk dkljfsd ljksdljk");
 }
 #endif

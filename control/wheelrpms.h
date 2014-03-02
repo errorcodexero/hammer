@@ -19,7 +19,9 @@ std::ostream& operator<<(std::ostream&,wheelcalib);
 
 wheelcalib readconfig();
 wheelcalib rpmsdefault();
+#if 0
 wheelcalib nullvalues();
 wheelcalib zerovalues();
+#endif
 
 #endif

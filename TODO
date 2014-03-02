@@ -1,5 +1,6 @@
 Drivebase:
 	-Complete location estimate code (DYLAN)
+	-Calibrate and improve gyro
 Vision processing:
 	-Integrate vision code(THOMAS)
 	-Determine what the wire format is (THOMAS)
@@ -28,3 +29,4 @@ Ejector:
 	-Test ejector mode change that makes it keep the collector up
 Collector arms:
 	-Time movements & adjust code appropriately
+	-Add a reverse mode

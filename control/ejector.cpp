@@ -45,7 +45,7 @@ namespace Ejector{
 					timer.update(time,1);
 				}else{
 					timer.update(time,0);
-					static const Time RISE_TIME=2.5;
+					static const Time RISE_TIME=0.6; //Is most nearly 0.0262 (11/420)seconds, rounding to 0.03 //Increased becuase it doesn't push the ball
 					if(timer.elapsed()>RISE_TIME){
 						location=UP;
 					}
@@ -60,7 +60,7 @@ namespace Ejector{
 			case GOING_DOWN:
 				if(out==OUTPUT_DOWN){
 					timer.update(time,0);
-					static const Time LOWER_TIME=1.6;
+					static const Time LOWER_TIME=0.1; //Is most nearly 0.0286 (12/420)seconds. rounding to 0.03 //Tripled becuase it doesn't push the ball 
 					if(timer.elapsed()>LOWER_TIME){
 						location=DOWN;
 					}

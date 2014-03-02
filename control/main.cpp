@@ -342,7 +342,9 @@ Control_status::Control_status next(
 	if(j.button[Gamepad_button::A] || panel.mode_buttons.catch_mode) return Control_status::CATCH;
 	if(j.button[Gamepad_button::B] || panel.mode_buttons.collect) return COLLECT;
 	if(j.button[Gamepad_button::X] || panel.mode_buttons.drive_w_ball) return DRIVE_W_BALL;
-	if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return Control_status::SHOOT_LOW;
+	if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return DRIVE_WO_BALL;
+	//Changed so as not to accidentally time out the robot
+	//if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return Control_status::SHOOT_LOW;
 	//todo: use some sort of constants rather than 0/1 for the axes
 	{
 		Joystick_section joy_section=joystick_section(j.axis[0],j.axis[1]);

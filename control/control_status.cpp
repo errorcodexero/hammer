@@ -28,7 +28,7 @@ namespace Control_status{
 		X(EJECT)
 		X(EJECT_WHEN_READY)
 		X(CATCH)
-		X(SHOOT_LOW)
+		//X(SHOOT_LOW)
 		#undef X
 		assert(0);
 	}
@@ -58,7 +58,7 @@ namespace Control_status{
 		X(EJECT)
 		X(EJECT_WHEN_READY)
 		X(CATCH)
-		X(SHOOT_LOW)
+		//X(SHOOT_LOW)
 		#undef X
 		return r;
 	}

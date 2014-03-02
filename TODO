@@ -28,8 +28,5 @@ Ejector:
 	-Make second eject mode work (AUSTIN)
 Collector arms:
 	-Time movements & adjust code appropriately
-Low level:
-	-Deal more systematically with when the robot is disabled
-		-Feed Toplevel::Outputs based on robot outputs into the estimators
 Collector:
 	-Add a reverse mode

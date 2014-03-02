@@ -20,7 +20,7 @@ namespace Control_status{
 		TRUSS_TOSS_PREP,TRUSS_TOSS,TRUSS_TOSS_WHEN_READY,
 		PASS_PREP,PASS,PASS_WHEN_READY,
 		EJECT_PREP,EJECT,EJECT_WHEN_READY,
-		CATCH
+		CATCH, //SHOOT_LOW
 	};
 	std::ostream& operator<<(std::ostream&,Control_status);
 	std::vector<Control_status> all();

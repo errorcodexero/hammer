@@ -96,8 +96,9 @@ Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double j
 	assert(fabs(joy_x)<=1);
 	assert(fabs(joy_y)<=1);
 	assert(fabs(joy_theta)<=1);
-	assert(fabs(joy_throttle)<=1);
-	double throttle=(fabs(joy_throttle)<.25)?1:.5;
+	//assert(fabs(joy_throttle)<=1);
+	//double throttle=(fabs(joy_throttle)<.25)?1:.5;
+	double throttle = (1 + -joy_throttle) / 2;
 	joy_x*=throttle;
 	joy_y*=-throttle;//invert y.
 	joy_theta*=throttle;
@@ -166,6 +167,8 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		since_switch.elapsed()
 	);
 
+	field_relative.update(main_joystick.button[Gamepad_button::X]);
+	
 	Toplevel::Mode mode=to_mode(control_status);
 	Drive_goal drive_goal1=drive_goal(
 		control_status,
@@ -176,6 +179,9 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		field_relative.get()
 	);
 	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal1,rpmsdefault());
+	if(toplevel_status.injector!=Injector::Estimator::DOWN_IDLE&&toplevel_status.injector!=Injector::Estimator::DOWN_VENT){
+		subgoals_now.injector_arms=Injector_arms::GOAL_CLOSE;
+	}
 	Toplevel::Output high_level_outputs=control(toplevel_status,subgoals_now);
 	high_level_outputs=panel_override(panel,high_level_outputs);
 	Robot_outputs r=convert_output(high_level_outputs);
@@ -185,7 +191,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		wheel.bottom=in.jaguar[JAG_BOTTOM_FEEDBACK].speed;
 		est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel);
 	}
-	field_relative.update(main_joystick.button[Gamepad_button::X]);
+	
 	r=force(r);
 	
 	r.driver_station.lcd[1]=as_string(r.jaguar[0]).substr(13, 20);
@@ -344,7 +350,8 @@ Control_status::Control_status next(
 	if(j.button[Gamepad_button::B] || panel.mode_buttons.collect) return COLLECT;
 	if(j.button[Gamepad_button::X] || panel.mode_buttons.drive_w_ball) return DRIVE_W_BALL;
 	if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return DRIVE_WO_BALL;
-
+	//Changed so as not to accidentally time out the robot
+	//if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return Control_status::SHOOT_LOW;
 	//todo: use some sort of constants rather than 0/1 for the axes
 	{
 		Joystick_section joy_section=joystick_section(j.axis[0],j.axis[1]);

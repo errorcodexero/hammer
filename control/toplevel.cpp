@@ -187,6 +187,7 @@ namespace Toplevel{
 		X(EJECT_PREP)
 		X(EJECT)
 		X(CATCH)
+		//X(SHOOT_LOW)
 		#undef X
 		assert(0);
 	}
@@ -236,15 +237,32 @@ namespace Toplevel{
 				break;
 			case EJECT_PREP:
 			case EJECT:
-				r.collector_tilt=Collector_tilt::GOAL_UP;//was down, but with the current ejector geometry works better this way.
+                r.collector_tilt=Collector_tilt::GOAL_UP;//was down, but with the current ejector geometry works better this way.
+                r.injector_arms=Injector_arms::GOAL_OPEN;
+                if(m==EJECT) r.ejector=Ejector::START;
+                //Copied from a previous commit of the code, basically what it was before modification
+				break;
+				/*
+				r.collector=REVERSE;
+				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_OPEN;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
 				if(m==EJECT) r.ejector=Ejector::START;
 				break;
+				*/
 			case CATCH:
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;//not sure that this matters
 				r.shooter_wheels=convert_goal(calib,Shooter_wheels::STOP);//could also have a reverse mode here
 				break;
+			/*
+			case SHOOT_LOW:
+				r.collector_tilt=Collector_tilt::GOAL_UP;//was down, but with the current ejector geometry works better this way.
+				r.injector_arms=Injector_arms::GOAL_OPEN;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);//could also have a reverse mode here
+				if(m==SHOOT_LOW) r.ejector=Ejector::START;
+				break;
+			*/
 			default:assert(0);
 		}
 		return r;
@@ -265,7 +283,7 @@ int main(){
 		TRUSS_TOSS_PREP,TRUSS_TOSS,
 		PASS_PREP,PASS,
 		EJECT_PREP,EJECT,
-		CATCH
+		CATCH, //SHOOT_LOW
 	};
 	Toplevel::Status status;
 	cout<<status<<"\n";

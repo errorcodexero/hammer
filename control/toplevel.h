@@ -89,7 +89,7 @@ namespace Toplevel{
 		TRUSS_TOSS_PREP,TRUSS_TOSS,
 		PASS_PREP,PASS,
 		EJECT_PREP,EJECT,
-		CATCH
+		CATCH, //SHOOT_LOW
 	};
 	std::ostream& operator<<(std::ostream& o,Mode);
 

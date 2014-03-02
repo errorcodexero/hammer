@@ -283,7 +283,7 @@ int main(){
 		TRUSS_TOSS_PREP,TRUSS_TOSS,
 		PASS_PREP,PASS,
 		EJECT_PREP,EJECT,
-		CATCH, SHOOT_LOW
+		CATCH, //SHOOT_LOW
 	};
 	Toplevel::Status status;
 	cout<<status<<"\n";

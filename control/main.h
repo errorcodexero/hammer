@@ -3,10 +3,8 @@
 
 #include "force_interface.h"
 #include "gyro_tracker.h"
-#include "../util/interface.h"
 #include "../util/posedge_toggle.h"
 #include "../util/perf_tracker.h"
-#include "../util/countdown_timer.h"
 #include "../util/bound_tracker.h"
 #include "control_status.h"
 #include "../util/countup_timer.h"

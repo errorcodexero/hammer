@@ -39,6 +39,15 @@ ostream& operator<<(ostream& o,Driver_station_input a){
 	return o<<")";
 }
 
+bool operator==(Driver_station_output::Lcd a,Driver_station_output::Lcd b){
+	for(unsigned i=0;i<Driver_station_output::Lcd::HEIGHT;i++){
+		if(a.line[i]!=b.line[i]){
+			return 0;
+		}
+	}
+	return 1;
+}
+
 Driver_station_output::Driver_station_output(){
 	for(unsigned i=0;i<DIGITAL_OUTPUTS;i++){
 		digital[i]=0;
@@ -51,16 +60,22 @@ bool operator==(Driver_station_output a,Driver_station_output b){
 			return 0;
 		}
 	}
-	for(unsigned i=0;i<Driver_station_output::LCD_HEIGHT;i++){
-		if(a.lcd[i]!=b.lcd[i]){
-			return 0;
-		}
-	}
-	return 1;
+	return a.lcd==b.lcd;
 }
 
 bool operator!=(Driver_station_output a,Driver_station_output b){
 	return !(a==b);
+}
+
+ostream& operator<<(ostream& o,Driver_station_output::Lcd a){
+	o<<"lcd(";
+	for(unsigned i=0;i<Driver_station_output::Lcd::HEIGHT;i++){
+		o<<a.line[i];
+		if(i+1!=Driver_station_output::Lcd::HEIGHT){
+			o<<"/";
+		}
+	}
+	return o<<")";
 }
 
 ostream& operator<<(ostream& o,Driver_station_output a){
@@ -69,13 +84,7 @@ ostream& operator<<(ostream& o,Driver_station_output a){
 	for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
 		o<<a.digital[i];
 	}
-	o<<" lcd:";
-	for(unsigned i=0;i<Driver_station_output::LCD_HEIGHT;i++){
-		o<<a.lcd[i];
-		if(i+1!=Driver_station_output::LCD_HEIGHT){
-			o<<"/";
-		}
-	}
+	o<<a.lcd;
 	return o<<")";
 }
 

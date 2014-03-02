@@ -197,15 +197,15 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	
 	r=force(r);
 	
-	r.driver_station.lcd[1]=as_string(r.jaguar[0]).substr(13, 20);
-	r.driver_station.lcd[2]=as_string(r.jaguar[1]).substr(13, 20);
-	r.driver_station.lcd[3]=as_string(r.jaguar[2]).substr(13, 20);
-	r.driver_station.lcd[4]=as_string(r.jaguar[3]).substr(13, 20);
+	r.driver_station.lcd.line[1]=as_string(r.jaguar[0]).substr(13, 20);
+	r.driver_station.lcd.line[2]=as_string(r.jaguar[1]).substr(13, 20);
+	r.driver_station.lcd.line[3]=as_string(r.jaguar[2]).substr(13, 20);
+	r.driver_station.lcd.line[4]=as_string(r.jaguar[3]).substr(13, 20);
 	stringstream strin;
 	strin<<toplevel_status.shooter_wheels;
-	r.driver_station.lcd[5]="Speeds:"+strin.str().substr(22, 20);
+	r.driver_station.lcd.line[5]="Speeds:"+strin.str().substr(22, 20);
 	
-	{	
+	{
 		static int i=0;
 		if(i==0){
 			stringstream ss;

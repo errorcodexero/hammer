@@ -7,12 +7,17 @@
 struct Driver_station_output{
 	static const unsigned DIGITAL_OUTPUTS=8;
 	bool digital[DIGITAL_OUTPUTS];
-
-	static const unsigned LCD_HEIGHT=6;
-	std::string lcd[LCD_HEIGHT];
+	
+	struct Lcd{
+		static const unsigned HEIGHT=6;
+		std::string line[HEIGHT];
+	};
+	Lcd lcd;
 
 	Driver_station_output();
 };
+bool operator==(Driver_station_output::Lcd,Driver_station_output::Lcd);
+std::ostream& operator<<(std::ostream&,Driver_station_output::Lcd);
 bool operator==(Driver_station_output,Driver_station_output);
 bool operator!=(Driver_station_output,Driver_station_output);
 std::ostream& operator<<(std::ostream&,Driver_station_output);

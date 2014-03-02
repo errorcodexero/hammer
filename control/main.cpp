@@ -189,7 +189,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		Shooter_wheels::Status wheel;
 		wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;
 		wheel.bottom=in.jaguar[JAG_BOTTOM_FEEDBACK].speed;
-		est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel);
+		est.update(in.now,in.robot_mode.enabled,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel);
 	}
 	
 	r=force(r);

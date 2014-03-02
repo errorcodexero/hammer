@@ -22,6 +22,7 @@ namespace Collector_tilt{
 			#define X(name) case OUTPUT_##name: return o<<""#name;
 			X(UP)
 			X(DOWN)
+			X(NEITHER)
 			#undef X
 			default: assert(0);
 		}
@@ -34,6 +35,7 @@ namespace Collector_tilt{
 			X(DOWN)
 			X(RAISING)
 			X(LOWERING)
+			X(UNKNOWN)
 			#undef X
 			default: assert(0);
 		}
@@ -44,13 +46,19 @@ namespace Collector_tilt{
 	void Estimator::update(Time time,Output output){
 		switch(est){
 			case STATUS_UP:
-				if(output!=OUTPUT_UP){
-					est=STATUS_LOWERING;
-					timer.update(time,1);
+				switch(output){
+					case OUTPUT_DOWN:
+						est=STATUS_LOWERING;
+						timer.update(time,1);
+						break;
+					case OUTPUT_NEITHER:
+						est=STATUS_UNKNOWN;
+						break;
+					default: break;
 				}
 				break;
 			case STATUS_DOWN:
-				if(output!=OUTPUT_DOWN){
+				if(output==OUTPUT_UP){
 					est=STATUS_RAISING;
 					timer.update(time,1);
 				}
@@ -63,20 +71,44 @@ namespace Collector_tilt{
 						est=STATUS_UP;
 					}
 				}else{
+					//Could make the estimate more aggressive by having it go to lowering or unknown depending on the output.
 					timer.update(time,0);
-					est=STATUS_LOWERING;
+					est=STATUS_UNKNOWN;
 				}
 				break;
 			case STATUS_LOWERING:
-				if(output==OUTPUT_DOWN){
-					timer.update(time,0);
-					static const Time LOWER_TIME=0.82;//Timed and recorded (The longest timing in the recordings; average was 0.748)
-					if(timer.elapsed()>LOWER_TIME){
-						est=STATUS_DOWN;
-					}
-				}else{
-					timer.update(time,0);
-					est=STATUS_RAISING;
+				switch(output){
+					case OUTPUT_DOWN:
+						timer.update(time,0);
+						static const Time LOWER_TIME=0.82;//Timed and recorded (The longest timing in the recordings; average was 0.748)
+						if(timer.elapsed()>LOWER_TIME){
+							est=STATUS_DOWN;
+						}
+						break;
+					case OUTPUT_UP:
+						timer.update(time,0);
+						est=STATUS_RAISING;
+						break;
+					case OUTPUT_NEITHER:
+						//could make this a little less conservative by assuming that if you're most of the way down you'll continue to go down
+						est=STATUS_UNKNOWN;
+						break;
+					default: assert(0);
+				}
+				break;
+			case STATUS_UNKNOWN:
+				switch(output){
+					case OUTPUT_DOWN:
+						timer.update(time,1);
+						est=STATUS_LOWERING;
+						break;
+					case OUTPUT_UP:
+						timer.update(time,1);
+						est=STATUS_RAISING;
+						break;
+					case OUTPUT_NEITHER:
+						break;
+					default: assert(0);
 				}
 				break;
 			default: assert(0);
@@ -136,12 +168,18 @@ int main(){
 	for(auto goal:GOALS){
 		cout<<goal<<":"<<control(goal)<<"\n";
 	}
-	static const vector<Status> STATUS_LIST{STATUS_UP,STATUS_DOWN,STATUS_RAISING,STATUS_LOWERING};
+	static const vector<Status> STATUS_LIST{STATUS_UP,STATUS_DOWN,STATUS_RAISING,STATUS_LOWERING,STATUS_UNKNOWN};
 	cout<<"\n";
 	for(auto status:STATUS_LIST){
 		for(auto goal:GOALS){
 			cout<<status<<" "<<goal<<" "<<ready(status,goal)<<"\n";
 		}
+	}
+
+	static const vector<Output> OUTPUTS{OUTPUT_UP,OUTPUT_DOWN,OUTPUT_NEITHER};
+	for(auto output:OUTPUTS){
+		cout<<output<<"\n";
+		e.update(3,output);
 	}
 }
 #endif

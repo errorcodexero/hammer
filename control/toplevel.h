@@ -67,7 +67,7 @@ namespace Toplevel{
 		
 		public:
 		Estimator();
-		void update(Time,Output,Pump::Status,float orientation,Shooter_wheels::Status);
+		void update(Time,bool enabled,Output,Pump::Status,float orientation,Shooter_wheels::Status);
 		Status estimate()const;
 		void out(std::ostream&)const;
 

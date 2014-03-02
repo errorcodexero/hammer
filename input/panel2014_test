@@ -8,4 +8,4 @@ g++ -Wall -Werror -DPANEL2014_TEST panel2014.cpp ../control/fire_control.cpp \
 	../util/negedge_trigger.cpp \
 	../control/collector_tilt.cpp \
 	../util/interface.cpp \
-	-o panel2014 && ./panel2014
+	-o panel2014 2>&1 && ./panel2014

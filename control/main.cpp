@@ -123,12 +123,15 @@ Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x
 
 Toplevel::Output panel_override(Panel p,Toplevel::Output out){
 	#define X(name) if(p.name) out.name=*p.name;
-	X(collector)
+/*	X(collector)
 	X(collector_tilt)
 	X(injector)
 	X(injector_arms)
-	X(ejector)
+	X(ejector)*/
 	#undef X
+	if(p.force_wheels_off){
+		out.shooter_wheels=Shooter_wheels::Output();
+	}
 	return out;
 }
 

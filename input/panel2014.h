@@ -20,7 +20,7 @@ std::ostream& operator<<(std::ostream&,Mode_buttons);
 struct Panel{
 	//presets
 	Mode_buttons mode_buttons;
-	bool fire;
+	bool fire,pass_now;
 
 	//shooting override section
 	Fire_control::Target target;
@@ -28,13 +28,15 @@ struct Panel{
 	bool learn;
 
 	//standard override section
+	/*
 	Maybe<Collector_mode> collector;
 	Maybe<Collector_tilt::Output> collector_tilt;
 	Maybe<Injector::Output> injector;
 	Maybe<Injector_arms::Output> injector_arms;
 	Maybe<Ejector::Output> ejector;
-	//Maybe<Pump::Output> pump;//this probably doesn't need to exist.
-
+	*/
+	bool force_wheels_off;
+	
 	Panel();
 };
 std::ostream& operator<<(std::ostream&,Panel);

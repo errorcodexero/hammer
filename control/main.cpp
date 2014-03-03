@@ -148,6 +148,13 @@ string as_string(T t){
 	return ss.str();
 }
 
+string fRel(bool field){
+	if(field){
+		return "True";
+	}
+	return "False";
+}
+
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
@@ -202,8 +209,8 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	}
 	
 	r=force(r);
-
-	r.driver_station.lcd.line[0]=as_string(field_relative.get());
+	
+	r.driver_station.lcd.line[0]="FieldRelative: " + fRel(field_relative.get());//as_string(field_relative.get());
 	r.driver_station.lcd.line[1]=as_string(r.jaguar[0]).substr(13, 20);
 	r.driver_station.lcd.line[2]=as_string(r.jaguar[1]).substr(13, 20);
 	r.driver_station.lcd.line[3]=as_string(r.jaguar[2]).substr(13, 20);
@@ -212,14 +219,18 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	strin<<toplevel_status.shooter_wheels;
 	r.driver_station.lcd.line[5]="Speeds:"+strin.str().substr(22, 20);
 
-	r.driver_station.lcd=format_for_lcd(as_string(in.now)+as_string(in.driver_station));
+	//r.driver_station.lcd=format_for_lcd(as_string(in.now)+as_string(in.driver_station));
 	
 	{
 		static int i=0;
 		if(i==0){
 			stringstream ss;
 			ss<<in<<"\r\n"<<*this<<"\r\n";
-			ss<<"Field Relative?: "<<field_relative.get();
+			/*
+			ss<<"Gyro Voltage"<<in.analog[0]<<" "<<"Update"<<gyro.center<<"\r\n";
+			ss<<"Gyro Value:"<<gyro.angle();
+			*/
+			ss<<"\n"<<"Field Relative?:"<<field_relative.get()<<"\n";
 			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
 			cerr<<subgoals_now<<high_level_outputs<<"\n";
 		}

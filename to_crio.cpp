@@ -56,10 +56,10 @@ int read_driver_station(Driver_station_input& r){
 	if(!ds) return 2048;
 	DriverStationEnhancedIO &en=ds->GetEnhancedIO();
 	for(unsigned i=0;i<r.ANALOG_INPUTS;i++){
-		r.analog[i]=en.GetAnalogIn(i+1);
+		r.analog[i]=en.GetAnalogIn(i+1);//Causing a LOT of printouts when the DS is disconnected
 	}
 	for(unsigned i=0;i<r.DIGITAL_INPUTS;i++){
-		r.digital[i]=en.GetDigital(i+1);
+		r.digital[i]=en.GetDigital(i+1);//Same as above ^^
 	}
 	return 0;
 }

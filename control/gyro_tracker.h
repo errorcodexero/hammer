@@ -24,11 +24,11 @@ class Gyro_tracker{
 	double cal_accumulated;
 	unsigned cal_samples;
 	Time cal_start;
-	Volt center;
 	Integrator integrator;
 	
 	public:
 	Gyro_tracker();
+	Volt center;
 	void update(Time now,Volt);
 	Degree angle()const;
 	

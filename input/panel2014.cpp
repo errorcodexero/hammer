@@ -44,11 +44,11 @@ ostream& operator<<(ostream& o,Panel p){
 	X(target)
 	X(speed)
 	X(learn)
-	X(collector)
+/*	X(collector)
 	X(collector_tilt)
 	X(injector)
 	X(injector_arms)
-	X(ejector)
+	X(ejector)*/
 	#undef X
 	return o<<")";
 }
@@ -57,8 +57,8 @@ int demux27(double analog){
 	assert(0);
 }
 
-Fire_control::Target interpret_target(bool a,bool b,bool c){
-	int x=a+2*b+4*c;
+Fire_control::Target interpret_target(double f){
+	/*int x=a+2*b+4*c;
 	switch(x){
 		case 0: return Fire_control::NO_TARGET;
 		case 1: return Fire_control::HIGH;
@@ -68,7 +68,9 @@ Fire_control::Target interpret_target(bool a,bool b,bool c){
 		default:
 			//may want to add some way of returning an error;
 			return Fire_control::NO_TARGET;
-	}
+	}*/
+	//TODO: Measure the analog values of the switch.
+	return Fire_control::NO_TARGET;
 }
 
 Maybe<Collector_mode> interpret_collector(double analog){
@@ -131,47 +133,22 @@ Maybe<Ejector::Output> interpret_ejector(int x){
 Panel interpret(Driver_station_input d){
 	Panel panel;
 	//all these assignments are just made up.  
-	unsigned combined=0;
-	for(unsigned i=0;i<4;i++){
-		combined<<=1;
-		combined|=d.digital[i];
-	}
-	panel.mode_buttons.drive_wo_ball=combined==1;
-	panel.mode_buttons.drive_w_ball=combined==2;
-	panel.mode_buttons.collect=combined==3;
-	panel.mode_buttons.shoot_high=combined==4;
-	panel.mode_buttons.truss_toss=combined==5;
-	panel.mode_buttons.pass=combined==6;
-	panel.mode_buttons.eject=combined==7;
-	panel.mode_buttons.catch_mode=combined==8;
-
-	panel.fire=combined==9;
-
-	//5 options?
-	panel.target=interpret_target(d.digital[4],d.digital[5],d.digital[6]);
-	panel.speed=d.analog[0];
-	panel.learn=combined==10;
-	
-	//4 options? maybe 3.
-	panel.collector=interpret_collector(d.analog[1]);
-
 	{
-		pair<int,int> p=demux_3x3(d.analog[2]);
-		//3 options
-		panel.collector_tilt=interpret_collector_tilt(p.first);
-
-		//3 options
-		panel.injector=interpret_injector(p.second);
+		double x=d.analog[3];
+		panel.mode_buttons.drive_wo_ball=x>3.1;
+		panel.mode_buttons.drive_w_ball=x<2.9 && x>2.6;
+		panel.mode_buttons.collect=x<2.35 && x>2.05;
+		panel.mode_buttons.pass=x<1.8 && x<1.5;
+		panel.mode_buttons.eject=x<1.25 && x<.95;
+		panel.pass_now=x<.7 && x>.4;
 	}
+	panel.mode_buttons.catch_mode=d.digital[2];
 
-	{
-		pair<int,int> p=demux_3x3(d.analog[3]);
-		//3 options
-		panel.injector_arms=interpret_injector_arms(p.first);
+	panel.fire=d.digital[1];
 
-		//3 options
-		panel.ejector=interpret_ejector(p.second);
-	}
+	panel.target=interpret_target(d.analog[2]);
+	panel.speed=d.analog[1];
+	//panel.learn=TBD
 	return panel;
 }
 

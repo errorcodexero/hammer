@@ -25,6 +25,8 @@ struct Main{
 	Posedge_toggle field_relative;
 	Posedge_trigger autonomous_start;
 	
+	Shooter_wheels::Calibration_manager wheel_calibration;
+	
 	Main();
 	Robot_outputs operator()(Robot_inputs);
 };

@@ -64,7 +64,6 @@ Driver_station_output::Lcd format_for_lcd(string const& s){
 	Driver_station_output::Lcd r;
 	unsigned at=0;
 	for(unsigned i=0;i<r.HEIGHT && at<s.size();i++){
-		cout<<"start line "<<i<<"\n";
 		stringstream ss;
 		for(unsigned j=0;j<r.WIDTH && at<s.size() && s[at]!='\n';j++){
 			ss<<s[at++];

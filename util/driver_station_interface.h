@@ -10,7 +10,7 @@ struct Driver_station_output{
 	
 	struct Lcd{
 		static const unsigned HEIGHT=6;
-		static const unsigned WIDTH=25;//this has not been tested.
+		static const unsigned WIDTH=21;//this has not been tested.
 		std::string line[HEIGHT];
 	};
 	Lcd lcd;

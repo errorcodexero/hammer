@@ -204,6 +204,8 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	stringstream strin;
 	strin<<toplevel_status.shooter_wheels;
 	r.driver_station.lcd.line[5]="Speeds:"+strin.str().substr(22, 20);
+
+	r.driver_station.lcd=format_for_lcd(as_string(in.now)+as_string(in.driver_station));
 	
 	{
 		static int i=0;

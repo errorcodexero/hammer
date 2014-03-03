@@ -148,6 +148,25 @@ string as_string(T t){
 	return ss.str();
 }
 
+bool vowel(char c){
+	c=tolower(c);
+	return c=='a' || c=='e' || c=='i' || c=='o' || c=='u' || c=='y';
+}
+
+string abbreviate_text(string s){
+	stringstream ss;
+	//bool skipped_last=0;
+	for(unsigned i=0;i<s.size();i++){
+		if(s[i]==' ' || s[i]==':' || s[i]=='_') continue;
+		if(vowel(s[i])){
+			//skip
+		}else{
+			ss<<s[i];
+		}
+	}
+	return ss.str();
+}
+
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
@@ -212,7 +231,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	strin<<toplevel_status.shooter_wheels;
 	r.driver_station.lcd.line[5]="Speeds:"+strin.str().substr(22, 20);
 
-	r.driver_station.lcd=format_for_lcd(as_string(in.now)+as_string(in.driver_station));
+	r.driver_station.lcd=format_for_lcd(abbreviate_text(as_string(in.now)+"\n"+as_string(panel)+as_string(in.driver_station)));
 	
 	{
 		static int i=0;

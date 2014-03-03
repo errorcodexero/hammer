@@ -27,11 +27,16 @@ bool operator!=(Driver_station_input a,Driver_station_input b){
 	return !(a==b);
 }
 
+float round(float f){
+	return (int)(f*10)*10;
+}
+
 ostream& operator<<(ostream& o,Driver_station_input a){
+	//o.precision(2);
 	o<<"Driver_station_input(";
 	o<<"analog:";
 	for(unsigned i=0;i<Driver_station_input::ANALOG_INPUTS;i++){
-		o<<a.analog[i]<<" ";
+		o<<round(a.analog[i])<<" ";
 	}
 	o<<"digital:";
 	for(unsigned i=0;i<Driver_station_input::DIGITAL_INPUTS;i++){

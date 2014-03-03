@@ -2,6 +2,7 @@
 #include<iostream>
 #include<cassert>
 #include<stdlib.h>
+#include<math.h>
 #include"wheelrpms.h"
 
 using namespace std;
@@ -129,9 +130,9 @@ namespace Shooter_wheels{
 		return o<<"Shooter_wheels::Control("<<c.calib<<")";
 	}
 	
-	bool ready(Status,Goal){
-		//this is wrong
-		return 1;//assert(0);
+	bool ready(Status status,Goal goal){
+		//this should be refined.
+		return fabs(status.top-goal.top)<100 && fabs(status.bottom-goal.bottom)<100;
 	}
 	
 	Goal convert_goal(wheelcalib c,High_level_goal g){

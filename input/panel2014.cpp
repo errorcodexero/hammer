@@ -1,5 +1,6 @@
 #include "panel2014.h"
 #include<stdlib.h>
+#include "util.h"
 
 using namespace std;
 
@@ -29,9 +30,21 @@ ostream& operator<<(ostream& o,Mode_buttons m){
 	return o<<")";
 }
 
+Calibration_target::Calibration_target():target(Fire_control::NO_TARGET),top(0){}
+
+ostream& operator<<(ostream& o,Calibration_target a){
+	o<<"Cal_target(";
+	o<<a.target<<" ";
+	if(a.top){
+		o<<"top";
+	}else{
+		o<<"bottom";
+	}
+	return o<<")";
+}
+
 Panel::Panel():
 	fire(0),
-	target(Fire_control::NO_TARGET),
 	speed(0),
 	learn(0)
 {}
@@ -39,11 +52,14 @@ Panel::Panel():
 ostream& operator<<(ostream& o,Panel p){
 	o<<"Panel( ";
 	#define X(name) o<<""#name<<":"<<p.name<<" ";
-	X(mode_buttons)
+//	o<<p.mode_buttons;
 	X(fire)
+	X(pass_now)
 	X(target)
-	X(speed)
+//	X(speed)
+	o<<"spd:"<<((int)(p.speed)*10)/10<<" ";
 	X(learn)
+	X(force_wheels_off)
 /*	X(collector)
 	X(collector_tilt)
 	X(injector)
@@ -57,7 +73,7 @@ int demux27(double analog){
 	assert(0);
 }
 
-Fire_control::Target interpret_target(double f){
+Calibration_target interpret_target(double f){
 	/*int x=a+2*b+4*c;
 	switch(x){
 		case 0: return Fire_control::NO_TARGET;
@@ -70,7 +86,23 @@ Fire_control::Target interpret_target(double f){
 			return Fire_control::NO_TARGET;
 	}*/
 	//TODO: Measure the analog values of the switch.
-	return Fire_control::NO_TARGET;
+	int i=interpret_10_turn_pot(f/3.3*5);
+	Calibration_target r;
+	r.top=i%2;
+	switch(i/2){
+		case 0:
+			r.target=Fire_control::HIGH;
+			break;
+		case 1:
+			r.target=Fire_control::TRUSS;
+			break;
+		case 2:
+			r.target=Fire_control::PASS;
+			break;
+		default:
+			r.target=Fire_control::NO_TARGET;
+	}
+	return r;
 }
 
 Maybe<Collector_mode> interpret_collector(double analog){
@@ -136,18 +168,20 @@ Panel interpret(Driver_station_input d){
 	{
 		double x=d.analog[3];
 		panel.mode_buttons.drive_wo_ball=x>3.1;
-		panel.mode_buttons.drive_w_ball=x<2.9 && x>2.6;
-		panel.mode_buttons.collect=x<2.35 && x>2.05;
-		panel.mode_buttons.pass=x<1.8 && x<1.5;
-		panel.mode_buttons.eject=x<1.25 && x<.95;
-		panel.pass_now=x<.7 && x>.4;
+		panel.mode_buttons.drive_w_ball=(x<2.9 && x>2.6);
+		panel.mode_buttons.collect=(x<2.35 && x>2.05);
+		panel.mode_buttons.shoot_high=!d.digital[0];
+		panel.mode_buttons.pass=(x<1.8 && x>1.5);
+		panel.mode_buttons.eject=(x<1.25 && x>.95);
+		panel.pass_now=(x<.7 && x>.4);
 	}
-	panel.mode_buttons.catch_mode=d.digital[2];
+	panel.mode_buttons.catch_mode=!d.digital[2];
 
-	panel.fire=d.digital[1];
+	panel.fire=!d.digital[1];
 
 	panel.target=interpret_target(d.analog[2]);
 	panel.speed=d.analog[1];
+	panel.force_wheels_off=d.digital[3];//note: Which way is on/off is not labeled on the console yet.  
 	//panel.learn=TBD
 	return panel;
 }

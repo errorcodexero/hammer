@@ -206,8 +206,13 @@ public:
 		{
 			DriverStation *ds=DriverStation::GetInstance();
 			if(ds){
+				DriverStationEnhancedIO &d=ds->GetEnhancedIO();
+				for(unsigned i=0;i<8;i++){
+					d.SetDigitalConfig(i+1,DriverStationEnhancedIO::kInputPullUp);
+				}
 				for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
-					ds->GetEnhancedIO().SetDigitalOutput(i+1,out.driver_station.digital[i]);
+					d.SetDigitalConfig(i+1+8,DriverStationEnhancedIO::kOutput);
+					d.SetDigitalOutput(i+1+8,out.driver_station.digital[i]);
 				}
 			}else{
 				error_code|=2048;

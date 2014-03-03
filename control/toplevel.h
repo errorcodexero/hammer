@@ -1,6 +1,7 @@
 #ifndef TOPLEVEL_H
 #define TOPLEVEL_H
 
+#include<vector>
 #include "collector.h"
 #include "collector_tilt.h"
 #include "injector.h"
@@ -80,6 +81,7 @@ namespace Toplevel{
 
 	Output control(Status,Subgoals);
 	bool ready(Status,Subgoals);
+	std::vector<std::string> not_ready(Status,Subgoals);
 	
 	//all this mode stuff really belongs elsewhere
 	enum Mode{

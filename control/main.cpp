@@ -92,16 +92,22 @@ Main::Main():control_status(Control_status::DRIVE_W_BALL),autonomous_start(0){}
 
 Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch);
 
+double Clip(double joy_theta){
+	if(joy_theta > 1.0){
+		joy_theta = 1.0;
+	}
+	if(joy_theta < -1.0){
+		joy_theta = -1.0;
+	}
+	return joy_theta;
+}
+
 Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
-	assert(fabs(joy_x)<=1);
-	assert(fabs(joy_y)<=1);
-	assert(fabs(joy_theta)<=1);
-	//assert(fabs(joy_throttle)<=1);
-	//double throttle=(fabs(joy_throttle)<.25)?1:.5;
+	
 	double throttle = (1 + -joy_throttle) / 2;
-	joy_x*=throttle;
-	joy_y*=-throttle;//invert y.
-	joy_theta*=throttle;
+	joy_x = Clip(joy_x) * throttle;
+	joy_y = -Clip(joy_y) * throttle;//Invert Y
+	joy_theta = Clip(joy_theta) * 0.75;
 	return Drive_goal(Pt(joy_x,joy_y,joy_theta),field_relative);
 }
 
@@ -193,7 +199,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	}
 	
 	r=force(r);
-	
+	r.driver_station.lcd[0]=as_string(field_relative.get());
 	r.driver_station.lcd[1]=as_string(r.jaguar[0]).substr(13, 20);
 	r.driver_station.lcd[2]=as_string(r.jaguar[1]).substr(13, 20);
 	r.driver_station.lcd[3]=as_string(r.jaguar[2]).substr(13, 20);
@@ -207,6 +213,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		if(i==0){
 			stringstream ss;
 			ss<<in<<"\r\n"<<*this<<"\r\n";
+			ss<<"Field Relative?: "<<field_relative.get();
 			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
 			cerr<<subgoals_now<<high_level_outputs<<"\n";
 		}

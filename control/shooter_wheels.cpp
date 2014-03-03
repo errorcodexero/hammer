@@ -91,10 +91,10 @@ namespace Shooter_wheels{
 		Output r;
 		//Jaguar_output top=Jaguar_output::voltageOut(.25),bottom=Jaguar_output::voltageOut(.6);
 		bool all_open_loop=0;
-		r.top[Output::FEEDBACK]=all_open_loop?open_loop(status.top,goal.top):Jaguar_output::speedOut(goal.top);
-		r.top[Output::OPEN_LOOP]=open_loop(status.top,goal.top);
-		r.bottom[Output::FEEDBACK]=all_open_loop?open_loop(status.bottom,goal.bottom):Jaguar_output::speedOut(goal.bottom);
-		r.bottom[Output::OPEN_LOOP]=open_loop(status.bottom,goal.bottom);
+		r.top[Output::FEEDBACK]=all_open_loop?open_loop(status.top,goal.second.top):Jaguar_output::speedOut(goal.second.top);
+		r.top[Output::OPEN_LOOP]=open_loop(status.top,goal.second.top);
+		r.bottom[Output::FEEDBACK]=all_open_loop?open_loop(status.bottom,goal.second.bottom):Jaguar_output::speedOut(goal.second.bottom);
+		r.bottom[Output::OPEN_LOOP]=open_loop(status.bottom,goal.second.bottom);
 		return r;
 	}
 	/*
@@ -131,21 +131,22 @@ namespace Shooter_wheels{
 	}
 	
 	bool ready(Status status,Goal goal){
-		//this should be refined.
-		return fabs(status.top-goal.top)<100 && fabs(status.bottom-goal.bottom)<100;
+		if(goal.first==Shooter_wheels::STOP || goal.first==Shooter_wheels::X) return 1;
+		//this could be refined.
+		return fabs(status.top-goal.second.top)<100 && fabs(status.bottom-goal.second.bottom)<100;
 	}
 	
 	Goal convert_goal(wheelcalib c,High_level_goal g){
 		switch(g){
 			case TRUSS:
-				return c.overtruss; //Previously 1200
+				return make_pair(g,c.overtruss); //Previously 1200
 			case HIGH_GOAL:
-				return c.highgoal; //Previously 3000
+				return make_pair(g,c.highgoal); //Previously 3000
 			case PASS:
-				return c.lowgoal; //Previously 2200
+				return make_pair(g,c.lowgoal); //Previously 2200
 			case STOP:
 			case X:
-				return Goal();
+				return make_pair(g,Shooter_wheels::Status());
 			default: assert(0);
 		}
 	}

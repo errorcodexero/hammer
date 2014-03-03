@@ -2,6 +2,7 @@
 #define SHOOTER_WHEELS_H
 
 #include<iosfwd>
+#include<utility>
 #include"shooter_status.h"
 #include"wheelrpms.h"
 #include "../util/jag_interface.h"
@@ -16,7 +17,7 @@ namespace Shooter_wheels{
 	};
 	std::ostream& operator<<(std::ostream& o,Output);
 	
-	typedef Status Goal;
+	typedef std::pair<High_level_goal,Status> Goal;
 	Output control(Goal);
 
 	struct Control{

@@ -5,6 +5,7 @@
 #include<map>
 #include<iostream>
 #include<vector>
+#include<sstream>
 #include "interface.h"
 
 Pwm_output pwm_convert(double);
@@ -44,5 +45,12 @@ std::ostream& operator<<(std::ostream& o,std::vector<T> const& v){
 double sum(std::vector<double>);
 double mean(std::vector<double>);
 double stddev(std::vector<double>);
+
+template<typename T>
+std::string as_string(T t){
+	std::stringstream ss;
+	ss<<t;
+	return ss.str();
+}
 
 #endif

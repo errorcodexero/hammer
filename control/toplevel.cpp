@@ -2,6 +2,7 @@
 #include<iostream>
 #include<cassert>
 #include<math.h>
+#include "../util/util.h"
 
 using namespace std;
 
@@ -165,6 +166,18 @@ namespace Toplevel{
 			Injector_arms::ready(status.injector_arms,g.injector_arms) && 
 			Ejector::ready(status.ejector,g.ejector) && 
 			ready(status.shooter_wheels,g.shooter_wheels);
+	}
+	
+	vector<string> not_ready(Status status,Subgoals g){
+		vector<string> r;
+		#define X(name) if(!ready(status.name,g.name)) r|=as_string(""#name);
+		X(collector_tilt)
+		X(injector)
+		X(injector_arms)
+		X(ejector)
+		X(shooter_wheels)
+		#undef X
+		return r;
 	}
 	
 	/*ostream& operator<<(ostream& o,Control a){

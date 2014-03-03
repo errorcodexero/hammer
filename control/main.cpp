@@ -141,13 +141,6 @@ Toplevel::Output panel_override(Panel p,Toplevel::Output out){
 	return out;
 }
 
-template<typename T>
-string as_string(T t){
-	stringstream ss;
-	ss<<t;
-	return ss.str();
-}
-
 bool vowel(char c){
 	c=tolower(c);
 	return c=='a' || c=='e' || c=='i' || c=='o' || c=='u' || c=='y';
@@ -231,8 +224,11 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	strin<<toplevel_status.shooter_wheels;
 	r.driver_station.lcd.line[5]="Speeds:"+strin.str().substr(22, 20);
 
-	r.driver_station.lcd=format_for_lcd(abbreviate_text(as_string(in.now)+"\n"+as_string(panel)+as_string(in.driver_station)));
-	
+	/*r.driver_station.lcd=format_for_lcd(
+		//abbreviate_text(as_string(in.now)+"\n"+as_string(panel)+as_string(in.driver_station))
+		as_string(subgoals_now)+as_string(toplevel_status)
+	);*/
+	r.driver_station.digital[7]=ready(toplevel_status,subgoals_now);
 	{
 		static int i=0;
 		if(i==0){
@@ -244,7 +240,10 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		}
 		i=(i+1)%1000;
 	}
-
+	//cerr<<subgoals_now<<"\r\n";
+	//cerr<<toplevel_status<<"\r\n\r\n";
+	cerr<<"Waiting on:"<<not_ready(toplevel_status,subgoals_now)<<"\n";
+	
 	if(print_button(main_joystick.button[Gamepad_button::LB])){
 		cout<<in<<"\r\n";
 		cout<<*this<<"\r\n";

@@ -9,6 +9,16 @@
 
 using namespace std;
 
+wheelcalib operator-(wheelcalib a,wheelcalib b){
+	#define X(name) a.name-=b.name;
+	X(highgoal)
+	X(lowgoal)
+	X(overtruss)
+	X(passing)
+	#undef X
+	return a;
+}
+
 ostream& operator<<(ostream& o,wheelcalib w){
 	o<<"High Goal RPMs(Top)	="<<w.highgoal.top<<endl;
 	o<<"High Goal RPMs(Bottom)	="<<w.highgoal.bottom<<endl;

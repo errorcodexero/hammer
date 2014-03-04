@@ -196,5 +196,15 @@ int main(){
 	}
 	Calibration_manager c;
 	cout<<c<<"\n";
+	for(auto a:Calibration_target::all()){
+		for(double d:vector<double>{0,1.5,3.3}){
+			cout<<a<<"\n";
+			cout<<c.update(0,d,a)-rpmsdefault()<<"\n";
+		}
+	}
+	
+	wheelcalib a;
+	wheelcalib b;
+	cout<<(a-b)<<"\n";
 }
 #endif

@@ -74,20 +74,23 @@ void Jag_control::set(Jaguar_output a,bool enable){
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 			jaguar->SetSafetyEnabled(true);
 			mode=SPEED;
+		}else{
+			jaguar->Set(a.speed,SYNC_GROUP);
+			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 		}
-		jaguar->Set(a.speed,SYNC_GROUP);
-		CANJaguar::UpdateSyncGroup(SYNC_GROUP);
-	}
-	else{
+	}else{
 		if(mode!=VOLTAGE){
 			jaguar->ChangeControlMode(CANJaguar::kPercentVbus);
 			jaguar->EnableControl();
 			jaguar->SetExpiration(2.0);
+			jaguar->Set(a.voltage,SYNC_GROUP);
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 			jaguar->SetSafetyEnabled(true);
+			mode=VOLTAGE;
+		}else{
+			jaguar->Set(a.voltage,SYNC_GROUP);
+			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 		}
-		jaguar->Set(a.voltage,SYNC_GROUP);
-		CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 	}
 }
 

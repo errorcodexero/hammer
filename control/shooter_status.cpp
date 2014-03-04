@@ -16,6 +16,12 @@ namespace Shooter_wheels{
 	bool operator!=(Status a,Status b){
 		return !(a==b);
 	}
+
+	Status& operator-=(Status& a,Status b){
+		a.top-=b.top;
+		a.bottom-=b.bottom;
+		return a;
+	}
 	
 	ostream& operator<<(ostream& o,Status s){
 		return o<<"Shooter_wheels::Status("<<s.top<<","<<s.bottom<<")";

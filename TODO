@@ -18,7 +18,12 @@ Shooter wheels:
 	-Make learn button work
 AutoMode:
 	-Test existing code
+<<<<<<< HEAD
+	-Create different modes
+	-Make sure that all of the states can be disabled
+=======
 	-Create different modes (THOMAS)
+>>>>>>> 22858cc006167dc7a18ddae0d28937e0f1b91515
 OI:
 	-Selector for AutoModes
 	-On/Off
@@ -28,5 +33,5 @@ Air:
 Ejector:
 	-Make second eject mode work (AUSTIN)
 Collector:
-	-Add a reverse mode
+	-Add a reverse mode(Luke&Jeremy)
 

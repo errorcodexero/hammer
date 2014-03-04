@@ -11,11 +11,12 @@ struct wheelcalib{
 	Shooter_wheels::Status passing;
 };
 
+wheelcalib operator-(wheelcalib,wheelcalib);
+std::ostream& operator<<(std::ostream&,wheelcalib);
+
 void configfile();
 void adddefaultrpms();
 void writeconfig(wheelcalib);
-
-std::ostream& operator<<(std::ostream&,wheelcalib);
 
 wheelcalib readconfig();
 wheelcalib rpmsdefault();

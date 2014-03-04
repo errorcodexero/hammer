@@ -23,6 +23,9 @@ struct Calibration_target{
 	bool top;
 	
 	Calibration_target();
+	Calibration_target(Fire_control::Target,bool top);
+	
+	static std::vector<Calibration_target> all();
 };
 std::ostream& operator<<(std::ostream&,Calibration_target);
 

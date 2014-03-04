@@ -1,4 +1,4 @@
-g++ -Wall -Werror -DPANEL2014_TEST panel2014.cpp ../control/fire_control.cpp \
+g++ -Wall -Werror -std=c++0x -DPANEL2014_TEST panel2014.cpp ../control/fire_control.cpp \
 	../control/injector.cpp \
 	../control/injector_arms.cpp \
 	../control/ejector.cpp \
@@ -9,4 +9,4 @@ g++ -Wall -Werror -DPANEL2014_TEST panel2014.cpp ../control/fire_control.cpp \
 	../control/collector_tilt.cpp \
 	../util/driver_station_interface.cpp \
 	util.cpp \
-	-o panel2014 && ./panel2014
+	-o panel2014 2>&1 && ./panel2014

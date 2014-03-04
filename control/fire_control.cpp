@@ -115,13 +115,7 @@ namespace Fire_control{
 		if(target == PASS && goal == OTHER) {throw "error1";}
 		if(target == TRUSS && goal == OTHER) {throw "error1";}
 		if(target == EJECT && goal == OTHER) {throw "error1";}
-		switch(target){
-			case NO_TARGET:
-			case HIGH:
-			case TRUSS:
-			case EJECT:
-			default: assert(0);
-		}
+		throw "Unknown";
 	}
 
 	
@@ -147,6 +141,9 @@ namespace Fire_control{
 		cout<<t<<" "<<g<<"\n";
 		assert(0);
 	}
+
+	const vector<Fire_control::Goal> GOALS;//{PREP,FIRE,FIRE_WHEN_READY,DRIVE,OTHER};
+	const vector<Target> TARGETS;//{NO_TARGET,HIGH,TRUSS,PASS,EJECT};
 }
 
 #ifdef FIRE_CONTROL_TEST
@@ -159,9 +156,7 @@ int main(){
 		cout<<a<<" "<<goal(a)<<" "<<target(a)<<"\n";
 	}
 
-	static const vector<Fire_control::Goal> GOALS{PREP,FIRE,FIRE_WHEN_READY,DRIVE,OTHER};
 	cout<<GOALS<<"\n";
-	static const vector<Target> TARGETS{/*NO_TARGET,*/HIGH,TRUSS,PASS,EJECT};
 	cout<<TARGETS<<"\n";
 	for(auto goal:GOALS){
 		for(auto target:TARGETS){
@@ -170,7 +165,7 @@ int main(){
 			try{
 				cout<<generate_status(target, goal)<<"\n";
 			}catch(...){
-			cout<<"Not an option\n";
+				cout<<"Not an option\n";
 			}
 		}
 	}

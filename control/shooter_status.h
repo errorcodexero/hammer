@@ -14,6 +14,7 @@ namespace Shooter_wheels{
 	};
 	bool operator==(Status,Status);
 	bool operator!=(Status,Status);
+	Status& operator-=(Status&,Status);
 	std::ostream& operator<<(std::ostream&,Status);
 }
 

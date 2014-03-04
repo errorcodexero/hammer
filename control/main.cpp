@@ -2,8 +2,6 @@
 #include<iostream>
 #include<sstream>
 #include<cassert>
-#include "octocanum.h"
-#include "../util/util.h"
 #include <math.h>
 #include "holonomic.h"
 #include "toplevel.h"
@@ -11,6 +9,7 @@
 #include "control_status.h"
 #include "../input/util.h"
 #include "../input/panel2014.h"
+#include "../util/util.h"
 
 using namespace std;
 

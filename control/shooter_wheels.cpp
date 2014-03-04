@@ -107,9 +107,12 @@ namespace Shooter_wheels{
 		return Shooter_wheels::target_speed_bottom(g,calib);
 	}*/
 
+	RPM free_speed(){
+		return 5984;  //Calculated top speed on 100% output
+	}
+
 	Jaguar_output open_loop(RPM status,RPM goal){
-		static const double FREE_SPEED=5984;  //Calculated top speed on 100% output
-		if(goal>FREE_SPEED) goal=FREE_SPEED;
+		if(goal>free_speed()) goal=free_speed();
 		if(status>.8*goal&&goal>1000) return Jaguar_output::voltageOut((goal/62.5+4.199)/100);
 		return Jaguar_output::voltageOut(goal>1000);
 	} 

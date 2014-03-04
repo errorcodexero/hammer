@@ -35,6 +35,8 @@ namespace Shooter_wheels{
 	Goal convert_goal(wheelcalib,High_level_goal);
 	Output control(Status,Goal);
 	bool ready(Status,Goal);
+
+	RPM free_speed();
 }
 
 #endif

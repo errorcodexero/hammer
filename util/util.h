@@ -53,4 +53,6 @@ std::string as_string(T t){
 	return ss.str();
 }
 
+double clip(double);
+
 #endif

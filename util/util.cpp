@@ -73,6 +73,16 @@ double stddev(vector<double> v){
 	)));
 }
 
+double clip(double d){
+	if(d > 1.0){
+		d = 1.0;
+	}
+	if(d < -1.0){
+		d = -1.0;
+	}
+	return d;
+}
+
 #ifdef UTIL_TEST
 
 #include<cassert>

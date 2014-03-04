@@ -91,22 +91,12 @@ Main::Main():control_status(Control_status::DRIVE_W_BALL),autonomous_start(0){}
 
 Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch);
 
-double Clip(double joy_theta){
-	if(joy_theta > 1.0){
-		joy_theta = 1.0;
-	}
-	if(joy_theta < -1.0){
-		joy_theta = -1.0;
-	}
-	return joy_theta;
-}
-
 Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
 	
 	double throttle = (1 + -joy_throttle) / 2;
-	joy_x = Clip(joy_x) * throttle;
-	joy_y = -Clip(joy_y) * throttle;//Invert Y
-	joy_theta = Clip(joy_theta) * 0.75;
+	joy_x = clip(joy_x) * throttle;
+	joy_y = -clip(joy_y) * throttle;//Invert Y
+	joy_theta = clip(joy_theta) * 0.75;
 	return Drive_goal(Pt(joy_x,joy_y,joy_theta),field_relative);
 }
 

@@ -390,24 +390,26 @@ Control_status::Control_status next(
 		return AUTO_SPIN_UP;
 	}
 
-	//at the top here should deal with all the buttons that put you into a specific mode.
-	if(j.button[Gamepad_button::A] || panel.mode_buttons.catch_mode) return Control_status::CATCH;
-	if(j.button[Gamepad_button::B] || panel.mode_buttons.collect) return COLLECT;
-	if(j.button[Gamepad_button::X] || panel.mode_buttons.drive_w_ball) return DRIVE_W_BALL;
-	if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return DRIVE_WO_BALL;
-	//Changed so as not to accidentally time out the robot
-	//if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return Control_status::SHOOT_LOW;
-	//todo: use some sort of constants rather than 0/1 for the axes
-	{
-		Joystick_section joy_section=joystick_section(j.axis[0],j.axis[1]);
-		Fire_control::Target target=to_target(joy_section,panel.mode_buttons);
-		if(Fire_control::target(status)!=target && !autonomous_mode){
-			switch(target){
-				case Fire_control::TRUSS: return TRUSS_TOSS_PREP;
-				case Fire_control::PASS: return PASS_PREP;
-				case Fire_control::HIGH: return SHOOT_HIGH_PREP;
-				case Fire_control::EJECT: return EJECT_PREP;
-				default: break;
+	if(!autonomous_mode){
+		//at the top here should deal with all the buttons that put you into a specific mode.
+		if(j.button[Gamepad_button::A] || panel.mode_buttons.catch_mode) return Control_status::CATCH;
+		if(j.button[Gamepad_button::B] || panel.mode_buttons.collect) return COLLECT;
+		if(j.button[Gamepad_button::X] || panel.mode_buttons.drive_w_ball) return DRIVE_W_BALL;
+		if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return DRIVE_WO_BALL;
+		//Changed so as not to accidentally time out the robot
+		//if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return Control_status::SHOOT_LOW;
+		//todo: use some sort of constants rather than 0/1 for the axes
+		{
+			Joystick_section joy_section=joystick_section(j.axis[0],j.axis[1]);
+			Fire_control::Target target=to_target(joy_section,panel.mode_buttons);
+			if(Fire_control::target(status)!=target && !autonomous_mode){
+				switch(target){
+					case Fire_control::TRUSS: return TRUSS_TOSS_PREP;
+					case Fire_control::PASS: return PASS_PREP;
+					case Fire_control::HIGH: return SHOOT_HIGH_PREP;
+					case Fire_control::EJECT: return EJECT_PREP;
+					default: break;
+				}
 			}
 		}
 	}
@@ -567,7 +569,7 @@ void print_diff(ostream& o,Toplevel::Status a,Toplevel::Status b){
 	X(shooter_wheels)
 	X(pump)
 	//X(orientation)
-	print_diff_approx(o,a.orientation,b.orientation);
+	//print_diff_approx(o,a.orientation,b.orientation);
 	#undef X
 }
 

@@ -2,6 +2,7 @@
 #include<iostream>
 #include<cassert>
 #include<math.h>
+#include "../util/util.h"
 
 using namespace std;
 
@@ -44,7 +45,10 @@ namespace Toplevel{
 		o<<" inject:"<<g.injector;
 		o<<" inj arm:"<<g.injector_arms;
 		o<<" eject:"<<g.ejector;
-		o<<" shoot:"<<g.shooter_wheels;
+		o<<" shoot:";
+		o<<g.shooter_wheels.first;
+		o<<g.shooter_wheels.second;
+		//o<<g.shooter_wheels; not sure why this line doesn't work.
 		o<<" drive:"<<g.drive;
 		return o<<")";
 	}
@@ -88,11 +92,11 @@ namespace Toplevel{
 
 	Estimator::Estimator():pump(Pump::NOT_FULL), orientation(0){}
 
-	void Estimator::update(Time time,Output out,Pump::Status pump_status, float orientation1,Shooter_wheels::Status wheels_in){
-		collector_tilt.update(time,out.collector_tilt);
-		injector.update(time,out.injector);
-		injector_arms.update(time,out.injector_arms);
-		ejector.update(time,out.ejector);
+	void Estimator::update(Time time,bool enabled,Output out,Pump::Status pump_status, float orientation1,Shooter_wheels::Status wheels_in){
+		collector_tilt.update(time,enabled?out.collector_tilt:Collector_tilt::OUTPUT_NEITHER);
+		injector.update(time,enabled?out.injector:Injector::OUTPUT_VENT);
+		injector_arms.update(time,enabled?out.injector_arms:Injector_arms::OUTPUT_OPEN);
+		ejector.update(time,enabled?out.ejector:Ejector::OUTPUT_DOWN);
 		shooter_wheels=wheels_in;
 		pump=pump_status;
 		orientation = orientation1;
@@ -167,6 +171,18 @@ namespace Toplevel{
 			ready(status.shooter_wheels,g.shooter_wheels);
 	}
 	
+	vector<string> not_ready(Status status,Subgoals g){
+		vector<string> r;
+		#define X(name) if(!ready(status.name,g.name)) r|=as_string(""#name);
+		X(collector_tilt)
+		X(injector)
+		X(injector_arms)
+		X(ejector)
+		X(shooter_wheels)
+		#undef X
+		return r;
+	}
+	
 	/*ostream& operator<<(ostream& o,Control a){
 		o<<"Toplevel::Control(";
 		o<<a.shooter_wheels;
@@ -187,6 +203,7 @@ namespace Toplevel{
 		X(EJECT_PREP)
 		X(EJECT)
 		X(CATCH)
+		//X(SHOOT_LOW)
 		#undef X
 		assert(0);
 	}
@@ -236,15 +253,32 @@ namespace Toplevel{
 				break;
 			case EJECT_PREP:
 			case EJECT:
-				r.collector_tilt=Collector_tilt::GOAL_UP;//was down, but with the current ejector geometry works better this way.
+                r.collector_tilt=Collector_tilt::GOAL_UP;//was down, but with the current ejector geometry works better this way.
+                r.injector_arms=Injector_arms::GOAL_OPEN;
+                if(m==EJECT) r.ejector=Ejector::START;
+                //Copied from a previous commit of the code, basically what it was before modification
+				break;
+				/*
+				r.collector=REVERSE;
+				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_OPEN;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
 				if(m==EJECT) r.ejector=Ejector::START;
 				break;
+				*/
 			case CATCH:
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;//not sure that this matters
 				r.shooter_wheels=convert_goal(calib,Shooter_wheels::STOP);//could also have a reverse mode here
 				break;
+			/*
+			case SHOOT_LOW:
+				r.collector_tilt=Collector_tilt::GOAL_UP;//was down, but with the current ejector geometry works better this way.
+				r.injector_arms=Injector_arms::GOAL_OPEN;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);//could also have a reverse mode here
+				if(m==SHOOT_LOW) r.ejector=Ejector::START;
+				break;
+			*/
 			default:assert(0);
 		}
 		return r;
@@ -265,7 +299,7 @@ int main(){
 		TRUSS_TOSS_PREP,TRUSS_TOSS,
 		PASS_PREP,PASS,
 		EJECT_PREP,EJECT,
-		CATCH
+		CATCH, //SHOOT_LOW
 	};
 	Toplevel::Status status;
 	cout<<status<<"\n";
@@ -281,8 +315,8 @@ int main(){
 	cout<<est<<"\n";
 	cout<<est.estimate()<<"\n";
 	Pump::Status ps=Pump::FULL;
-	est.update(0,Output(),ps,0,Shooter_wheels::Status());
-	est.update(10,Output(),ps,0,Shooter_wheels::Status());
+	est.update(0,1,Output(),ps,0,Shooter_wheels::Status());
+	est.update(10,0,Output(),ps,0,Shooter_wheels::Status());
 	cout<<est.estimate()<<"\n";
 	/*
 	if we choose one of the modes and use all the built-in controls then we should after some time get to a status where we're ready.  

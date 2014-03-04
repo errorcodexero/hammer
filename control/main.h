@@ -3,10 +3,8 @@
 
 #include "force_interface.h"
 #include "gyro_tracker.h"
-#include "../util/interface.h"
 #include "../util/posedge_toggle.h"
 #include "../util/perf_tracker.h"
-#include "../util/countdown_timer.h"
 #include "../util/bound_tracker.h"
 #include "control_status.h"
 #include "../util/countup_timer.h"
@@ -25,6 +23,9 @@ struct Main{
 	Posedge_trigger print_button;
 
 	Posedge_toggle field_relative;
+	Posedge_trigger autonomous_start;
+	
+	Shooter_wheels::Calibration_manager wheel_calibration;
 	
 	Main();
 	Robot_outputs operator()(Robot_inputs);

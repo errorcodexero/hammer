@@ -57,7 +57,8 @@ namespace Injector_arms{
 			case STATUS_OPENING:
 				if(out==OUTPUT_OPEN){
 					timer.update(t,0);
-					static const Time OPEN_TIME=1;
+					//This is actually even faster than opening; rounding up to .1 should give plenty of margin.
+					static const Time OPEN_TIME=.1;
 					if(timer.elapsed()>OPEN_TIME){
 						est=STATUS_OPEN;
 					}
@@ -69,7 +70,7 @@ namespace Injector_arms{
 			case STATUS_CLOSING:
 				if(out==OUTPUT_CLOSE){
 					timer.update(t,0);
-					static const Time CLOSE_TIME=1.5;
+					static const Time CLOSE_TIME=0.1; //Is most nearly 0.0738 (31/420), rounding to 0.1 seconds
 					if(timer.elapsed()>CLOSE_TIME){
 						est=STATUS_CLOSED;
 					}

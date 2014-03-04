@@ -1,5 +1,7 @@
 Drivebase:
 	-Complete location estimate code (DYLAN)
+	-Calibrate and improve gyro
+	-Log when stuff gets clipped & figure out why it happens
 Vision processing:
 	-Integrate vision code(THOMAS)
 	-Determine what the wire format is (THOMAS)
@@ -9,12 +11,11 @@ Vision processing:
 		~For ball locations
 Shooter wheels:
 	-Determine the actual speeds to use 
-	-Add option to use config file (AUSTIN)
 	-Add fallback systems
 	-Revise jag code (STEVE)
 	-Add joystick set mode (ADRIAN)
-	-Analyse the speed data Jeff has (JACOB)
 	-Check that the ready function does the right thing
+	-Make learn button work
 AutoMode:
 	-Test existing code
 <<<<<<< HEAD
@@ -30,6 +31,9 @@ OI:
 Air:
 	-FINISH TRACKING PNEUMATIC PRESSURE! (JACOB)
 Ejector:
-	-Test ejector mode change that makes it keep the collector up
+	-Make second eject mode work (AUSTIN)
 Collector arms:
 	-Time movements & adjust code appropriately
+Collector:
+	-Add a reverse mode
+

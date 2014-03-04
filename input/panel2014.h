@@ -17,24 +17,35 @@ struct Mode_buttons{
 };
 std::ostream& operator<<(std::ostream&,Mode_buttons);
 
+//maybe this should go in wheelcalib.h or something.
+struct Calibration_target{
+	Fire_control::Target target;
+	bool top;
+	
+	Calibration_target();
+};
+std::ostream& operator<<(std::ostream&,Calibration_target);
+
 struct Panel{
 	//presets
 	Mode_buttons mode_buttons;
-	bool fire;
+	bool fire,pass_now;
 
 	//shooting override section
-	Fire_control::Target target;
+	Calibration_target target;
 	double speed;	
 	bool learn;
 
 	//standard override section
+	/*
 	Maybe<Collector_mode> collector;
 	Maybe<Collector_tilt::Output> collector_tilt;
 	Maybe<Injector::Output> injector;
 	Maybe<Injector_arms::Output> injector_arms;
 	Maybe<Ejector::Output> ejector;
-	//Maybe<Pump::Output> pump;//this probably doesn't need to exist.
-
+	*/
+	bool force_wheels_off;
+	
 	Panel();
 };
 std::ostream& operator<<(std::ostream&,Panel);

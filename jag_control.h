@@ -5,7 +5,7 @@
 #ifndef _WRS_KERNEL
 #include<stdint.h> //for uint8_t
 #endif
-#include"util/interface.h"
+#include"util/jag_interface.h"
 
 class CANJaguar;
 

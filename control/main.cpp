@@ -88,19 +88,26 @@ Toplevel::Mode to_mode(Control_status::Control_status status){
 }
 
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
-Main::Main():control_status(Control_status::DRIVE_W_BALL){}
+Main::Main():control_status(Control_status::DRIVE_W_BALL),autonomous_start(0){}
 
-Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,Time since_switch);
+Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch);
+
+double Clip(double joy_theta){
+	if(joy_theta > 1.0){
+		joy_theta = 1.0;
+	}
+	if(joy_theta < -1.0){
+		joy_theta = -1.0;
+	}
+	return joy_theta;
+}
 
 Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
-	assert(fabs(joy_x)<=1);
-	assert(fabs(joy_y)<=1);
-	assert(fabs(joy_theta)<=1);
-	assert(fabs(joy_throttle)<=1);
-	double throttle=(fabs(joy_throttle)<.25)?1:.5;
-	joy_x*=throttle;
-	joy_y*=-throttle;//invert y.
-	joy_theta*=throttle;
+	
+	double throttle = (1 + -joy_throttle) / 2;
+	joy_x = Clip(joy_x) * throttle;
+	joy_y = -Clip(joy_y) * throttle;//Invert Y
+	joy_theta = Clip(joy_theta) * 0.75;
 	return Drive_goal(Pt(joy_x,joy_y,joy_theta),field_relative);
 }
 
@@ -122,20 +129,42 @@ Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x
 
 Toplevel::Output panel_override(Panel p,Toplevel::Output out){
 	#define X(name) if(p.name) out.name=*p.name;
-	X(collector)
+/*	X(collector)
 	X(collector_tilt)
 	X(injector)
 	X(injector_arms)
-	X(ejector)
+	X(ejector)*/
 	#undef X
+	if(p.force_wheels_off){
+		out.shooter_wheels=Shooter_wheels::Output();
+	}
 	return out;
 }
 
-template<typename T>
-string as_string(T t){
+bool vowel(char c){
+	c=tolower(c);
+	return c=='a' || c=='e' || c=='i' || c=='o' || c=='u' || c=='y';
+}
+
+string abbreviate_text(string s){
 	stringstream ss;
-	ss<<t;
+	//bool skipped_last=0;
+	for(unsigned i=0;i<s.size();i++){
+		if(s[i]==' ' || s[i]==':' || s[i]=='_') continue;
+		if(vowel(s[i])){
+			//skip
+		}else{
+			ss<<s[i];
+		}
+	}
 	return ss.str();
+}
+
+string fRel(bool field){
+	if(field){
+		return "True";
+	}
+	return "False";
 }
 
 Robot_outputs Main::operator()(Robot_inputs in){
@@ -159,8 +188,15 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	Panel panel=interpret(in.driver_station);	
 	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	Toplevel::Status toplevel_status=est.estimate();
-	control_status=next(control_status,toplevel_status,in.joystick[1],panel,in.robot_mode.autonomous,since_switch.elapsed());
+	control_status=next(
+		control_status,toplevel_status,in.joystick[1],panel,
+		in.robot_mode.autonomous,
+		autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled),
+		since_switch.elapsed()
+	);
 
+	field_relative.update(main_joystick.button[Gamepad_button::X]);
+	
 	Toplevel::Mode mode=to_mode(control_status);
 	Drive_goal drive_goal1=drive_goal(
 		control_status,
@@ -171,6 +207,9 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		field_relative.get()
 	);
 	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal1,rpmsdefault());
+	if(toplevel_status.injector!=Injector::Estimator::DOWN_IDLE&&toplevel_status.injector!=Injector::Estimator::DOWN_VENT){
+		subgoals_now.injector_arms=Injector_arms::GOAL_CLOSE;
+	}
 	Toplevel::Output high_level_outputs=control(toplevel_status,subgoals_now);
 	high_level_outputs=panel_override(panel,high_level_outputs);
 	Robot_outputs r=convert_output(high_level_outputs);
@@ -178,30 +217,45 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		Shooter_wheels::Status wheel;
 		wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;
 		wheel.bottom=in.jaguar[JAG_BOTTOM_FEEDBACK].speed;
-		est.update(in.now,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel);
+		est.update(in.now,in.robot_mode.enabled,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel);
 	}
-	field_relative.update(main_joystick.button[Gamepad_button::X]);
+	
 	r=force(r);
 	
-	r.driver_station.lcd[1]=as_string(r.jaguar[0]).substr(13, 20);
-	r.driver_station.lcd[2]=as_string(r.jaguar[1]).substr(13, 20);
-	r.driver_station.lcd[3]=as_string(r.jaguar[2]).substr(13, 20);
-	r.driver_station.lcd[4]=as_string(r.jaguar[3]).substr(13, 20);
+	r.driver_station.lcd.line[0]="FieldRelative: " + fRel(field_relative.get());//as_string(field_relative.get());
+	r.driver_station.lcd.line[1]=as_string(r.jaguar[0]).substr(13, 20);
+	r.driver_station.lcd.line[2]=as_string(r.jaguar[1]).substr(13, 20);
+	r.driver_station.lcd.line[3]=as_string(r.jaguar[2]).substr(13, 20);
+	r.driver_station.lcd.line[4]=as_string(r.jaguar[3]).substr(13, 20);
 	stringstream strin;
 	strin<<toplevel_status.shooter_wheels;
-	r.driver_station.lcd[5]="Speeds:"+strin.str().substr(22, 20);
-	
-	{	
+	r.driver_station.lcd.line[5]="Speeds:"+strin.str().substr(22, 20);
+
+	//r.driver_station.lcd=format_for_lcd(as_string(in.now)+as_string(in.driver_station));
+	/*r.driver_station.lcd=format_for_lcd(
+		//abbreviate_text(as_string(in.now)+"\n"+as_string(panel)+as_string(in.driver_station))
+		as_string(subgoals_now)+as_string(toplevel_status)
+	);*/
+	r.driver_station.digital[7]=ready(toplevel_status,subgoals_now);
+	{
 		static int i=0;
 		if(i==0){
 			stringstream ss;
 			ss<<in<<"\r\n"<<*this<<"\r\n";
+			/*
+			ss<<"Gyro Voltage"<<in.analog[0]<<" "<<"Update"<<gyro.center<<"\r\n";
+			ss<<"Gyro Value:"<<gyro.angle();
+			*/
+			ss<<"\n"<<"Field Relative?:"<<field_relative.get()<<"\n";
 			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
 			cerr<<subgoals_now<<high_level_outputs<<"\n";
 		}
 		i=(i+1)%1000;
 	}
-
+	//cerr<<subgoals_now<<"\r\n";
+	//cerr<<toplevel_status<<"\r\n\r\n";
+	cerr<<"Waiting on:"<<not_ready(toplevel_status,subgoals_now)<<"\n";
+	
 	if(print_button(main_joystick.button[Gamepad_button::LB])){
 		cout<<in<<"\r\n";
 		cout<<*this<<"\r\n";
@@ -323,11 +377,13 @@ Control_status::Control_status next(
 	Joystick_data j,
 	Panel panel,
 	bool autonomous_mode,
+	bool autonomous_mode_start,
 	Time since_switch
 ){
 	using namespace Control_status;
 
-	if(autonomous_mode && !autonomous(status)){
+	//if(autonomous_mode && !autonomous(status)){
+	if(autonomous_mode_start){
 		//TODO: Put the code to select which autonomous mode here.
 		return AUTO_SPIN_UP;
 	}
@@ -337,7 +393,8 @@ Control_status::Control_status next(
 	if(j.button[Gamepad_button::B] || panel.mode_buttons.collect) return COLLECT;
 	if(j.button[Gamepad_button::X] || panel.mode_buttons.drive_w_ball) return DRIVE_W_BALL;
 	if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return DRIVE_WO_BALL;
-
+	//Changed so as not to accidentally time out the robot
+	//if(j.button[Gamepad_button::Y] || panel.mode_buttons.drive_wo_ball) return Control_status::SHOOT_LOW;
 	//todo: use some sort of constants rather than 0/1 for the axes
 	{
 		Joystick_section joy_section=joystick_section(j.axis[0],j.axis[1]);
@@ -475,10 +532,15 @@ Control_status::Control_status next(
 }
 
 template<typename T>
-void print_diff(T a,T b){
+void print_diff(string s,T a,T b){
 	if(a!=b){
-		cout<<"From "<<a<<" to "<<b<<"\n";
+		cout<<s<<"From "<<a<<" to "<<b<<"\n";
 	}
+}
+
+template<typename T>
+void print_diff(T a,T b){
+	print_diff("",a,b);
 }
 
 template<typename T>
@@ -488,10 +550,14 @@ void print_diff_approx(T a,T b){
 	}
 }
 
+void print_diff(unsigned char a,unsigned char b){
+	print_diff((int)a,(int)b);
+}
+
 void print_diff(Gyro_tracker a,Gyro_tracker b){ print_diff_approx(a,b); }
 
 void print_diff(Toplevel::Status a,Toplevel::Status b){
-	#define X(name) print_diff(a.name,b.name);
+	#define X(name) print_diff(""#name ": ",a.name,b.name);
 	X(collector_tilt)
 	X(injector)
 	X(injector_arms)
@@ -507,18 +573,66 @@ void print_diff(Toplevel::Estimator a,Toplevel::Estimator b){
 }
 
 void print_diff(Main a,Main b){
-	print_diff(a.force,b.force);
-	print_diff(a.gyro,b.gyro);
-	print_diff(a.est,b.est);
-	print_diff(a.control_status,b.control_status);
-	print_diff(a.ball_collecter,b.ball_collecter);
-	print_diff(a.field_relative,b.field_relative);
+	#define X(name) print_diff(""#name ": ",a.name,b.name);
+	#define Y(name) print_diff(a.name,b.name);
+	X(force)
+	Y(gyro);
+	Y(est)
+	X(control_status)
+	X(ball_collecter)
+	X(field_relative)
+	#undef Y
+	#undef X
 }
 
-//void print_diff(Robot_outputs a,Robot_outputs b){
-	//for(unsigned i=0;i<Robot_outputs::PWMS;i++){
-	//assert(0);
-//}
+void print_diff(Robot_outputs a,Robot_outputs b){
+	for(unsigned i=0;i<Robot_outputs::PWMS;i++){
+		if(a.pwm[i]!=b.pwm[i]){
+			cout<<"pwm"<<i<<" "<<(int)a.pwm[i]<<"->"<<(int)b.pwm[i]<<"\n";
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
+		if(a.solenoid[i]!=b.solenoid[i]){
+			cout<<"solenoid"<<i<<" "<<a.solenoid[i]<<"->"<<b.solenoid[i]<<"\n";
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::RELAYS;i++){
+		if(a.relay[i]!=b.relay[i]){
+			cout<<"relay"<<i<<" "<<a.relay[i]<<"->"<<b.relay[i]<<"\n";
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
+		if(a.digital_io[i]!=b.digital_io[i]){
+			cout<<"digital_io"<<i<<" "<<a.digital_io[i]<<"->"<<b.digital_io[i]<<"\n";
+		}
+	}
+	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+		if(a.jaguar[i]!=b.jaguar[i]){
+			cout<<"jaguar"<<i<<" "<<a.jaguar[i]<<"->"<<b.jaguar[i]<<"\n";
+		}
+	}
+	print_diff(a.driver_station,b.driver_station);
+}
+
+void print_diff(Robot_inputs a,Robot_inputs b){
+	#define X(name) print_diff(""#name ": ",a.name,b.name);
+	X(robot_mode)
+	//X(now)
+	for(unsigned i=0;i<Robot_inputs::JOYSTICKS;i++){
+		X(joystick[i])
+	}
+	for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
+		X(digital_io[i])
+	}
+	for(unsigned i=0;i<Robot_inputs::ANALOG_INPUTS;i++){
+		X(analog[i])
+	}
+	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+		X(jaguar[i])
+	}
+	X(driver_station)
+	#undef X
+}
 
 bool approx_equal(Main a,Main b){
 	//cout<<"a\n";
@@ -538,6 +652,35 @@ bool approx_equal(Main a,Main b){
 }
 
 #ifdef MAIN_TEST
+
+template<typename T>
+struct Monitor{
+	T data;
+
+	void update(T t){
+		print_diff(data,t);
+		data=t;
+	}
+};
+
+void auto_test(){
+	Main m;
+	Monitor<Robot_inputs> inputs;
+	Monitor<Main> state;
+	Monitor<Robot_outputs> outputs;
+	for(unsigned i=0;i<150;i++){
+		Robot_inputs in;
+		in.now=i/10.0;
+		in.robot_mode.autonomous=1;
+		in.robot_mode.enabled=1;
+		auto out_now=m(in);
+		cout<<"Now="<<in.now<<"\n";
+		inputs.update(in);
+		state.update(m);
+		outputs.update(out_now);
+	}
+}
+
 int main(){
 	/*Main m;
 	cout<<m<<"\n";
@@ -564,33 +707,12 @@ int main(){
 	cout<<func(-1, 0, 0)<<"\n";
 	cout<<func(0, 0, 0)<<"\n";
 	*/
-	Main m;
-	cout<<m<<"\n";
-	for(Control_status::Control_status control_status:Control_status::all()){
-		cout<<control_status<<" "<<to_mode(control_status)<<"\n";
-	}
-	Robot_outputs out;
-	Main old_main;
-	for(unsigned i=0;i<15;i++){
-		Robot_inputs in;
-		in.now=i/10.0;
-		in.robot_mode.autonomous=1;
-		auto out_now=m(in);
-
-		if(!approx_equal(m,old_main)){
-			//cout<<"M="<<m<<"\n";
-		}
-		print_diff(old_main,m);
-		old_main=m;
-
-		if(out_now!=out){
-			cout<<in<<"\n";
-			print_diff(out,out_now);
-			cout<<"\n\n";
-			out=out_now;
-		}else{
-			cout<<"same\n";
+	bool test_control_status=1;
+	if(test_control_status){
+		for(Control_status::Control_status control_status:Control_status::all()){
+			cout<<control_status<<" "<<to_mode(control_status)<<"\n";
 		}
 	}
+	auto_test();
 }
 #endif

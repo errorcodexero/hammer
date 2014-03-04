@@ -24,19 +24,44 @@ ostream& operator<<(ostream& o,Integrator a){
 
 Gyro_tracker::Gyro_tracker():cal_accumulated(0),cal_samples(0),cal_start(-1),center(0){
 }
-
+/*
+    m_center = (uint32_t)((float)value / (float)count + .5);
+    m_offset = ((float)value / (float)count) - (float)m_center;
+    //In this context, value is the accumulated value over (count) number of samples
+   	  
+    m_analog->GetAccumulatorOutput(&rawValue, &count);
+    INT64 value = rawValue - (INT64)((float)count * m_offset);
+    double scaledValue = value * 1e-9 * (double)m_analog->GetLSBWeight() * (double)(1 << m_analog->GetAverageBits()) /
+	(m_analog->GetModule()->GetSampleRate() * m_voltsPerDegreePerSecond);
+    return (float)scaledValue;
+    
+ */
 void Gyro_tracker::update(Time now,Volt v){
-	bool cal_done=cal_start!=-1 && now-cal_start>1;
+	bool cal_done = cal_start!=-1 && now-cal_start>1;
 	if(cal_done){
 		//this value is totally bogus and needs to be calibrated or copied carefully from Gyro.cpp.
-		double x=(v-center)*18000;
+		double x=(v-center)*138.89;
 		
 		integrator.update(now,x);
+	/* What needs to happen to get a meaningful value for degrees
+	 CurrentVolts - CenterVolts = DiffVolts
+	 DiffVolts * ConvertVoltsToDegPerSec = DegPerSec
+	 DegPerSec * Seconds/Sample = DegressTraveled/Sample
+	 DegressTraveled/Sample * Samples = TotalDegTraveled
+	 AccumulatedDegrees += TotalDegTraveled
+	 */
+	/*
+	double timePassed += (now - timePassed);
+	double diff = v - center;
+	double DegPerSec = diff * (1/0.0072) //This is the inverse of the value of Volts/(Deg/Sec) to get (Deg/Sec)/Volts
+	double DegPerSam = DegPerSec *  
+	 
+	 */
 	}else{
 		if(cal_start==-1) cal_start=now;
 		cal_accumulated+=v;
 		cal_samples++;
-		center=cal_accumulated/cal_samples;
+		center = cal_accumulated / cal_samples;
 	}
 }
 

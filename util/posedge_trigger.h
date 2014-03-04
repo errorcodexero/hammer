@@ -8,6 +8,8 @@ struct Posedge_trigger{
 	//Last stores the last value that was given
 
 	Posedge_trigger();
+	explicit Posedge_trigger(bool assume_previous);
+
 	//Lets you call things of posedgetrigger as if it were a function
 	bool operator()(bool);
 	//If previous value was 0, and new value is one, return one

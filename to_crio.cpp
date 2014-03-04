@@ -56,10 +56,10 @@ int read_driver_station(Driver_station_input& r){
 	if(!ds) return 2048;
 	DriverStationEnhancedIO &en=ds->GetEnhancedIO();
 	for(unsigned i=0;i<r.ANALOG_INPUTS;i++){
-		//r.analog[i]=en.GetAnalogIn(i+1);
+		r.analog[i]=en.GetAnalogIn(i+1);//Causing a LOT of printouts when the DS is disconnected
 	}
 	for(unsigned i=0;i<r.DIGITAL_INPUTS;i++){
-		//r.digital[i]=en.GetDigital(i+1);
+		r.digital[i]=en.GetDigital(i+1);//Same as above ^^
 	}
 	return 0;
 }
@@ -179,12 +179,13 @@ public:
 		}
 		
 		if(lcd){
-			lcd->Printf(DriverStationLCD::kUser_Line1,1,"%s",space_out(out.driver_station.lcd[0]).c_str());
-			lcd->Printf(DriverStationLCD::kUser_Line2,1,"%s",space_out(out.driver_station.lcd[1]).c_str());
-			lcd->Printf(DriverStationLCD::kUser_Line3,1,"%s",space_out(out.driver_station.lcd[2]).c_str());
-			lcd->Printf(DriverStationLCD::kUser_Line4,1,"%s",space_out(out.driver_station.lcd[3]).c_str());
-			lcd->Printf(DriverStationLCD::kUser_Line5,1,"%s",space_out(out.driver_station.lcd[4]).c_str());
-			lcd->Printf(DriverStationLCD::kUser_Line6,1,"%s",space_out(out.driver_station.lcd[5]).c_str());
+			//The first column is numbered 1.
+			lcd->Printf(DriverStationLCD::kUser_Line1,1,"%s",space_out(out.driver_station.lcd.line[0]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line2,1,"%s",space_out(out.driver_station.lcd.line[1]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line3,1,"%s",space_out(out.driver_station.lcd.line[2]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line4,1,"%s",space_out(out.driver_station.lcd.line[3]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line5,1,"%s",space_out(out.driver_station.lcd.line[4]).c_str());
+			lcd->Printf(DriverStationLCD::kUser_Line6,1,"%s",space_out(out.driver_station.lcd.line[5]).c_str());
 			lcd->UpdateLCD();
 		}else{
 			cerr<<"lcd is null\r\n";
@@ -205,8 +206,13 @@ public:
 		{
 			DriverStation *ds=DriverStation::GetInstance();
 			if(ds){
+				DriverStationEnhancedIO &d=ds->GetEnhancedIO();
+				for(unsigned i=0;i<8;i++){
+					d.SetDigitalConfig(i+1,DriverStationEnhancedIO::kInputPullUp);
+				}
 				for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
-					//ds->GetEnhancedIO().SetDigitalOutput(i+1,out.driver_station.digital[i]);
+					d.SetDigitalConfig(i+1+8,DriverStationEnhancedIO::kOutput);
+					d.SetDigitalOutput(i+1+8,out.driver_station.digital[i]);
 				}
 			}else{
 				error_code|=2048;

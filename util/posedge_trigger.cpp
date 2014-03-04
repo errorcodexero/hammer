@@ -6,6 +6,8 @@ using namespace std;
 
 Posedge_trigger::Posedge_trigger():last(1){}
 
+Posedge_trigger::Posedge_trigger(bool assume_previous):last(assume_previous){}
+
 bool Posedge_trigger::operator()(bool b){
 	bool r=!last && b;
 	last=b;

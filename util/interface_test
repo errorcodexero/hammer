@@ -1,1 +1,1 @@
-g++ -DINTERFACE_TEST interface.cpp -o interface 2>&1 && ./interface
+g++ -DINTERFACE_TEST interface.cpp jag_interface.cpp driver_station_interface.cpp -o interface 2>&1 && ./interface

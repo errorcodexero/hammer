@@ -1,6 +1,7 @@
 #ifndef TOPLEVEL_H
 #define TOPLEVEL_H
 
+#include<vector>
 #include "collector.h"
 #include "collector_tilt.h"
 #include "injector.h"
@@ -8,7 +9,6 @@
 #include "shooter_wheels.h"
 #include "ejector.h"
 #include "pump.h"
-#include "../util/point.h"
 #include "holonomic.h"
 
 namespace Toplevel{
@@ -68,7 +68,7 @@ namespace Toplevel{
 		
 		public:
 		Estimator();
-		void update(Time,Output,Pump::Status,float orientation,Shooter_wheels::Status);
+		void update(Time,bool enabled,Output,Pump::Status,float orientation,Shooter_wheels::Status);
 		Status estimate()const;
 		void out(std::ostream&)const;
 
@@ -81,6 +81,7 @@ namespace Toplevel{
 
 	Output control(Status,Subgoals);
 	bool ready(Status,Subgoals);
+	std::vector<std::string> not_ready(Status,Subgoals);
 	
 	//all this mode stuff really belongs elsewhere
 	enum Mode{
@@ -90,7 +91,7 @@ namespace Toplevel{
 		TRUSS_TOSS_PREP,TRUSS_TOSS,
 		PASS_PREP,PASS,
 		EJECT_PREP,EJECT,
-		CATCH
+		CATCH, //SHOOT_LOW
 	};
 	std::ostream& operator<<(std::ostream& o,Mode);
 

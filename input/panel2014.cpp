@@ -1,5 +1,6 @@
 #include "panel2014.h"
 #include<stdlib.h>
+#include "util.h"
 
 using namespace std;
 
@@ -29,9 +30,21 @@ ostream& operator<<(ostream& o,Mode_buttons m){
 	return o<<")";
 }
 
+Calibration_target::Calibration_target():target(Fire_control::NO_TARGET),top(0){}
+
+ostream& operator<<(ostream& o,Calibration_target a){
+	o<<"Cal_target(";
+	o<<a.target<<" ";
+	if(a.top){
+		o<<"top";
+	}else{
+		o<<"bottom";
+	}
+	return o<<")";
+}
+
 Panel::Panel():
 	fire(0),
-	target(Fire_control::NO_TARGET),
 	speed(0),
 	learn(0)
 {}
@@ -39,16 +52,19 @@ Panel::Panel():
 ostream& operator<<(ostream& o,Panel p){
 	o<<"Panel( ";
 	#define X(name) o<<""#name<<":"<<p.name<<" ";
-	X(mode_buttons)
+//	o<<p.mode_buttons;
 	X(fire)
+	X(pass_now)
 	X(target)
-	X(speed)
+//	X(speed)
+	o<<"spd:"<<((int)(p.speed)*10)/10<<" ";
 	X(learn)
-	X(collector)
+	X(force_wheels_off)
+/*	X(collector)
 	X(collector_tilt)
 	X(injector)
 	X(injector_arms)
-	X(ejector)
+	X(ejector)*/
 	#undef X
 	return o<<")";
 }
@@ -57,8 +73,8 @@ int demux27(double analog){
 	assert(0);
 }
 
-Fire_control::Target interpret_target(bool a,bool b,bool c){
-	int x=a+2*b+4*c;
+Calibration_target interpret_target(double f){
+	/*int x=a+2*b+4*c;
 	switch(x){
 		case 0: return Fire_control::NO_TARGET;
 		case 1: return Fire_control::HIGH;
@@ -68,7 +84,25 @@ Fire_control::Target interpret_target(bool a,bool b,bool c){
 		default:
 			//may want to add some way of returning an error;
 			return Fire_control::NO_TARGET;
+	}*/
+	//TODO: Measure the analog values of the switch.
+	int i=interpret_10_turn_pot(f/3.3*5);
+	Calibration_target r;
+	r.top=i%2;
+	switch(i/2){
+		case 0:
+			r.target=Fire_control::HIGH;
+			break;
+		case 1:
+			r.target=Fire_control::TRUSS;
+			break;
+		case 2:
+			r.target=Fire_control::PASS;
+			break;
+		default:
+			r.target=Fire_control::NO_TARGET;
 	}
+	return r;
 }
 
 Maybe<Collector_mode> interpret_collector(double analog){
@@ -131,47 +165,24 @@ Maybe<Ejector::Output> interpret_ejector(int x){
 Panel interpret(Driver_station_input d){
 	Panel panel;
 	//all these assignments are just made up.  
-	unsigned combined=0;
-	for(unsigned i=0;i<4;i++){
-		combined<<=1;
-		combined|=d.digital[i];
-	}
-	panel.mode_buttons.drive_wo_ball=combined==1;
-	panel.mode_buttons.drive_w_ball=combined==2;
-	panel.mode_buttons.collect=combined==3;
-	panel.mode_buttons.shoot_high=combined==4;
-	panel.mode_buttons.truss_toss=combined==5;
-	panel.mode_buttons.pass=combined==6;
-	panel.mode_buttons.eject=combined==7;
-	panel.mode_buttons.catch_mode=combined==8;
-
-	panel.fire=combined==9;
-
-	//5 options?
-	panel.target=interpret_target(d.digital[4],d.digital[5],d.digital[6]);
-	panel.speed=d.analog[0];
-	panel.learn=combined==10;
-	
-	//4 options? maybe 3.
-	panel.collector=interpret_collector(d.analog[1]);
-
 	{
-		pair<int,int> p=demux_3x3(d.analog[2]);
-		//3 options
-		panel.collector_tilt=interpret_collector_tilt(p.first);
-
-		//3 options
-		panel.injector=interpret_injector(p.second);
+		double x=d.analog[3];
+		panel.mode_buttons.drive_wo_ball=x>3.1;
+		panel.mode_buttons.drive_w_ball=(x<2.9 && x>2.6);
+		panel.mode_buttons.collect=(x<2.35 && x>2.05);
+		panel.mode_buttons.shoot_high=!d.digital[0];
+		panel.mode_buttons.pass=(x<1.8 && x>1.5);
+		panel.mode_buttons.eject=(x<1.25 && x>.95);
+		panel.pass_now=(x<.7 && x>.4);
 	}
+	panel.mode_buttons.catch_mode=!d.digital[2];
 
-	{
-		pair<int,int> p=demux_3x3(d.analog[3]);
-		//3 options
-		panel.injector_arms=interpret_injector_arms(p.first);
+	panel.fire=!d.digital[1];
 
-		//3 options
-		panel.ejector=interpret_ejector(p.second);
-	}
+	panel.target=interpret_target(d.analog[2]);
+	panel.speed=d.analog[1];
+	panel.force_wheels_off=d.digital[3];//note: Which way is on/off is not labeled on the console yet.  
+	//panel.learn=TBD
 	return panel;
 }
 

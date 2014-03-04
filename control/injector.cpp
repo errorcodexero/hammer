@@ -128,6 +128,8 @@ namespace Injector{
 				return RECOVERY;
 			case Estimator::DOWN_IDLE:
 				return IDLE;
+			case Estimator::X:
+				return RECOVERY;
 			default: assert(0);
 		}
 	}

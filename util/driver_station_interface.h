@@ -18,6 +18,7 @@ struct Driver_station_output{
 	Driver_station_output();
 };
 bool operator==(Driver_station_output::Lcd,Driver_station_output::Lcd);
+bool operator!=(Driver_station_output::Lcd,Driver_station_output::Lcd);
 std::ostream& operator<<(std::ostream&,Driver_station_output::Lcd);
 bool operator==(Driver_station_output,Driver_station_output);
 bool operator!=(Driver_station_output,Driver_station_output);

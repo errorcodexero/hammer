@@ -54,6 +54,10 @@ bool operator==(Driver_station_output::Lcd a,Driver_station_output::Lcd b){
 	return 1;
 }
 
+bool operator!=(Driver_station_output::Lcd a,Driver_station_output::Lcd b){
+	return !(a==b);
+}
+
 ostream& operator<<(ostream& o,Driver_station_output::Lcd a){
 	o<<"lcd(";
 	for(unsigned i=0;i<Driver_station_output::Lcd::HEIGHT;i++){

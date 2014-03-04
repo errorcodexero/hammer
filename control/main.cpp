@@ -256,7 +256,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	}
 	//cerr<<subgoals_now<<"\r\n";
 	//cerr<<toplevel_status<<"\r\n\r\n";
-	cerr<<"Waiting on:"<<not_ready(toplevel_status,subgoals_now)<<"\n";
+	//cerr<<"Waiting on:"<<not_ready(toplevel_status,subgoals_now)<<"\n";
 	
 	if(print_button(main_joystick.button[Gamepad_button::LB])){
 		cout<<in<<"\r\n";
@@ -534,49 +534,50 @@ Control_status::Control_status next(
 }
 
 template<typename T>
-void print_diff(string s,T a,T b){
+void print_diff(ostream& o,string s,T a,T b){
 	if(a!=b){
-		cout<<s<<"From "<<a<<" to "<<b<<"\n";
+		o<<s<<"From "<<a<<" to "<<b<<"\n";
 	}
 }
 
 template<typename T>
-void print_diff(T a,T b){
-	print_diff("",a,b);
+void print_diff(ostream& o,T a,T b){
+	print_diff(o,"",a,b);
 }
 
 template<typename T>
-void print_diff_approx(T a,T b){
+void print_diff_approx(ostream& o,T a,T b){
 	if(!approx_equal(a,b)){
-		cout<<"From "<<a<<" to "<<b<<"\n";
+		o<<"From "<<a<<" to "<<b<<"\n";
 	}
 }
 
-void print_diff(unsigned char a,unsigned char b){
-	print_diff((int)a,(int)b);
+void print_diff(ostream& o,unsigned char a,unsigned char b){
+	print_diff(o,(int)a,(int)b);
 }
 
-void print_diff(Gyro_tracker a,Gyro_tracker b){ print_diff_approx(a,b); }
+void print_diff(ostream& o,Gyro_tracker a,Gyro_tracker b){ print_diff_approx(o,a,b); }
 
-void print_diff(Toplevel::Status a,Toplevel::Status b){
-	#define X(name) print_diff(""#name ": ",a.name,b.name);
+void print_diff(ostream& o,Toplevel::Status a,Toplevel::Status b){
+	#define X(name) print_diff(o,""#name ": ",a.name,b.name);
 	X(collector_tilt)
 	X(injector)
 	X(injector_arms)
 	X(ejector)
 	X(shooter_wheels)
 	X(pump)
-	X(orientation)
+	//X(orientation)
+	print_diff_approx(o,a.orientation,b.orientation);
 	#undef X
 }
 
-void print_diff(Toplevel::Estimator a,Toplevel::Estimator b){
-	print_diff(a.estimate(),b.estimate());
+void print_diff(ostream& o,Toplevel::Estimator a,Toplevel::Estimator b){
+	print_diff(o,a.estimate(),b.estimate());
 }
 
-void print_diff(Main a,Main b){
-	#define X(name) print_diff(""#name ": ",a.name,b.name);
-	#define Y(name) print_diff(a.name,b.name);
+void print_diff(ostream& o,Main a,Main b){
+	#define X(name) print_diff(o,""#name ": ",a.name,b.name);
+	#define Y(name) print_diff(o,a.name,b.name);
 	X(force)
 	Y(gyro);
 	Y(est)
@@ -587,37 +588,48 @@ void print_diff(Main a,Main b){
 	#undef X
 }
 
-void print_diff(Robot_outputs a,Robot_outputs b){
+void print_diff(ostream& o,Driver_station_output a,Driver_station_output b){
+	#define X(name) print_diff(o,a.name,b.name);
+	X(lcd)
+	for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
+		if(a.digital[i]!=b.digital[i]){
+			o<<"Driver_staiont_output::digital["<<i<<"]:"<<a.digital[i]<<"->"<<b.digital[i]<<"\n";
+		}
+	}
+	#undef X
+}
+
+void print_diff(ostream& o,Robot_outputs a,Robot_outputs b){
 	for(unsigned i=0;i<Robot_outputs::PWMS;i++){
 		if(a.pwm[i]!=b.pwm[i]){
-			cout<<"pwm"<<i<<" "<<(int)a.pwm[i]<<"->"<<(int)b.pwm[i]<<"\n";
+			o<<"pwm"<<i<<" "<<(int)a.pwm[i]<<"->"<<(int)b.pwm[i]<<"\n";
 		}
 	}
 	for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
 		if(a.solenoid[i]!=b.solenoid[i]){
-			cout<<"solenoid"<<i<<" "<<a.solenoid[i]<<"->"<<b.solenoid[i]<<"\n";
+			o<<"solenoid"<<i<<" "<<a.solenoid[i]<<"->"<<b.solenoid[i]<<"\n";
 		}
 	}
 	for(unsigned i=0;i<Robot_outputs::RELAYS;i++){
 		if(a.relay[i]!=b.relay[i]){
-			cout<<"relay"<<i<<" "<<a.relay[i]<<"->"<<b.relay[i]<<"\n";
+			o<<"relay"<<i<<" "<<a.relay[i]<<"->"<<b.relay[i]<<"\n";
 		}
 	}
 	for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
 		if(a.digital_io[i]!=b.digital_io[i]){
-			cout<<"digital_io"<<i<<" "<<a.digital_io[i]<<"->"<<b.digital_io[i]<<"\n";
+			o<<"digital_io"<<i<<" "<<a.digital_io[i]<<"->"<<b.digital_io[i]<<"\n";
 		}
 	}
 	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
 		if(a.jaguar[i]!=b.jaguar[i]){
-			cout<<"jaguar"<<i<<" "<<a.jaguar[i]<<"->"<<b.jaguar[i]<<"\n";
+			o<<"jaguar"<<i<<" "<<a.jaguar[i]<<"->"<<b.jaguar[i]<<"\n";
 		}
 	}
-	print_diff(a.driver_station,b.driver_station);
+	print_diff(o,a.driver_station,b.driver_station);
 }
 
-void print_diff(Robot_inputs a,Robot_inputs b){
-	#define X(name) print_diff(""#name ": ",a.name,b.name);
+void print_diff(ostream& o,Robot_inputs a,Robot_inputs b){
+	#define X(name) print_diff(o,""#name ": ",a.name,b.name);
 	X(robot_mode)
 	//X(now)
 	for(unsigned i=0;i<Robot_inputs::JOYSTICKS;i++){
@@ -659,9 +671,11 @@ template<typename T>
 struct Monitor{
 	T data;
 
-	void update(T t){
-		print_diff(data,t);
+	string update(T t){
+		stringstream ss;
+		print_diff(ss,data,t);
 		data=t;
+		return ss.str();
 	}
 };
 
@@ -670,16 +684,20 @@ void auto_test(){
 	Monitor<Robot_inputs> inputs;
 	Monitor<Main> state;
 	Monitor<Robot_outputs> outputs;
-	for(unsigned i=0;i<150;i++){
+	for(unsigned i=0;i<1500;i++){
 		Robot_inputs in;
-		in.now=i/10.0;
+		in.now=i/100.0;
 		in.robot_mode.autonomous=1;
 		in.robot_mode.enabled=1;
 		auto out_now=m(in);
-		cout<<"Now="<<in.now<<"\n";
-		inputs.update(in);
-		state.update(m);
-		outputs.update(out_now);
+		string change;
+		change+=inputs.update(in);
+		change+=state.update(m);
+		change+=outputs.update(out_now);
+		if(change.size()){
+			cout<<"Now="<<in.now<<"\n";
+			cout<<change<<"\n";
+		}
 	}
 }
 

@@ -58,7 +58,7 @@ namespace Collector_tilt{
 			case STATUS_RAISING:
 				if(output==OUTPUT_UP){
 					timer.update(time,0);
-					static const Time RISE_TIME=2.5;//total guess
+					static const Time RISE_TIME=1.695;//Timed and recorded (The longest timing in the recordings; average was 1.595)
 					if(timer.elapsed()>RISE_TIME){
 						est=STATUS_UP;
 					}
@@ -70,7 +70,7 @@ namespace Collector_tilt{
 			case STATUS_LOWERING:
 				if(output==OUTPUT_DOWN){
 					timer.update(time,0);
-					static const Time LOWER_TIME=1.5;//total guess
+					static const Time LOWER_TIME=0.82;//Timed and recorded (The longest timing in the recordings; average was 0.748)
 					if(timer.elapsed()>LOWER_TIME){
 						est=STATUS_DOWN;
 					}

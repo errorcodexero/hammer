@@ -1,3 +1,5 @@
+#ifndef _WRS_KERNEL
+
 #include <vector>
 #include <assert.h>
 #include <stdlib.h>
@@ -174,4 +176,6 @@ int main(){
 	}
 }
 
-#endif
+#endif // WHEEL_RPM_INTERFACE_TEST
+
+#endif // _WRS_KERNEL

@@ -152,7 +152,7 @@ void Shooter_sim::update(Time t,Shooter_wheels::Output a){
 }
 
 Shooter_wheels::Status Shooter_sim::estimate()const{
-	assert(0);
+	return Shooter_wheels::Status(top.estimate(),bottom.estimate());
 }
 
 ostream& operator<<(ostream& o,Shooter_sim a){

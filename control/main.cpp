@@ -556,7 +556,7 @@ void print_diff(ostream& o,Toplevel::Status a,Toplevel::Status b){
 	X(injector)
 	X(injector_arms)
 	X(ejector)
-	X(shooter_wheels)
+	print_diff_approx(o,a.shooter_wheels,b.shooter_wheels);
 	X(pump)
 	//X(orientation)
 	//print_diff_approx(o,a.orientation,b.orientation);
@@ -582,7 +582,7 @@ void print_diff(ostream& o,Main a,Main b){
 
 void print_diff(ostream& o,Driver_station_output a,Driver_station_output b){
 	#define X(name) print_diff(o,a.name,b.name);
-	X(lcd)
+	//X(lcd) skipping this for now since it really clutters the prinout right now since it shows shooter wheel speeds
 	for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
 		if(a.digital[i]!=b.digital[i]){
 			o<<"Driver_staiont_output::digital["<<i<<"]:"<<a.digital[i]<<"->"<<b.digital[i]<<"\n";
@@ -618,6 +618,12 @@ void print_diff(ostream& o,Robot_outputs a,Robot_outputs b){
 		}
 	}
 	print_diff(o,a.driver_station,b.driver_station);
+}
+
+void print_diff(ostream& o,string s,Jaguar_input a,Jaguar_input b){
+	if(!approx_equal(a,b)){
+		o<<s<<a<<"->"<<b<<"\n";
+	}
 }
 
 void print_diff(ostream& o,Robot_inputs a,Robot_inputs b){
@@ -658,6 +664,7 @@ bool approx_equal(Main a,Main b){
 }
 
 #ifdef MAIN_TEST
+#include "wheel_sim.h"
 
 template<typename T>
 struct Monitor{
@@ -671,17 +678,38 @@ struct Monitor{
 	}
 };
 
+Jaguar_input jag_at_speed(double speed){
+	Jaguar_input r;
+	r.speed=speed;
+	return r;
+}
+
+Shooter_wheels::Output shooter_output(Robot_outputs out){
+	Shooter_wheels::Output r;
+	r.top[Shooter_wheels::Output::FEEDBACK]=out.jaguar[JAG_TOP_FEEDBACK];
+	r.top[Shooter_wheels::Output::OPEN_LOOP]=out.jaguar[JAG_TOP_OPEN_LOOP];
+	r.bottom[Shooter_wheels::Output::FEEDBACK]=out.jaguar[JAG_BOTTOM_FEEDBACK];
+	r.bottom[Shooter_wheels::Output::OPEN_LOOP]=out.jaguar[JAG_BOTTOM_OPEN_LOOP];
+	return r;
+}
+
 void auto_test(){
 	Main m;
 	Monitor<Robot_inputs> inputs;
 	Monitor<Main> state;
 	Monitor<Robot_outputs> outputs;
+	Shooter_sim shooter_sim;
 	for(unsigned i=0;i<1500;i++){
 		Robot_inputs in;
 		in.now=i/100.0;
 		in.robot_mode.autonomous=1;
 		in.robot_mode.enabled=1;
+		//in.jaguar[JAG_TOP_OPEN_LOOP]=leave at 0
+		in.jaguar[JAG_TOP_FEEDBACK]=jag_at_speed(shooter_sim.estimate().top);
+		//in.jaguar[JAG_BOTTOM_OPEN_LOOP]=
+		in.jaguar[JAG_BOTTOM_FEEDBACK]=jag_at_speed(shooter_sim.estimate().bottom);
 		auto out_now=m(in);
+		shooter_sim.update(in.now,shooter_output(out_now));
 		string change;
 		change+=inputs.update(in);
 		change+=state.update(m);

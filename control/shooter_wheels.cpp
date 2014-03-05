@@ -3,6 +3,7 @@
 #include<cassert>
 #include<stdlib.h>
 #include<math.h>
+#include<unistd.h>
 #include"wheelrpms.h"
 
 using namespace std;

@@ -1,7 +1,13 @@
 #include <vector>
 #include <assert.h>
 #include <stdlib.h>
+
+#if 0 // usleep() is obsolete
 #include <unistd.h>
+#else // use nanosleep() instead
+#include <time.h>
+#endif
+
 #include <iostream>
 #include "../util/util.h"
 #include "wheelrpms.h"
@@ -9,6 +15,18 @@
 #include "../util/negedge_trigger.h"
 
 using namespace std;
+
+int usleep (const int us_delay)
+{
+    struct timespec tim, tim2;
+
+    tim.tv_sec  = 0;
+    tim.tv_nsec = us_delay / 1000;
+
+    int retSts = nanosleep (&tim , &tim2);
+
+    return retSts;
+}
 
 enum Button{
 	START,BTN0,BTN1
@@ -71,6 +89,18 @@ void printbutton1(){
 	}
 }
 
+int changevalueconverter(vector<int> v){
+	assert(v.size()==6);
+	int p=0;
+	if(v[0]==1)p=p+3200;
+	if(v[1]==1)p=p+1600;
+	if(v[2]==1)p=p+800;
+	if(v[3]==1)p=p+400;
+	if(v[4]==1)p=p+200;
+	if(v[5]==1)p=p+100;
+	return p;
+}
+
 vector<int> vthree(vector<int> v){
 	assert(!v.size()<3);
 	vector<int> newv;
@@ -89,10 +119,29 @@ vector<int> vsix(vector<int> v){
 	return newv;
 }
 
+wheelcalib whattochange (vector<int> v){
+	assert(v.size()==3);
+	wheelcalib r;
+	vector<int> t=vthree(v);
+	int s=changevalueconverter(vsix(v));
+	if(t[0]==0&&t[1]==0&&t[2]==0)r.highgoal.top=s;
+	if(t[0]==0&&t[1]==0&&t[2]==1)r.highgoal.bottom=s;
+	if(t[0]==0&&t[1]==1&&t[2]==0)r.lowgoal.top=s;
+	if(t[0]==0&&t[1]==1&&t[2]==1)r.lowgoal.bottom=s;
+	if(t[0]==1&&t[1]==0&&t[2]==0)r.overtruss.top=s;
+	if(t[0]==1&&t[1]==0&&t[2]==1)r.overtruss.bottom=s;
+	if(t[0]==1&&t[1]==1&&t[2]==0)r.passing.top=s;
+	if(t[0]==1&&t[1]==1&&t[2]==1)r.passing.bottom=s;
+	writeconfig(r);
+	return r;
+}
+
 int main(){
+	try{
 	vector<int> buttonorder;
 	vector<int> motorandprep;
 	vector<int> binarytoconvert;
+	wheelcalib vpostchange;
 	Presscount a;
 	Presscount b;
 	Presscount c;
@@ -115,6 +164,11 @@ int main(){
 	}
 	motorandprep=vthree(buttonorder);
 	binarytoconvert=vsix(buttonorder);
-	cout<<motorandprep<<"	"<<binarytoconvert<<"	"<<buttonorder<<endl;
+	cout<<motorandprep<<"	"<<changevalueconverter(binarytoconvert)<<"	"<<buttonorder<<endl;
+	vpostchange=whattochange(buttonorder);
+	cout<<vpostchange<<endl;
+	}catch(string&s){
+		cout<<"The dark fire will not avail you! Flame of Udûn!"<<endl;
+	}
 }
 

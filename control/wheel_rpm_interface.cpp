@@ -107,6 +107,8 @@ vector<int> vsix(vector<int> v){
 	return newv;
 }
 
+#ifdef WHEEL_RPM_INTERFACE_TEST
+
 int main(){
 	vector<int> buttonorder;
 	vector<int> motorandprep;
@@ -136,3 +138,4 @@ int main(){
 	cout<<motorandprep<<"	"<<binarytoconvert<<"	"<<buttonorder<<endl;
 }
 
+#endif

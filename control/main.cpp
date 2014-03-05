@@ -89,7 +89,7 @@ Toplevel::Mode to_mode(Control_status::Control_status status){
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
 Main::Main():control_status(Control_status::DRIVE_W_BALL),autonomous_start(0){}
 
-Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch);
+Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch,wheelcalib);
 
 Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
 	
@@ -171,17 +171,20 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		main_joystick.button[2]
 	);
 
+
 	ball_collecter.update(main_joystick.button[5]);
 	bool tanks_full=(in.digital_io[0]==DI_1);
 
 	Panel panel=interpret(in.driver_station);	
+	wheelcalib calib=wheel_calibration.update(panel.learn,panel.speed,panel.target);
 	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	Toplevel::Status toplevel_status=est.estimate();
 	control_status=next(
 		control_status,toplevel_status,gunner_joystick,panel,
 		in.robot_mode.autonomous,
 		autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled),
-		since_switch.elapsed()
+		since_switch.elapsed(),
+		calib
 	);
 
 	field_relative.update(main_joystick.button[Gamepad_button::X]);
@@ -195,7 +198,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		main_joystick.axis[Gamepad_axis::TRIGGER],
 		field_relative.get()
 	);
-	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal1,rpmsdefault());
+	Toplevel::Subgoals subgoals_now=subgoals(mode,drive_goal1,calib);
 	if(toplevel_status.injector!=Injector::Estimator::DOWN_IDLE&&toplevel_status.injector!=Injector::Estimator::DOWN_VENT){
 		subgoals_now.injector_arms=Injector_arms::GOAL_CLOSE;
 	}
@@ -273,6 +276,7 @@ ostream& operator<<(ostream& o,Main m){
 	o<<m.est;
 	o<<m.control_status;
 	o<<m.since_switch;
+	o<<m.wheel_calibration;
 	//o<<m.control;
 	//ball collector
 	//print button
@@ -370,7 +374,8 @@ Control_status::Control_status next(
 	Panel panel,
 	bool autonomous_mode,
 	bool autonomous_mode_start,
-	Time since_switch
+	Time since_switch,
+	wheelcalib calib
 ){
 	using namespace Control_status;
 
@@ -410,11 +415,10 @@ Control_status::Control_status next(
 		fire_when_ready=(vert==JOY_DOWN); //No equivalent on the switchpanel.
 	}
 
-	wheelcalib d=rpmsdefault();
-	bool ready_to_shoot=ready(part_status,subgoals(Toplevel::SHOOT_HIGH_PREP,Drive_goal(),d));
-	bool ready_to_truss_toss=ready(part_status,subgoals(Toplevel::TRUSS_TOSS_PREP,Drive_goal(),d));
-	bool ready_to_pass=ready(part_status,subgoals(Toplevel::PASS_PREP,Drive_goal(),d));
-	bool ready_to_collect=ready(part_status,subgoals(Toplevel::COLLECT,Drive_goal(),d));
+	bool ready_to_shoot=ready(part_status,subgoals(Toplevel::SHOOT_HIGH_PREP,Drive_goal(),calib));
+	bool ready_to_truss_toss=ready(part_status,subgoals(Toplevel::TRUSS_TOSS_PREP,Drive_goal(),calib));
+	bool ready_to_pass=ready(part_status,subgoals(Toplevel::PASS_PREP,Drive_goal(),calib));
+	bool ready_to_collect=ready(part_status,subgoals(Toplevel::COLLECT,Drive_goal(),calib));
 	bool took_shot=location_to_status(part_status.injector)==Injector::RECOVERY;
 	bool have_collected_question = false;
 	switch(status){

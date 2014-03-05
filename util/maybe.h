@@ -13,6 +13,10 @@ class Maybe{
 
 	explicit Maybe(T const& t1):t(new T(t1)){}
 
+	Maybe(Maybe<T> const& m):t(NULL){
+		if(m.t) t=new T(*m.t);
+	}
+
 	Maybe& operator=(Maybe const& m){
 		if(t){
 			if(m.t){
@@ -26,6 +30,17 @@ class Maybe{
 				t=new T(*m.t);
 			}
 		}
+		return *this;
+	}
+
+	Maybe& operator=(T const& a){
+		std::cout<<"a\n";
+		if(t){
+			*t=a;
+		}else{
+			t=new T(a);
+		}
+		std::cout<<"b\n";
 		return *this;
 	}
 
@@ -46,6 +61,27 @@ class Maybe{
 		return *t;
 	}
 };
+
+template<typename T>
+bool operator==(T a,Maybe<T> b){
+	if(!b) return 0;
+	return a==*b;
+}
+
+template<typename T>
+bool operator==(Maybe<T> a,T b){
+	return b==a;
+}
+
+template<typename T>
+bool operator!=(T a,Maybe<T> b){
+	return !(a==b);
+}
+
+template<typename T>
+bool operator!=(Maybe<T> a,T b){
+	return b!=a;
+}
 
 template<typename T>
 std::ostream& operator<<(std::ostream& o,Maybe<T> const& m){

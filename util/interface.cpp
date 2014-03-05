@@ -41,6 +41,7 @@ std::ostream& operator<<(std::ostream& o,Relay_output a){
 		#undef X
 		default: return o<<"?";
 	}
+
 }
 
 void terse(ostream& o,Relay_output a){

@@ -1,7 +1,13 @@
 #include <vector>
 #include <assert.h>
 #include <stdlib.h>
+
+#if 0 // usleep() is obsolete
 #include <unistd.h>
+#else // use nanosleep() instead
+#include <time.h>
+#endif
+
 #include <iostream>
 #include "../util/util.h"
 #include "wheelrpms.h"
@@ -9,6 +15,18 @@
 #include "../util/negedge_trigger.h"
 
 using namespace std;
+
+int usleep (const int us_delay)
+{
+    struct timespec tim, tim2;
+
+    tim.tv_sec  = 0;
+    tim.tv_nsec = us_delay / 1000;
+
+    int retSts = nanosleep (&tim , &tim2);
+
+    return retSts;
+}
 
 enum Button{
 	START,BTN0,BTN1

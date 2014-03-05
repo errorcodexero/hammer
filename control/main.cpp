@@ -585,7 +585,7 @@ void print_diff(ostream& o,Driver_station_output a,Driver_station_output b){
 	//X(lcd) skipping this for now since it really clutters the prinout right now since it shows shooter wheel speeds
 	for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
 		if(a.digital[i]!=b.digital[i]){
-			o<<"Driver_staiont_output::digital["<<i<<"]:"<<a.digital[i]<<"->"<<b.digital[i]<<"\n";
+			o<<"Driver_station_output::digital["<<i<<"]:"<<a.digital[i]<<"->"<<b.digital[i]<<"\n";
 		}
 	}
 	#undef X

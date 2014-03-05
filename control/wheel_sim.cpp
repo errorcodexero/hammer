@@ -147,8 +147,15 @@ ostream& operator<<(ostream& o,Wheel_sim a){
 
 void Shooter_sim::update(Time t,Shooter_wheels::Output a){
 	//for now we're assuming that the motor that's in PID mode has the same output as the one in voltage mode.  This is incorrect, but much simpler than the alternatives.
-	top.update(t,a.top[Shooter_wheels::Output::OPEN_LOOP].voltage);
-	bottom.update(t,a.bottom[Shooter_wheels::Output::OPEN_LOOP].voltage);
+	//top.update(t,a.top[Shooter_wheels::Output::OPEN_LOOP].voltage);
+	//bottom.update(t,a.bottom[Shooter_wheels::Output::OPEN_LOOP].voltage);
+
+	//just implement bang-bang control for the simulation.
+	bool top_on=a.top[Shooter_wheels::Output::FEEDBACK].speed>top.estimate();
+	bool bottom_on=a.bottom[Shooter_wheels::Output::FEEDBACK].speed>bottom.estimate();
+	//cout<<"Bang!:"<<top_on<<bottom_on<<"\n";
+	top.update(t,top_on);
+	bottom.update(t,bottom_on);
 }
 
 Shooter_wheels::Status Shooter_sim::estimate()const{

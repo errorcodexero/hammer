@@ -3,6 +3,7 @@ Drivebase:
 	-Calibrate and improve gyro
 	-Log when stuff gets clipped & figure out why it happens
 Vision processing:
+	-Send data over to the other machine that says when auto&teleop modes are
 	-Integrate vision code(THOMAS)
 	-Determine what the wire format is (THOMAS)
 	-Figure out how to talk over ethernet on the robot (TOM/THOMAS)
@@ -14,19 +15,12 @@ Shooter wheels:
 	-Add fallback systems
 	-Revise jag code (STEVE)
 	-Add joystick set mode (ADRIAN)
-	-Check that the ready function does the right thing
-	-Make learn button work
+	-Test that learn button works after it's wired
 AutoMode:
-	-Test existing code
-<<<<<<< HEAD
 	-Create different modes
-	-Make sure that all of the states can be disabled
-=======
-	-Create different modes (THOMAS)
->>>>>>> 22858cc006167dc7a18ddae0d28937e0f1b91515
-OI:
 	-Selector for AutoModes
 	-On/Off
+OI:
 	-Make it so that can detect when the Cypress board is present or not (STEVE?)
 Air:
 	-FINISH TRACKING PNEUMATIC PRESSURE! (JACOB)

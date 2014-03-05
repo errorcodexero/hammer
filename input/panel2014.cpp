@@ -37,6 +37,8 @@ Calibration_target::Calibration_target(Fire_control::Target a,bool b):target(a),
 
 vector<Calibration_target> Calibration_target::all(){
 	vector<Calibration_target> r;
+	vector<Fire_control::Target> t=Fire_control::targets();
+
 	for(unsigned i=0;i<Fire_control::targets().size();i++){
 		for(unsigned j=0;j<2;j++){
 			r|=Calibration_target(Fire_control::targets()[i],j);

@@ -142,8 +142,25 @@ namespace Fire_control{
 		assert(0);
 	}
 
-	const vector<Fire_control::Goal> GOALS;//{PREP,FIRE,FIRE_WHEN_READY,DRIVE,OTHER};
-	const vector<Target> TARGETS;//{NO_TARGET,HIGH,TRUSS,PASS,EJECT};
+	vector<Fire_control::Goal> goals(){
+		vector<Fire_control::Goal> r;
+		r|=PREP;
+		r|=FIRE;
+		r|=FIRE_WHEN_READY;
+		r|=DRIVE;
+		r|=OTHER;
+		return r;
+	}
+
+	vector<Target> targets(){
+		vector<Target> r;
+		r|=NO_TARGET;
+		r|=HIGH;	
+		r|=TRUSS;
+		r|=PASS;
+		r|=EJECT;
+		return r;
+	}
 }
 
 #ifdef FIRE_CONTROL_TEST
@@ -156,10 +173,10 @@ int main(){
 		cout<<a<<" "<<goal(a)<<" "<<target(a)<<"\n";
 	}
 
-	cout<<GOALS<<"\n";
-	cout<<TARGETS<<"\n";
-	for(auto goal:GOALS){
-		for(auto target:TARGETS){
+	cout<<goals()<<"\n";
+	cout<<targets()<<"\n";
+	for(auto goal:goals()){
+		for(auto target:targets()){
 			cout<<goal<<" "<<target<<"\n";
 			cout.flush();
 			try{

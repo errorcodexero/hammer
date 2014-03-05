@@ -59,6 +59,7 @@ namespace Shooter_wheels{
 	wheelcalib Calibration_manager::update(bool learn_button,double adjust_wheel,Calibration_target t){
 		wheelcalib r=calib;
 		double adjustment=((adjust_wheel/3.3)-.5)*2*100;
+		//cout<<"adjustment:"<<adjustment<<"\n";
 		find_rpm(r,t)+=adjustment;
 		if(learn(learn_button)){
 			//write changes to the file
@@ -84,10 +85,6 @@ namespace Shooter_wheels{
 		}
 	}
 
-	/*RPM Control::target_speed_top(High_level_goal g)const{
-		return Shooter_wheels::target_speed_top(g,calib);
-	}*/
-	
 	RPM target_speed_bottom(High_level_goal g, wheelcalib c){
 		switch(g){
 			case TRUSS:
@@ -103,18 +100,15 @@ namespace Shooter_wheels{
 		}
 	}
 	
-	/*RPM Control::target_speed_bottom(High_level_goal g)const{
-		return Shooter_wheels::target_speed_bottom(g,calib);
-	}*/
+	RPM free_speed(){
+		return 5984;  //Calculated top speed on 100% output
+	}
 
 	Jaguar_output open_loop(RPM status,RPM goal){
-		static const double FREE_SPEED=5984;  //Calculated top speed on 100% output
-		if(goal>FREE_SPEED) goal=FREE_SPEED;
+		if(goal>free_speed()) goal=free_speed();
 		if(status>.8*goal&&goal>1000) return Jaguar_output::voltageOut((goal/62.5+4.199)/100);
 		return Jaguar_output::voltageOut(goal>1000);
 	} 
-	
-	//pair<Jag_output,Jag_output> ctl(Status 
 	
 	Output control(Status status,Goal goal){
 		Output r;
@@ -126,36 +120,7 @@ namespace Shooter_wheels{
 		r.bottom[Output::OPEN_LOOP]=open_loop(status.bottom,goal.second.bottom);
 		return r;
 	}
-	/*
-	Output control(Goal g){
-		Output r;
-		r.top=target_speed_top(g);
-		r.bottom=target_speed_bottom(g);
-		return r;
-	}
-	*/
-	/*
-	bool Control::ready(High_level_goal g,RPM top_speed,RPM bottom_speed)const{
-		RPM error_top=top_speed-target_speed_top(g);
-		RPM error_bot=bottom_speed-target_speed_bottom(g);
-		RPM worst_error=max(abs(error_top),abs(error_bot));
-		switch(g){
-			case HIGH_GOAL: return worst_error<300;
-			case TRUSS:
-			case PASS:
-			case STOP:
-				return worst_error<600;
-			case X:
-				return 1;
-			default:
-				return 0;
-		}
-	}
 
-	bool Control::ready(Status status,High_level_goal goal)const{
-		return ready(goal,status.top,status.bottom);
-	}*/
-	
 	ostream& operator<<(ostream& o,Calibration_manager c){
 		return o<<"Shooter_wheels::Calibration_manager("<<c.calib<<")";
 	}
@@ -194,12 +159,18 @@ int main(){
 		//assert(control.ready(goal,target_speed_top(goal,rpmsdefault()),target_speed_bottom(goal,rpmsdefault())));
 		cout<<goal<<"\n";
 	}
+	{
+		auto r=unlink("wheelrpms.txt");
+		assert(r==0);
+	}
 	Calibration_manager c;
 	cout<<c<<"\n";
 	for(auto a:Calibration_target::all()){
+		cout<<"-----------------------\n";
 		for(double d:vector<double>{0,1.5,3.3}){
 			cout<<a<<"\n";
-			cout<<c.update(0,d,a)-rpmsdefault()<<"\n";
+			c.update(0,d,a);
+			cout<<c.update(1,d,a)-rpmsdefault()<<"\n";
 		}
 	}
 	

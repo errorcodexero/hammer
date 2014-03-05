@@ -32,8 +32,6 @@ Air:
 	-FINISH TRACKING PNEUMATIC PRESSURE! (JACOB)
 Ejector:
 	-Make second eject mode work (AUSTIN)
-Collector arms:
-	-Time movements & adjust code appropriately
 Collector:
 	-Add a reverse mode(Luke&Jeremy)
 

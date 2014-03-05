@@ -1,5 +1,6 @@
 #include "jag_interface.h"
 #include<iostream>
+#include<cmath>
 
 using namespace std;
 
@@ -56,6 +57,10 @@ ostream& operator<<(ostream& o,Jaguar_input a){
 	o<<"speed:"<<a.speed;
 	o<<" current:"<<a.current;
 	return o<<")";
+}
+
+bool approx_equal(Jaguar_input a,Jaguar_input b){
+	return a.current==b.current && fabs(a.speed-b.speed)<140;//this threshold is totally arbitrary.
 }
 
 #ifdef JAG_INTERFACE_TEST

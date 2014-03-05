@@ -27,7 +27,7 @@ ostream& operator<<(ostream& o,Pt p){
 }
 
 bool approx_equal(double a,double b){
-	return fabs(a-b)<.0001;
+	return fabs(a-b)<.001;
 }
 
 bool approx_equal(Pt a,Pt b){

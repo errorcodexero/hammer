@@ -37,12 +37,19 @@ Calibration_target::Calibration_target(Fire_control::Target a,bool b):target(a),
 
 vector<Calibration_target> Calibration_target::all(){
 	vector<Calibration_target> r;
+<<<<<<< HEAD
 	vector<Fire_control::Target> t=Fire_control::targets();
 	for(unsigned i=0;i<t.size();i++){
 		for(unsigned j=0;j<2;j++){
 			r|=Calibration_target(t[i],j);
+=======
+	for(unsigned i=0;i<Fire_control::targets().size();i++){
+		for(unsigned j=0;j<2;j++){
+			r|=Calibration_target(Fire_control::targets()[i],j);
+>>>>>>> 34569070d9d2d6f0282fcb00a95125b79f65643a
 		}
 	}
+	assert(r.size());
 	return r;
 }
 

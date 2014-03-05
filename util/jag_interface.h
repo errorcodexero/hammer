@@ -25,5 +25,6 @@ struct Jaguar_input{
 bool operator==(Jaguar_input,Jaguar_input);
 bool operator!=(Jaguar_input,Jaguar_input);
 std::ostream& operator<<(std::ostream&,Jaguar_input);
+bool approx_equal(Jaguar_input,Jaguar_input);
 
 #endif

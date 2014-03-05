@@ -1,7 +1,7 @@
 #include "gyro_tracker.h"
 #include<iostream>
 #include<cassert>
-
+#include "../util/point.h"
 using namespace std;
 
 Integrator::Integrator():last(-1),total(0){}
@@ -79,7 +79,7 @@ bool operator!=(Gyro_tracker a,Gyro_tracker b){
 }
 
 bool approx_equal(Gyro_tracker a,Gyro_tracker b){
-	return a.cal_accumulated==b.cal_accumulated /*&& a.cal_samples==b.cal_samples*/ && a.cal_start==b.cal_start && a.center==b.center && a.integrator.total==b.integrator.total;
+	return approx_equal(a.cal_accumulated,b.cal_accumulated) /*&& a.cal_samples==b.cal_samples*/ && approx_equal(a.cal_start,b.cal_start) && approx_equal(a.center,b.center) && approx_equal(a.integrator.total,b.integrator.total);
 }
 
 ostream& operator<<(ostream& o,Gyro_tracker a){

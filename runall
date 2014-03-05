@@ -61,6 +61,9 @@ rm toplevel
 echo now running SHOOTER WHEELS TEST
 ./shooter_wheels_test
 rm shooter_wheels
+echo now running WHEEL SIM TEST
+./wheel_sim_test
+rm wheel_sim
 cd ../util
 echo now running BOUND TRACKER TEST
 ./bound_tracker_test

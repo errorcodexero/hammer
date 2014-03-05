@@ -151,11 +151,11 @@ namespace Fire_control{
 		r|=OTHER;
 		return r;
 	}
-	
+
 	vector<Target> targets(){
 		vector<Target> r;
 		r|=NO_TARGET;
-		r|=HIGH;
+		r|=HIGH;	
 		r|=TRUSS;
 		r|=PASS;
 		r|=EJECT;

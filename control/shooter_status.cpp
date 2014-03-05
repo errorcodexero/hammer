@@ -1,6 +1,7 @@
 #include"shooter_status.h"
 #include<iostream>
 #include<cassert>
+#include<cmath>
 
 using namespace std;
 
@@ -25,5 +26,11 @@ namespace Shooter_wheels{
 	
 	ostream& operator<<(ostream& o,Status s){
 		return o<<"Shooter_wheels::Status("<<s.top<<","<<s.bottom<<")";
+	}
+
+	bool approx_equal(Status a,Status b){
+		//this threshold is totally arbitrary.
+		static const double THRESHOLD=140;
+		return fabs(a.top-b.top)<THRESHOLD && fabs(a.bottom-b.bottom)<THRESHOLD;
 	}
 }

@@ -215,6 +215,9 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		est.update(in.now,in.robot_mode.enabled,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel);
 	}
 	
+        // Turn on camera light in autonomous mode:
+        r.relay[1] = (in.robot_mode.autonomous) ? RELAY_01 : RELAY_00;
+
 	r=force(r);
 	
 	r.driver_station.lcd.line[0]="FieldRelative: " + fRel(field_relative.get());//as_string(field_relative.get());

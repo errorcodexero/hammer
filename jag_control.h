@@ -41,8 +41,8 @@ public:
 	~Jag_control();
 	
 	void set(Jaguar_output,bool enable);
-	Jaguar_input get() const;
-	void out(std::ostream&)const;
+	Jaguar_input get();
+	void output(std::ostream&)const;
 };
 
 std::ostream& operator<<(std::ostream&,Jag_control::Mode);

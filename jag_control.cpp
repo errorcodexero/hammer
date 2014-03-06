@@ -16,11 +16,11 @@ ostream& operator<<(ostream& o,Jag_control::Mode m){
 }
 
 ostream& operator<<(ostream& o,Jag_control const& j){
-	j.out(o);
+	j.output(o);
 	return o;
 }
 
-void Jag_control::init(int CANBusAddress):since_query(0){
+void Jag_control::init(int CANBusAddress){
 	assert(!jaguar);//initialization is only allowed once.
 	assert(mode==INIT);
 	jaguar = new CANJaguar(CANBusAddress);
@@ -35,7 +35,7 @@ void Jag_control::init(int CANBusAddress):since_query(0){
 	jaguar->ConfigEncoderCodesPerRev(1);*/
 }
 
-Jag_control::Jag_control():jaguar(NULL),mode(INIT){}
+Jag_control::Jag_control():jaguar(NULL),mode(INIT),since_query(0){}
 
 Jag_control::Jag_control(int CANBusAddress):jaguar(NULL),mode(INIT){
 	init(CANBusAddress);
@@ -96,7 +96,7 @@ void Jag_control::set(Jaguar_output a,bool enable){
 	}
 }
 
-Jaguar_input Jag_control::get()const{
+Jaguar_input Jag_control::get(){
 	if(since_query>20){
 		in.speed = jaguar -> GetSpeed();
 		since_query=0;
@@ -105,7 +105,7 @@ Jaguar_input Jag_control::get()const{
 	return in;
 }
 
-void Jag_control::out(ostream& o)const{
+void Jag_control::output(ostream& o)const{
 	o<<"Jag_control(";
 	o<<"init:"<<!!jaguar;
 	o<<" "<<mode;

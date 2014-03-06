@@ -18,8 +18,7 @@
 
 using namespace std;
 
-int usleep (const int us_delay)
-{
+int usleep (const int us_delay){
     struct timespec tim, tim2;
 
     tim.tv_sec  = 0;

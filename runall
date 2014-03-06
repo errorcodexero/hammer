@@ -56,7 +56,7 @@ echo now running PUMP TEST
 ./pump_test
 rm pump
 echo now running PUMP ADVANCED TEST
-./pump_advanced
+../control/pump_advanced_test
 rm pump_advanced
 echo now running TOPLEVEL TEST
 ./toplevel_test

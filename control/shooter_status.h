@@ -1,5 +1,5 @@
-#ifndef SHOOTER_STATUS
-#define SHOOTER_STATUS
+#ifndef SHOOTER_STATUS_H
+#define SHOOTER_STATUS_H
 
 #include<iosfwd>
 

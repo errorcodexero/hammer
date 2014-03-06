@@ -179,14 +179,18 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	wheelcalib calib=wheel_calibration.update(panel.learn,panel.speed,panel.target);
 	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	Toplevel::Status toplevel_status=est.estimate();
-	control_status=next(
+	Control_status::Control_status control_status_next=next(
 		control_status,toplevel_status,gunner_joystick,panel,
 		in.robot_mode.autonomous,
 		autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled),
 		since_switch.elapsed(),
 		calib
 	);
-
+	if(control_status_next!=control_status){
+		since_switch.update(in.now,1);
+	}
+	control_status=control_status_next;
+	
 	field_relative.update(main_joystick.button[Gamepad_button::X]);
 	
 	Toplevel::Mode mode=to_mode(control_status);

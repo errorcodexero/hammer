@@ -20,7 +20,7 @@ ostream& operator<<(ostream& o,Jag_control const& j){
 	return o;
 }
 
-void Jag_control::init(int CANBusAddress){
+void Jag_control::init(int CANBusAddress):since_query(0){
 	assert(!jaguar);//initialization is only allowed once.
 	assert(mode==INIT);
 	jaguar = new CANJaguar(CANBusAddress);
@@ -74,9 +74,10 @@ void Jag_control::set(Jaguar_output a,bool enable){
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 			jaguar->SetSafetyEnabled(true);
 			mode=SPEED;
-		}else{
+		}else if(a!=out){
 			jaguar->Set(a.speed,SYNC_GROUP);
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
+			out=a;
 		}
 	}else{
 		if(mode!=VOLTAGE){
@@ -87,17 +88,21 @@ void Jag_control::set(Jaguar_output a,bool enable){
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 			jaguar->SetSafetyEnabled(true);
 			mode=VOLTAGE;
-		}else{
+		}else if(a!=out){
 			jaguar->Set(a.voltage,SYNC_GROUP);
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
+			out=a;
 		}
 	}
 }
 
 Jaguar_input Jag_control::get()const{
-	Jaguar_input x;
-	x.speed = jaguar -> GetSpeed();
-	return x;
+	if(since_query>20){
+		in.speed = jaguar -> GetSpeed();
+		since_query=0;
+	}
+	since_query++;
+	return in;
 }
 
 void Jag_control::out(ostream& o)const{

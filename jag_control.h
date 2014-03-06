@@ -15,7 +15,11 @@ public:
 	static const uint8_t SYNC_GROUP=0x40;
 private:
 	CANJaguar *jaguar;
+
+	Jaguar_input in;
+	int since_query;
 	
+	Jaguar_output out;
 public:
 	enum Mode{INIT,SPEED,VOLTAGE,DISABLE};
 	//at some point we may want to remember the speed/voltage that we were driving to so that we can just send it when it changes.

@@ -67,6 +67,9 @@ namespace Shooter_wheels{
 			calib=r;
 			writeconfig(r);
 		}
+		double a2=adjust_wheel/3.3*4000;
+		r.highgoal.bottom=a2;
+		r.highgoal.top=a2-1250;
 		return r;
 	}
 	

@@ -3,6 +3,7 @@
 
 #include<iosfwd>
 #include<string>
+#include<vector>
 
 struct Driver_station_output{
 	static const unsigned DIGITAL_OUTPUTS=8;
@@ -10,7 +11,7 @@ struct Driver_station_output{
 	
 	struct Lcd{
 		static const unsigned HEIGHT=6;
-		static const unsigned WIDTH=21;//this has not been tested.
+		static const unsigned WIDTH=21;
 		std::string line[HEIGHT];
 	};
 	Lcd lcd;
@@ -24,6 +25,7 @@ bool operator==(Driver_station_output,Driver_station_output);
 bool operator!=(Driver_station_output,Driver_station_output);
 std::ostream& operator<<(std::ostream&,Driver_station_output);
 
+std::vector<std::string> to_lines(std::string const&,unsigned width);
 Driver_station_output::Lcd format_for_lcd(std::string const&);
 
 struct Driver_station_input{

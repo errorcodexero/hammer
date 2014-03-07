@@ -31,7 +31,7 @@ ostream& operator<<(ostream& o,Mode_buttons m){
 	return o<<")";
 }
 
-Calibration_target::Calibration_target():target(Fire_control::NO_TARGET),top(0){}
+Calibration_target::Calibration_target():target(Fire_control::NO_TARGET),top(0),direct_mode(0){}
 
 Calibration_target::Calibration_target(Fire_control::Target a,bool b):target(a),top(b){}
 
@@ -56,6 +56,7 @@ ostream& operator<<(ostream& o,Calibration_target a){
 	}else{
 		o<<"bottom";
 	}
+	o<<"direct:"<<a.direct_mode;
 	return o<<")";
 }
 
@@ -76,11 +77,11 @@ ostream& operator<<(ostream& o,Panel p){
 	o<<"spd:"<<((int)(p.speed)*10)/10<<" ";
 	X(learn)
 	X(force_wheels_off)
-/*	X(collector)
+	X(collector)
 	X(collector_tilt)
 	X(injector)
-	X(injector_arms)
-	X(ejector)*/
+	//X(injector_arms)
+	X(ejector)
 	#undef X
 	return o<<")";
 }
@@ -105,6 +106,8 @@ Calibration_target interpret_target(double f){
 	int i=interpret_10_turn_pot(f/3.3*5);
 	Calibration_target r;
 	r.top=i%2;
+	int x=i/2;
+	//cerr<<"x="<<x<<"\r\n";
 	switch(i/2){
 		case 0:
 			r.target=Fire_control::HIGH;
@@ -115,8 +118,12 @@ Calibration_target interpret_target(double f){
 		case 2:
 			r.target=Fire_control::PASS;
 			break;
+		//case 9:
 		default:
-			r.target=Fire_control::NO_TARGET;
+			r.direct_mode=1;
+			break;
+		//default:
+		//	r.target=Fire_control::NO_TARGET;
 	}
 	return r;
 }
@@ -198,6 +205,18 @@ Panel interpret(Driver_station_input d){
 	panel.target=interpret_target(d.analog[2]);
 	panel.speed=d.analog[1];
 	panel.force_wheels_off=d.digital[3];//note: Which way is on/off is not labeled on the console yet.  
+	
+	{
+		double x=d.analog[4];
+		if(x>2 && x<2.35) panel.injector=Injector::OUTPUT_UP;
+		if(x>1.65 && x<2) panel.ejector=Ejector::OUTPUT_UP;
+		if(x>2.7 && x<3.10) panel.collector_tilt=Collector_tilt::OUTPUT_UP;
+		if(x>2.35 && x<2.65) panel.collector_tilt=Collector_tilt::OUTPUT_DOWN;
+		if(x>1.35 && x<1.75) panel.collector=ON;
+		if(x>1.05 && x<1.35) panel.collector=REVERSE;
+		if(x>.35 && x<1.75) panel.learn=1;
+	}
+	
 	//panel.learn=TBD
 	return panel;
 }

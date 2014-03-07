@@ -134,7 +134,7 @@ class To_crio
 	int skipped;
 	Jag_control jaguar[Robot_outputs::CAN_JAGUARS];
 	DriverStationLCD *lcd;
-        NetworkTable *table;
+	//NetworkTable *table;
 public:
 	To_crio():error_code(0),skipped(0),lcd(NULL)
 	{
@@ -164,7 +164,7 @@ public:
 		lcd=DriverStationLCD::GetInstance();
 		if(!lcd) error_code|=512;
 
-                table = NetworkTable::GetTable("crio");
+		//table = NetworkTable::GetTable("crio");
 	}
 	
 	int set_solenoid(unsigned i,Solenoid_output v){
@@ -318,13 +318,13 @@ public:
 		}
 		run(in);
 
-                // Network Table update:
+/*                // Network Table update:
                 enum dsMode_t { DS_OTHER = 0, DS_AUTO = 1, DS_TELE = 2 };
                 dsMode_t dsMode = 
                     (in.robot_mode.autonomous && in.robot_mode.enabled) ? DS_AUTO :
                     (in.robot_mode.enabled) ? DS_TELE : DS_OTHER;
                 table->PutBoolean ("isEnabled", in.robot_mode.enabled);
-                table->PutNumber  ("dsMode",    dsMode);
+                table->PutNumber  ("dsMode",    dsMode);*/
 	}
 };
 

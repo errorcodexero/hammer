@@ -21,6 +21,7 @@ std::ostream& operator<<(std::ostream&,Mode_buttons);
 struct Calibration_target{
 	Fire_control::Target target;
 	bool top;
+	bool direct_mode;
 	
 	Calibration_target();
 	Calibration_target(Fire_control::Target,bool top);
@@ -40,13 +41,13 @@ struct Panel{
 	bool learn;
 
 	//standard override section
-	/*
+	
 	Maybe<Collector_mode> collector;
 	Maybe<Collector_tilt::Output> collector_tilt;
 	Maybe<Injector::Output> injector;
-	Maybe<Injector_arms::Output> injector_arms;
+	//Maybe<Injector_arms::Output> injector_arms;
 	Maybe<Ejector::Output> ejector;
-	*/
+	
 	bool force_wheels_off;
 	
 	Panel();

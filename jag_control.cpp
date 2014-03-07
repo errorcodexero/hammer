@@ -74,7 +74,7 @@ void Jag_control::set(Jaguar_output a,bool enable){
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 			jaguar->SetSafetyEnabled(true);
 			mode=SPEED;
-		}else if(a!=out){
+		}else if(a!=out || since_query==1){
 			jaguar->Set(a.speed,SYNC_GROUP);
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 			out=a;
@@ -88,7 +88,7 @@ void Jag_control::set(Jaguar_output a,bool enable){
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 			jaguar->SetSafetyEnabled(true);
 			mode=VOLTAGE;
-		}else if(a!=out){
+		}else if(a!=out || since_query==1){
 			jaguar->Set(a.voltage,SYNC_GROUP);
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 			out=a;

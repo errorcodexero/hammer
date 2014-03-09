@@ -4,10 +4,11 @@
 #include<iosfwd>
 #include<string>
 #include<vector>
+#include<bitset>
 
 struct Driver_station_output{
 	static const unsigned DIGITAL_OUTPUTS=8;
-	bool digital[DIGITAL_OUTPUTS];
+	std::bitset<DIGITAL_OUTPUTS> digital;
 	
 	struct Lcd{
 		static const unsigned HEIGHT=6;
@@ -34,7 +35,7 @@ struct Driver_station_input{
 	double analog[ANALOG_INPUTS];
 
 	static const unsigned DIGITAL_INPUTS=8;
-	bool digital[DIGITAL_INPUTS];
+	std::bitset<DIGITAL_INPUTS> digital;
 
 	Driver_station_input();
 };

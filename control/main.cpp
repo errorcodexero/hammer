@@ -118,11 +118,11 @@ Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x
 
 Toplevel::Output panel_override(Panel p,Toplevel::Output out){
 	#define X(name) if(p.name) out.name=*p.name;
-/*	X(collector)
+	X(collector)
 	X(collector_tilt)
 	X(injector)
-	X(injector_arms)
-	X(ejector)*/
+	//X(injector_arms)
+	X(ejector)
 	#undef X
 	if(p.force_wheels_off){
 		out.shooter_wheels=Shooter_wheels::Output();
@@ -280,7 +280,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	}
 	
         // Turn on camera light in autonomous mode:
-        r.relay[1] = (in.robot_mode.autonomous) ? RELAY_10 : RELAY_00;
+        r.relay[1] = (in.robot_mode.autonomous) ? RELAY_01 : RELAY_00;
 
 	r=force(r);
 	
@@ -298,21 +298,24 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		//abbreviate_text(as_string(in.now)+"\n"+as_string(panel)+as_string(in.driver_station))
 		as_string(subgoals_now)+as_string(toplevel_status)
 	);*/
+	//r.driver_station.lcd=format_for_lcd(as_string(panel));
 	r.driver_station.digital[7]=ready(toplevel_status,subgoals_now);
 	{
 		static int i=0;
 		if(i==0){
 			stringstream ss;
-			ss<<in<<"\r\n"<<*this<<"\r\n";
+			ss<<in<<"\r\n";//<<*this<<"\r\n";
+			ss<<panel<<"\r\n";
 			/*
 			ss<<"Gyro Voltage"<<in.analog[0]<<" "<<"Update"<<gyro.center<<"\r\n";
 			ss<<"Gyro Value:"<<gyro.angle();
 			*/
+			ss<<in.driver_station<<"\r\n";
 			ss<<"\n"<<"Field Relative?:"<<field_relative.get()<<"\n";
 			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
-			cerr<<subgoals_now<<high_level_outputs<<"\n";
+			//cerr<<subgoals_now<<high_level_outputs<<"\n";
 		}
-		i=(i+1)%1000;
+		i=(i+1)%100;
 	}
 	//cerr<<subgoals_now<<"\r\n";
 	//cerr<<toplevel_status<<"\r\n\r\n";
@@ -507,7 +510,7 @@ Control_status::Control_status next(
 		case AUTO_COLLECT:
 			if(autonomous_mode){
 				//this is a very non-scientific way of driving, and not really the right way to do this.
-				return (since_switch>2.4)?AUTO_SPIN_UP2:AUTO_COLLECT;
+				return (since_switch>2.4)?/*AUTO_SPIN_UP2*/DRIVE_WO_BALL:AUTO_COLLECT;
 			}
 			return COLLECT;
 		case AUTO_SPIN_UP2:

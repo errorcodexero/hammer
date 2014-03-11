@@ -66,10 +66,14 @@ namespace Shooter_wheels{
 			//write changes to the file
 			calib=r;
 			writeconfig(r);
+			cerr<<"Learning now!\r\n";
 		}
-		double a2=adjust_wheel/3.3*4000;
-		r.highgoal.bottom=a2;
-		r.highgoal.top=a2-1250;
+		//cerr<<"direct_mode:"<<t.direct_mode<<"\r\n";
+		if(t.direct_mode){
+			double a2=adjust_wheel/3.3*4000;
+			r.highgoal.bottom=a2;
+			r.highgoal.top=a2-1250;
+		}
 		return r;
 	}
 	

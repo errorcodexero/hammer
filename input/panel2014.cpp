@@ -106,7 +106,7 @@ Calibration_target interpret_target(double f){
 	int i=interpret_10_turn_pot(f/3.3*5);
 	Calibration_target r;
 	r.top=i%2;
-	int x=i/2;
+	//int x=i/2;
 	//cerr<<"x="<<x<<"\r\n";
 	switch(i/2){
 		case 0:

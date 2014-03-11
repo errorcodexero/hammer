@@ -1,6 +1,7 @@
 #include "driver_station_interface.h"
 #include<iostream>
 #include<sstream>
+#include "util.h"
 
 using namespace std;
 
@@ -69,18 +70,27 @@ ostream& operator<<(ostream& o,Driver_station_output::Lcd a){
 	return o<<")";
 }
 
-Driver_station_output::Lcd format_for_lcd(string const& s){
-	Driver_station_output::Lcd r;
+vector<string> to_lines(string const& s,unsigned width){
+	vector<string> r;
 	unsigned at=0;
-	for(unsigned i=0;i<r.HEIGHT && at<s.size();i++){
+	for(unsigned i=0;at<s.size();i++){
 		stringstream ss;
-		for(unsigned j=0;j<r.WIDTH && at<s.size() && s[at]!='\n';j++){
+		for(unsigned j=0;j<width && at<s.size() && s[at]!='\n';j++){
 			ss<<s[at++];
 		}
 		if(s[at]=='\n'){
 			at++;
 		}
-		r.line[i]=ss.str();
+		r|=ss.str();
+	}
+	return r;
+}
+
+Driver_station_output::Lcd format_for_lcd(string const& s){
+	Driver_station_output::Lcd r;
+	vector<string> v=to_lines(s,r.WIDTH);
+	for(unsigned i=0;i<v.size() && i<r.HEIGHT;i++){
+		r.line[i]=v[i];
 	}
 	return r;
 }

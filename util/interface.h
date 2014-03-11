@@ -2,6 +2,7 @@
 #define INTERFACE_H
 
 #include<iosfwd>
+#include<bitset>
 #include "jag_interface.h"
 #include "driver_station_interface.h"
 
@@ -44,10 +45,10 @@ std::ostream& operator<<(std::ostream& o,Robot_outputs);
 
 struct Joystick_data{
 	static const unsigned AXES=6;//limitation of FRC coms
-	double axis[6];
+	double axis[AXES];
 	
 	static const unsigned BUTTONS=12;//limitation of FRC coms
-	bool button[BUTTONS];
+	std::bitset<BUTTONS> button;
 	
 	Joystick_data();
 };

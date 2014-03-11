@@ -46,6 +46,9 @@ rm injector
 echo now running INJECTOR ARMS TEST
 ./injector_arms_test
 rm injector_arms
+echo now running LCD SCROLLER TEST
+./lcd_scroller_test
+rm lcd_scroller
 echo now running MAIN TEST
 ./main_test
 rm main

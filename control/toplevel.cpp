@@ -256,6 +256,7 @@ namespace Toplevel{
                 r.collector_tilt=Collector_tilt::GOAL_UP;//was down, but with the current ejector geometry works better this way.
                 r.injector_arms=Injector_arms::GOAL_OPEN;
                 if(m==EJECT) r.ejector=Ejector::START;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
                 //Copied from a previous commit of the code, basically what it was before modification
 				break;
 				/*
@@ -287,11 +288,25 @@ namespace Toplevel{
 
 #ifdef TOPLEVEL_TEST
 #include<vector>
+#include<fstream>
 
-int main(){
-	Toplevel::Subgoals g;
-	cout<<g<<"\n";
-	using namespace Toplevel;
+template<typename T>
+void tag(ostream& o,string name,T contents){
+	assert(name.size());
+	o<<"<"<<name<<">";
+	o<<contents;
+	o<<"</"<<split(name)[0]<<">";
+}
+
+template<typename T>
+string tag(string name,T contents){
+	stringstream ss;
+	tag(ss,name,contents);
+	return ss.str();
+}
+
+
+namespace Toplevel{
 	static const vector<Mode> MODES{
 		DRIVE_WO_BALL,DRIVE_W_BALL,
 		COLLECT,
@@ -301,6 +316,47 @@ int main(){
 		EJECT_PREP,EJECT,
 		CATCH, //SHOOT_LOW
 	};
+}
+
+void toplevel_modes(){
+	ofstream f("out.html");
+	tag(
+		f,
+		"html",
+		tag(
+			"body",
+			tag("table border",
+				[](){
+					stringstream ss;
+					ss<<"<tr>";
+					for(auto s:{"Mode","Collector","Collector tilt","Injector","Injector_arms","Ejector","Target"}){
+						tag(ss,"th",s);
+					}
+					ss<<"</tr>";	
+					for(auto mode:Toplevel::MODES){
+						Toplevel::Subgoals g=subgoals(mode,Drive_goal(),wheelcalib());
+						tag(ss,"tr",
+							tag("td",as_string(mode))+
+							tag("td",g.collector)+
+							tag("td",g.collector_tilt)+
+							tag("td",g.injector)+
+							tag("td",g.injector_arms)+
+							tag("td",g.ejector)+
+							tag("td",g.shooter_wheels.first)
+						);
+					}
+					return ss.str();
+				}()
+			)
+		)
+	);
+}
+
+int main(){
+	toplevel_modes();
+	using namespace Toplevel;
+	Toplevel::Subgoals g;
+	cout<<g<<"\n";
 	Toplevel::Status status;
 	cout<<status<<"\n";
 	//Toplevel::Control control;

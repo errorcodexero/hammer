@@ -83,6 +83,70 @@ double clip(double d){
 	return d;
 }
 
+string combine_blanks(string s){
+	//cout<<"comb"<<s<<"\n";
+	stringstream ss;
+	bool was_blank=1;
+	for(unsigned i=0;i<s.size();i++){
+		if(isblank(s[i])){
+			if(!was_blank){
+				ss<<s[i];
+				was_blank=1;
+			}
+		}else{
+			was_blank=0;
+			ss<<s[i];
+		}
+	}
+	return ss.str();
+}
+
+vector<string> split(string s,char c){
+	vector<string> r;
+	stringstream ss;
+	for(unsigned i=0;i<s.size();i++){
+		if(s[i]==c){
+			r|=ss.str();
+			ss.str("");
+		}else{
+			ss<<s[i];
+		}
+	}
+	if(ss.str().size()) r|=ss.str();
+	return r;
+}
+
+//this should probably go elsewhere, like util.cpp
+vector<string> split(string s){
+	s=combine_blanks(s);
+	vector<string> r;
+	stringstream ss;
+	for(unsigned i=0;i<s.size();i++){
+		if(isblank(s[i])){
+			r|=ss.str();
+			ss.str("");
+		}else{
+			ss<<s[i];
+		}
+	}
+	if(ss.str().size()) r|=ss.str();
+	return r;
+}
+
+double atof(string const& s){ return ::atof(s.c_str()); }
+
+//could add some way to report error.
+string inside_parens(string const& s){
+	unsigned i;
+	for(i=0;i<s.size() && s[i]!='(';i++) ;
+	if(i==s.size()) return "";
+	i++;//skip the '('
+	unsigned j;
+	for(j=0;j+i<s.size() && s[i+j]!=')';j++) ;
+	if(i+j<s.size()) return s.substr(i,j);
+	return "";
+}
+
 #ifdef UTIL_TEST
 
 #include<cassert>

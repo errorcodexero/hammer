@@ -1,1 +1,1 @@
-g++ -Wall -Werror -std=c++0x -DSHOOTER_WHEELS_TEST shooter_wheels.cpp wheelrpms.cpp shooter_status.cpp ../util/jag_interface.cpp ../util/posedge_trigger.cpp ../input/panel2014.cpp fire_control.cpp ../input/util.cpp -o shooter_wheels 2>&1 && ./shooter_wheels
+g++ -Wall -Werror -std=c++0x -DSHOOTER_WHEELS_TEST shooter_wheels.cpp wheelrpms.cpp shooter_status.cpp ../util/jag_interface.cpp ../util/posedge_trigger.cpp ../input/panel2014.cpp fire_control.cpp ../input/util.cpp ../util/util.cpp -o shooter_wheels 2>&1 && ./shooter_wheels

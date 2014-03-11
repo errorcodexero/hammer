@@ -1,6 +1,8 @@
 #include "interface.h"
 #include<iostream>
 #include<cassert>
+#include<stdlib.h>
+#include "util.h"
 
 using namespace std;
 
@@ -41,7 +43,6 @@ std::ostream& operator<<(std::ostream& o,Relay_output a){
 		#undef X
 		default: return o<<"?";
 	}
-
 }
 
 void terse(ostream& o,Relay_output a){
@@ -61,6 +62,20 @@ void terse(ostream& o,Relay_output a){
 		default:
 			o<<"?";
 	}
+}
+
+vector<Relay_output> relay_outputs(){
+	vector<Relay_output> r;
+	r|=RELAY_00;
+	r|=RELAY_01;
+	r|=RELAY_10;
+	r|=RELAY_11;
+	return r;
+}
+
+Maybe<Relay_output> parse_relay_output(string s){
+	//could have this try the terse encodings as well.
+	return parse_enum<Relay_output>(relay_outputs(),s);
 }
 
 Robot_outputs::Robot_outputs(){
@@ -148,6 +163,37 @@ Joystick_data::Joystick_data(){
 	}
 }
 
+//int atoi(string s){ return ::atoi(s.c_str()); }
+
+Maybe<Joystick_data> Joystick_data::parse(string const& s){
+	string s2=inside_parens(s);
+	//cout<<"got:"<<s2<<"\n";
+	vector<string> v=split(s2,':');
+	if(v.size()!=3) return Maybe<Joystick_data>();
+	Joystick_data r;
+	{
+		//cout<<"bs="<<v[1]<<"\n";
+		vector<string> b=split(v[2]);
+		//cout<<"list:"<<b.size()<<" "<<Joystick_data::BUTTONS<<"\n";
+		for(unsigned i=0;i<Joystick_data::BUTTONS;i++){
+			if(i>=b.size()){
+				//cout<<"sdflkj\n";
+				return Maybe<Joystick_data>();
+			}
+			//cout<<"xx\n";
+			r.button[i]=atoi(b[i].c_str());
+		}
+	}
+	{
+		vector<string> ax=split(v[1]);
+		for(unsigned i=0;i<Joystick_data::AXES;i++){
+			if(i>ax.size()) return Maybe<Joystick_data>();
+			r.axis[i]=atof(ax[i]);
+		}
+	}
+	return Maybe<Joystick_data>(r);
+}
+
 bool operator==(Joystick_data a,Joystick_data b){
 	for(unsigned i=0;i<Joystick_data::AXES;i++){
 		if(a.axis[i]!=b.axis[i]){
@@ -230,6 +276,19 @@ void terse(ostream& o,Digital_in d){
 	}
 }
 
+vector<Digital_in> digital_ins(){
+	vector<Digital_in> r;
+	r|=DI_OUTPUT;
+	r|=DI_0;
+	r|=DI_1;
+	return r;
+}
+
+Maybe<Digital_in> parse_digital_in(string s){
+	//might want to also allow the terse versions
+	return parse_enum(digital_ins(),s);
+}
+
 Robot_inputs::Robot_inputs():
 	now(0)
 {
@@ -303,5 +362,16 @@ int main(){
 	cout<<Jaguar_output()<<"\n";
 	cout<<Jaguar_output::speedOut(10)<<"\n";
 	cout<<Jaguar_output::voltageOut(1.0)<<"\n";
+	for(auto a:digital_ins()){
+		assert(a==parse_digital_in(as_string(a)));
+	}
+	for(auto a:relay_outputs()){
+		assert(a==parse_relay_output(as_string(a)));
+	}
+	assert(parse_relay_output("")==Maybe<Relay_output>());
+	Joystick_data j;
+	j.button[3]=1;
+	j.axis[5]=.3;
+	assert(j==Joystick_data::parse(as_string(j)));
 }
 #endif

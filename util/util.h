@@ -55,4 +55,19 @@ std::string as_string(T t){
 
 double clip(double);
 
+//this is not efficient.
+template<typename T>
+Maybe<T> parse_enum(std::vector<T> options,std::string value){
+	for(unsigned i=0;i<options.size();i++){
+		T opt=options[i];
+		if(as_string(opt)==value) return Maybe<T>(opt);
+	}
+	return Maybe<T>();
+}
+
+std::vector<std::string> split(std::string,char);
+std::vector<std::string> split(std::string);
+double atof(std::string const&);
+std::string inside_parens(std::string const&);
+
 #endif

@@ -5,6 +5,7 @@
 #include<string>
 #include<vector>
 #include<bitset>
+#include "maybe.h"
 
 struct Driver_station_output{
 	static const unsigned DIGITAL_OUTPUTS=8;
@@ -38,6 +39,9 @@ struct Driver_station_input{
 	std::bitset<DIGITAL_INPUTS> digital;
 
 	Driver_station_input();
+
+	static Maybe<Driver_station_input> parse(std::string const&);
+	static Driver_station_input rand();
 };
 bool operator==(Driver_station_input,Driver_station_input);
 bool operator!=(Driver_station_input,Driver_station_input);

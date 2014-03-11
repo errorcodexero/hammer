@@ -2,6 +2,7 @@
 #define JAG_INTERFACE_H
 
 #include<iosfwd>
+#include "maybe.h"
 
 struct Jaguar_output{
 	double speed,voltage;
@@ -12,6 +13,7 @@ struct Jaguar_output{
 	Jaguar_output();
 	static Jaguar_output speedOut(double);
 	static Jaguar_output voltageOut(double);
+	static Maybe<Jaguar_output> parse(std::string const&);
 };
 bool operator==(Jaguar_output,Jaguar_output);
 bool operator!=(Jaguar_output,Jaguar_output);
@@ -21,6 +23,8 @@ struct Jaguar_input{
 	double speed,current;
 
 	Jaguar_input();
+
+	static Maybe<Jaguar_input> parse(std::string const&);
 };
 bool operator==(Jaguar_input,Jaguar_input);
 bool operator!=(Jaguar_input,Jaguar_input);

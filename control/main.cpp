@@ -156,6 +156,66 @@ string fRel(bool field){
 	return "False";
 }
 
+void log_line(ostream& o,Robot_inputs in,Main m,Robot_outputs out){
+	o<<in.now;
+	#define X(name) o<<","<<name;
+	X(in.robot_mode.autonomous)
+	X(in.robot_mode.enabled)
+	for(unsigned i=0;i<Joystick_data::AXES;i++){
+		X(in.joystick[0].axis[i])
+	}
+	for(unsigned i=0;i<Joystick_data::BUTTONS;i++){
+		X(in.joystick[0].button[i])
+	}
+	X(in.digital_io[0]) //pressure switch
+	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+		X(in.jaguar[i].speed)
+	}
+	for(unsigned i=0;i<Driver_station_input::ANALOG_INPUTS;i++){
+		X(in.driver_station.analog[i])
+	}
+	for(unsigned i=0;i<Driver_station_input::DIGITAL_INPUTS;i++){
+		X(in.driver_station.digital[i])
+	}
+	//going to not put in the interpreted version of this in case need to diagnose a noise problem or something.  
+	
+	//put in the state stuff here...
+	//skipping any force stuff because I don't think our drivers know how to use it.  Would be detectable via joystic inputs.
+	X(m.control_status)
+	Toplevel::Status e=m.est.estimate();
+	X(e.collector_tilt)
+	X(e.injector)
+	X(e.injector_arms)
+	X(e.ejector)
+	X(e.shooter_wheels)
+	//skip pump
+	//skip orientation
+
+	//X(m.wheel_calibration) -> this might be good to do
+	#define Y(n) X(m.wheel_calibration.calib.n.top) X(m.wheel_calibration.calib.n.bottom)
+	Y(highgoal)
+	Y(lowgoal)
+	Y(overtruss)
+	Y(passing)
+	#undef Y
+
+	for(unsigned i=0;i<4;i++){ //others aren't used.
+		X((int)out.pwm[i])
+	}
+	for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
+		X(out.solenoid[i])
+	}
+	for(unsigned i=0;i<Robot_outputs::RELAYS && i<2;i++){
+		X(out.relay[i])
+	}
+	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+		X(out.jaguar[i])
+	}
+	X(out.driver_station.digital[7])//ready light
+	#undef X
+	o<<"\n";
+}
+
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
@@ -263,7 +323,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		cout<<*this<<"\r\n";
 		cout<<"\r\n";
 	}
-	
+	//log_line(cout,in,*this,r);
 	return r;
 }
 

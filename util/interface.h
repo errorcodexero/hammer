@@ -51,6 +51,8 @@ struct Joystick_data{
 	std::bitset<BUTTONS> button;
 	
 	Joystick_data();
+
+	static Maybe<Joystick_data> parse(std::string const&);
 };
 bool operator==(Joystick_data,Joystick_data);
 bool operator!=(Joystick_data,Joystick_data);

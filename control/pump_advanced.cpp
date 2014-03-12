@@ -1,5 +1,10 @@
 #include "pump_advanced.h"
 
+/*
+Important note to anyone reading this code:
+Use the pressure estimates to control the pump at your own risk.  As far as I can tell, it follows the letter of the law as far as the 2014 FIRST regulations, but it _will not_ pass inspection.  This is because the inspectors check to see that the pump is following the sensor rather that it stops at the right level.  
+*/
+
 using namespace std;
 
 namespace Pump_advanced{

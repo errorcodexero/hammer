@@ -79,10 +79,17 @@ namespace Control_status{
 	}
 
 	bool autonomous(Control_status s){
-		return s==AUTO_SPIN_UP || s==AUTO_FIRE || s==AUTO_TO_COLLECT || s==AUTO_COLLECT || s==AUTO_SPIN_UP2 || s==AUTO_FIRE || s==A2_SPIN_UP || s==A2_FIRE || s==A2_TO_COLLECT || s==A2_COLLECT || s==A2_SPIN_UP2 || s==A2_FIRE2 || s==A2_MOVE;
+		return s==AUTO_SPIN_UP || s==AUTO_FIRE || s==AUTO_TO_COLLECT || s==AUTO_COLLECT || s==AUTO_SPIN_UP2 || s==AUTO_FIRE2 || 
+			s==A2_SPIN_UP || s==A2_FIRE || s==A2_TO_COLLECT || s==A2_COLLECT || s==A2_SPIN_UP2 || s==A2_FIRE2 || s==A2_MOVE;
 	}
+
 	bool teleop(Control_status s){
-		return !autonomous(s);
+		return s==DRIVE_W_BALL || s==DRIVE_WO_BALL || s==COLLECT || 
+			s==SHOOT_HIGH_PREP || s==SHOOT_HIGH || s==SHOOT_HIGH_WHEN_READY || 
+			s==TRUSS_TOSS_PREP || s==TRUSS_TOSS || s==TRUSS_TOSS_WHEN_READY ||
+			s==PASS_PREP || s==PASS || s==PASS_WHEN_READY ||
+			s==EJECT_PREP || s==EJECT || s==EJECT_WHEN_READY ||
+			s==CATCH;
 	}
 }
 
@@ -90,6 +97,10 @@ namespace Control_status{
 int main(){
 	for(auto a:Control_status::all()){
 		cout<<a<<" "<<autonomous(a)<<"\n";
+		int x=0;
+		if(autonomous(a)) x++;
+		if(teleop(a)) x++;
+		assert(x==1);
 	}
 }
 #endif

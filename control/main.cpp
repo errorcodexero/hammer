@@ -114,7 +114,8 @@ Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x
 	Drive_goal r;
 	switch(control_status){
 		case Control_status::AUTO_COLLECT:
-			r.direction.y=-.5;
+		case Control_status::A2_MOVE:
+			r.direction.y=-1;
 			break;
 		default:
 			//otherwise leave at the default, which is 0.

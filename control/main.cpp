@@ -64,7 +64,14 @@ Toplevel::Mode to_mode(Control_status::Control_status status){
 		case Control_status::AUTO_TO_COLLECT: return Toplevel::COLLECT;
 		case Control_status::AUTO_COLLECT: return Toplevel::COLLECT;
 		case Control_status::AUTO_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP;
-		case Control_status::AUTO_FIRE2: return Toplevel::SHOOT_HIGH;
+		case Control_status::AUTO_FIRE2: return Toplevel::SHOOT_HIGH;		
+		case Control_status::A2_SPIN_UP: return Toplevel::SHOOT_HIGH_PREP;
+		case Control_status::A2_FIRE: return Toplevel::SHOOT_HIGH;
+		case Control_status::A2_TO_COLLECT: return Toplevel::COLLECT;
+		case Control_status::A2_COLLECT: return Toplevel::COLLECT;
+		case Control_status::A2_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP;
+		case Control_status::A2_FIRE2: return Toplevel::SHOOT_HIGH;
+		case Control_status::A2_MOVE: return Toplevel::DRIVE_WO_BALL;
 		case Control_status::DRIVE_W_BALL: return Toplevel::DRIVE_W_BALL;
 		case Control_status::DRIVE_WO_BALL: return Toplevel::DRIVE_WO_BALL;
 		case Control_status::COLLECT: return Toplevel::COLLECT;
@@ -452,7 +459,8 @@ Control_status::Control_status next(
 	//if(autonomous_mode && !autonomous(status)){
 	if(autonomous_mode_start){
 		//TODO: Put the code to select which autonomous mode here.
-		return AUTO_SPIN_UP;
+		//return AUTO_SPIN_UP;
+		return A2_SPIN_UP;
 	}
 
 	if(!autonomous_mode){
@@ -492,6 +500,41 @@ Control_status::Control_status next(
 	bool took_shot=location_to_status(part_status.injector)==Injector::RECOVERY;
 	bool have_collected_question = false;
 	switch(status){
+		case A2_SPIN_UP:
+			if(autonomous_mode){
+				return ready_to_shoot?A2_FIRE:A2_SPIN_UP;
+			}
+			return SHOOT_HIGH_PREP;
+		case A2_FIRE:
+			if(autonomous_mode){
+				return took_shot?A2_TO_COLLECT:A2_FIRE;
+			}
+			return A2_FIRE;
+		case A2_TO_COLLECT:
+			if(autonomous_mode){
+				return ready_to_collect?A2_COLLECT:A2_TO_COLLECT;
+			}
+			return COLLECT;
+		case A2_COLLECT:
+			if(autonomous_mode){
+				return (since_switch>2.4)?A2_SPIN_UP2:A2_COLLECT;
+			}
+			return COLLECT;
+		case A2_SPIN_UP2:
+			if(autonomous_mode){
+				return ready_to_shoot?A2_FIRE2:A2_SPIN_UP2;
+			}
+			return SHOOT_HIGH_PREP;
+		case A2_FIRE2:
+			if(autonomous_mode){
+				return took_shot?A2_MOVE:A2_FIRE2;
+			}
+			return A2_FIRE2;
+		case A2_MOVE:
+			if(autonomous_mode){
+				return (since_switch>3)?DRIVE_WO_BALL:A2_MOVE;
+			}
+			return A2_MOVE;
 		case AUTO_SPIN_UP:
 			if(autonomous_mode){
 				return ready_to_shoot?AUTO_FIRE:AUTO_SPIN_UP;

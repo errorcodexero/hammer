@@ -21,16 +21,23 @@ namespace Fire_control{
 			//or maybe the auto stuff should all return 'other'
 			case Control_status::AUTO_SPIN_UP:
 			case Control_status::AUTO_FIRE:
+			case Control_status::A2_SPIN_UP:
+			case Control_status::A2_FIRE:
 				return HIGH;
 			case Control_status::AUTO_TO_COLLECT:
 			case Control_status::AUTO_COLLECT:
+			case Control_status::A2_TO_COLLECT:
+			case Control_status::A2_COLLECT:
 				return NO_TARGET;
 			case Control_status::AUTO_SPIN_UP2:
 			case Control_status::AUTO_FIRE2:
+			case Control_status::A2_SPIN_UP2:
+			case Control_status::A2_FIRE2:
 				return HIGH;
 			case Control_status::DRIVE_W_BALL:
 			case Control_status::DRIVE_WO_BALL:
 			case Control_status::COLLECT:
+			case Control_status::A2_MOVE:
 				return NO_TARGET;
 			case Control_status::SHOOT_HIGH_PREP:
 			case Control_status::SHOOT_HIGH:
@@ -73,9 +80,16 @@ namespace Fire_control{
 			case Control_status::AUTO_COLLECT: return DRIVE;
 			case Control_status::AUTO_SPIN_UP2: return FIRE_WHEN_READY;
 			case Control_status::AUTO_FIRE2: return FIRE;
+			case Control_status::A2_SPIN_UP:return FIRE_WHEN_READY;
+			case Control_status::A2_FIRE: return FIRE;
+			case Control_status::A2_TO_COLLECT: return DRIVE;
+			case Control_status::A2_COLLECT: return DRIVE;
+			case Control_status::A2_SPIN_UP2:return FIRE_WHEN_READY;
+			case Control_status::A2_FIRE2: return FIRE;
 			case Control_status::DRIVE_W_BALL:
 			case Control_status::DRIVE_WO_BALL:
 			case Control_status::COLLECT:
+			case Control_status::A2_MOVE:
 				return DRIVE;
 			case Control_status::SHOOT_HIGH_PREP: return PREP;
 			case Control_status::SHOOT_HIGH: return FIRE;

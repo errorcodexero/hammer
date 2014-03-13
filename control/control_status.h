@@ -13,6 +13,14 @@ namespace Control_status{
 		AUTO_SPIN_UP2,
 		AUTO_FIRE2,
 
+		A2_SPIN_UP,
+		A2_FIRE,
+		A2_TO_COLLECT,
+		A2_COLLECT,
+		A2_SPIN_UP2,
+		A2_FIRE2,
+		A2_MOVE,
+
 		//many of these are the same as things in "Mode"
 		DRIVE_W_BALL,DRIVE_WO_BALL,
 		COLLECT,

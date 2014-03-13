@@ -781,6 +781,7 @@ bool approx_equal(Main a,Main b){
 }
 
 #ifdef MAIN_TEST
+#include<fstream>
 #include "wheel_sim.h"
 
 template<typename T>
@@ -838,6 +839,55 @@ void auto_test(){
 	}
 }
 
+void mode_table(){
+	static ofstream f("control_modes.html");
+	struct Tag{
+		string s;
+		Tag(string s1):s(s1){
+			f<<"<"<<s<<">";
+			s=split(s1)[0];
+		}
+
+		~Tag(){
+			f<<"</"<<s<<">";
+		}
+	};
+	Tag t("html");
+
+	Tag b("body");
+	Tag a("table border");
+	{
+		Tag a("tr");
+		{
+			Tag b("th");
+			f<<"Control status";
+		}
+		Tag c("th");
+		f<<"Mode";
+	}
+	for(auto control_status:Control_status::all()){
+		Tag r("tr");
+		{
+			Tag d("td");
+			f<<control_status;
+		}
+		Tag d("td");
+		f<<to_mode(control_status);
+	}
+}
+
+void mode_diagram(){
+	ofstream f("control_modes.dot");
+	f<<"digraph G{\n";
+	for(auto a:Control_status::all()){
+		string x=as_string(a),y=as_string(to_mode(a));
+		if(x!=y){
+			f<<"\t"<<a<<"->"<<to_mode(a)<<"\n";
+		}
+	}
+	f<<"}\n";
+}
+
 int main(){
 	/*Main m;
 	cout<<m<<"\n";
@@ -871,5 +921,7 @@ int main(){
 		}
 	}
 	auto_test();
+	mode_table();
+	mode_diagram();
 }
 #endif

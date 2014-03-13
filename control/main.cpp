@@ -889,7 +889,17 @@ void mode_diagram(){
 	f<<"}\n";
 }
 
+void check_auto_modes_end(){
+	for(auto control_status:Control_status::all()){
+		if(teleop(control_status)) continue;
+		auto n=next(control_status,Toplevel::Status(),Joystick_data(),Panel(),0,0,0,wheelcalib());
+		assert(teleop(n));
+		//cout<<control_status<<" "<<n<<"\n";
+	}
+}
+
 int main(){
+	check_auto_modes_end();
 	/*Main m;
 	cout<<m<<"\n";
 	cout<<m(Robot_inputs())<<"\n";

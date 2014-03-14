@@ -79,7 +79,7 @@ Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x
 	switch(control_status){
 		case Control_status::AUTO_COLLECT:
 		case Control_status::A2_MOVE:
-			r.direction.y=-1;
+			r.direction.y=-.7;
 			break;
 		case Control_status::A2_TO_COLLECT:
 			r.direction.y=.5;

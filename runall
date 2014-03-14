@@ -64,6 +64,9 @@ rm pump_advanced
 echo now running TOPLEVEL TEST
 ./toplevel_test
 rm toplevel
+echo now running TOPLEVEL MODE TEST
+./toplevel_mode_test
+rm toplevel_mode
 echo now running SHOOTER WHEELS TEST
 ./shooter_wheels_test
 rm shooter_wheels

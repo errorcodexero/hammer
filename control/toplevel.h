@@ -82,20 +82,6 @@ namespace Toplevel{
 	Output control(Status,Subgoals);
 	bool ready(Status,Subgoals);
 	std::vector<std::string> not_ready(Status,Subgoals);
-	
-	//all this mode stuff really belongs elsewhere
-	enum Mode{
-		DRIVE_WO_BALL,DRIVE_W_BALL,
-		COLLECT,
-		SHOOT_HIGH_PREP,SHOOT_HIGH,
-		TRUSS_TOSS_PREP,TRUSS_TOSS,
-		PASS_PREP,PASS,
-		EJECT_PREP,EJECT,
-		CATCH, //SHOOT_LOW
-	};
-	std::ostream& operator<<(std::ostream& o,Mode);
-
-	Subgoals subgoals(Mode,Drive_goal,wheelcalib);
 }
 
 #endif

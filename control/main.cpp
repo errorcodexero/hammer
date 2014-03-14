@@ -10,6 +10,7 @@
 #include "../input/util.h"
 #include "../input/panel2014.h"
 #include "../util/util.h"
+#include "toplevel_mode.h"
 
 using namespace std;
 
@@ -55,42 +56,6 @@ Robot_outputs convert_output(Toplevel::Output a){
 		cerr<<r.jaguar[i]<<"\r\n";
 	}*/
 	return r;
-}
-
-Toplevel::Mode to_mode(Control_status::Control_status status){
-	switch(status){
-		case Control_status::AUTO_SPIN_UP: return Toplevel::SHOOT_HIGH_PREP;
-		case Control_status::AUTO_FIRE: return Toplevel::SHOOT_HIGH;
-		case Control_status::AUTO_TO_COLLECT: return Toplevel::COLLECT;
-		case Control_status::AUTO_COLLECT: return Toplevel::COLLECT;
-		case Control_status::AUTO_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP;
-		case Control_status::AUTO_FIRE2: return Toplevel::SHOOT_HIGH;		
-		case Control_status::A2_SPIN_UP: return Toplevel::SHOOT_HIGH_PREP;
-		case Control_status::A2_FIRE: return Toplevel::SHOOT_HIGH;
-		case Control_status::A2_TO_COLLECT: return Toplevel::COLLECT;
-		case Control_status::A2_COLLECT: return Toplevel::COLLECT;
-		case Control_status::A2_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP;
-		case Control_status::A2_FIRE2: return Toplevel::SHOOT_HIGH;
-		case Control_status::A2_MOVE: return Toplevel::DRIVE_WO_BALL;
-		case Control_status::DRIVE_W_BALL: return Toplevel::DRIVE_W_BALL;
-		case Control_status::DRIVE_WO_BALL: return Toplevel::DRIVE_WO_BALL;
-		case Control_status::COLLECT: return Toplevel::COLLECT;
-		case Control_status::SHOOT_HIGH_PREP: return Toplevel::SHOOT_HIGH_PREP;
-		case Control_status::SHOOT_HIGH: return Toplevel::SHOOT_HIGH;
-		case Control_status::SHOOT_HIGH_WHEN_READY: return Toplevel::SHOOT_HIGH_PREP;
-		case Control_status::TRUSS_TOSS_PREP: return Toplevel::TRUSS_TOSS_PREP;
-		case Control_status::TRUSS_TOSS: return Toplevel::TRUSS_TOSS;
-		case Control_status::TRUSS_TOSS_WHEN_READY: return Toplevel::TRUSS_TOSS_PREP;
-		case Control_status::PASS_PREP: return Toplevel::PASS_PREP;
-		case Control_status::PASS: return Toplevel::PASS;
-		case Control_status::PASS_WHEN_READY: return Toplevel::PASS_PREP;
-		case Control_status::EJECT_PREP: return Toplevel::EJECT_PREP;
-		case Control_status::EJECT: return Toplevel::EJECT;
-		case Control_status::EJECT_WHEN_READY: return Toplevel::EJECT_PREP;
-		case Control_status::CATCH: return Toplevel::CATCH;
-		default:
-			assert(0);
-	}
 }
 
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
@@ -261,7 +226,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	
 	field_relative.update(main_joystick.button[Gamepad_button::X]);
 	
-	Toplevel::Mode mode=to_mode(control_status);
+	Toplevel::Mode mode=Toplevel::to_mode(control_status);
 	Drive_goal drive_goal1=drive_goal(
 		control_status,
 		main_joystick.axis[Gamepad_axis::LEFTX],
@@ -873,7 +838,7 @@ void mode_table(){
 			f<<control_status;
 		}
 		Tag d("td");
-		f<<to_mode(control_status);
+		f<<Toplevel::to_mode(control_status);
 	}
 }
 
@@ -881,9 +846,9 @@ void mode_diagram(){
 	ofstream f("control_modes.dot");
 	f<<"digraph G{\n";
 	for(auto a:Control_status::all()){
-		string x=as_string(a),y=as_string(to_mode(a));
+		string x=as_string(a),y=as_string(Toplevel::to_mode(a));
 		if(x!=y){
-			f<<"\t"<<a<<"->"<<to_mode(a)<<"\n";
+			f<<"\t"<<a<<"->"<<Toplevel::to_mode(a)<<"\n";
 		}
 	}
 	f<<"}\n";
@@ -928,7 +893,7 @@ int main(){
 	bool test_control_status=1;
 	if(test_control_status){
 		for(Control_status::Control_status control_status:Control_status::all()){
-			cout<<control_status<<" "<<to_mode(control_status)<<"\n";
+			cout<<control_status<<" "<<Toplevel::to_mode(control_status)<<"\n";
 		}
 	}
 	auto_test();

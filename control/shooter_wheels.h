@@ -9,7 +9,10 @@
 #include "../input/panel2014.h"
 
 namespace Shooter_wheels{
-	enum High_level_goal{HIGH_GOAL,TRUSS,PASS,STOP,X};
+	enum High_level_goal{
+		HIGH_GOAL,TRUSS,PASS,STOP,X,
+		HIGH_GOAL_NONBLOCK //go to the high goal speed but always read 'ready'
+	};
 	std::ostream& operator<<(std::ostream&,High_level_goal);
 	
 	struct Output{

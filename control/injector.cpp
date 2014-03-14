@@ -64,7 +64,7 @@ namespace Injector{
 				}
 			case Estimator::GOING_DOWN:
 				if(out==OUTPUT_DOWN){
-					static const Time LOWER_TIME=1.5; 
+					static const Time LOWER_TIME=.5; 
 					//Chosen based on testing by regulating down the return 
 					//Normal operation should never be as bad as ~0.4288 seconds
 					if(elapsed>LOWER_TIME){

@@ -17,6 +17,7 @@ namespace Shooter_wheels{
 			X1(PASS)
 			X1(STOP)
 			X1(X)
+			X1(HIGH_GOAL_NONBLOCK)
 			#undef X1
 			default: assert(0);
 		}
@@ -134,7 +135,7 @@ namespace Shooter_wheels{
 	}
 	
 	bool ready(Status status,Goal goal){
-		if(goal.first==Shooter_wheels::STOP || goal.first==Shooter_wheels::X) return 1;
+		if(goal.first==Shooter_wheels::STOP || goal.first==Shooter_wheels::X || goal.first==Shooter_wheels::HIGH_GOAL_NONBLOCK) return 1;
 		//this could be refined.
 		return fabs(status.top-goal.second.top)<100 && fabs(status.bottom-goal.second.bottom)<100;
 	}
@@ -144,6 +145,7 @@ namespace Shooter_wheels{
 			case TRUSS:
 				return make_pair(g,c.overtruss); //Previously 1200
 			case HIGH_GOAL:
+			case HIGH_GOAL_NONBLOCK:
 				return make_pair(g,c.highgoal); //Previously 3000
 			case PASS:
 				return make_pair(g,c.lowgoal); //Previously 2200
@@ -161,7 +163,7 @@ namespace Shooter_wheels{
 int main(){
 	using namespace Shooter_wheels;
 
-	static const vector<High_level_goal> GOALS{HIGH_GOAL,TRUSS,PASS,STOP,X};
+	static const vector<High_level_goal> GOALS{HIGH_GOAL,TRUSS,PASS,STOP,X,HIGH_GOAL_NONBLOCK};
 	for(auto goal:GOALS){
 		//Control control;
 		//assert(control.ready(goal,target_speed_top(goal,rpmsdefault()),target_speed_bottom(goal,rpmsdefault())));

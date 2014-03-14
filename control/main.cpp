@@ -64,7 +64,7 @@ Main::Main():control_status(Control_status::DRIVE_W_BALL),autonomous_start(0){}
 Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch,wheelcalib);
 
 Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
-	double throttle = (1 + -joy_throttle) / 2;
+	double throttle = .7+.3*fabs(joy_throttle);
 	joy_x = clip(joy_x) * throttle;
 	joy_y = -clip(joy_y) * throttle;//Invert Y
 	joy_theta = clip(joy_theta) * 0.75;
@@ -82,7 +82,7 @@ Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x
 			r.direction.y=-1;
 			break;
 		case Control_status::A2_TO_COLLECT:
-			r.direction.y=.4;
+			r.direction.y=.5;
 		default:
 			//otherwise leave at the default, which is 0.
 			break;

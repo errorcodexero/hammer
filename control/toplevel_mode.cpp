@@ -10,6 +10,7 @@ namespace Toplevel{
 		X(DRIVE_WO_BALL)
 		X(DRIVE_W_BALL)
 		X(COLLECT)
+		X(COLLECT_SPIN_UP)
 		X(SHOOT_HIGH_PREP)
 		X(SHOOT_HIGH)
 		X(TRUSS_TOSS_PREP)
@@ -37,6 +38,12 @@ namespace Toplevel{
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
 				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
+				break;
+			case COLLECT_SPIN_UP:
+				r.collector=ON;
+				r.collector_tilt=Collector_tilt::GOAL_DOWN;
+				r.injector_arms=Injector_arms::GOAL_OPEN;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::HIGH_GOAL);
 				break;
 			case COLLECT:
 				r.collector=ON;
@@ -111,8 +118,8 @@ namespace Toplevel{
 			case Control_status::AUTO_FIRE2: return Toplevel::SHOOT_HIGH;		
 			case Control_status::A2_SPIN_UP: return Toplevel::SHOOT_HIGH_PREP;
 			case Control_status::A2_FIRE: return Toplevel::SHOOT_HIGH;
-			case Control_status::A2_TO_COLLECT: return Toplevel::COLLECT;
-			case Control_status::A2_COLLECT: return Toplevel::COLLECT;
+			case Control_status::A2_TO_COLLECT: return Toplevel::COLLECT_SPIN_UP;
+			case Control_status::A2_COLLECT: return Toplevel::COLLECT_SPIN_UP;
 			case Control_status::A2_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP;
 			case Control_status::A2_FIRE2: return Toplevel::SHOOT_HIGH;
 			case Control_status::A2_MOVE: return Toplevel::DRIVE_WO_BALL;

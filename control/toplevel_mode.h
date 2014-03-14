@@ -14,6 +14,7 @@ namespace Toplevel{
 		PASS_PREP,PASS,
 		EJECT_PREP,EJECT,
 		CATCH, //SHOOT_LOW
+		COLLECT_SPIN_UP,
 	};
 	std::ostream& operator<<(std::ostream& o,Mode);
 

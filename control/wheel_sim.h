@@ -4,10 +4,12 @@
 #include "../util/interface.h"
 #include "shooter_status.h"
 #include "shooter_wheels.h"
+#include "../util/negedge_trigger.h"
 
 class Wheel_sim{
 	Time last;
 	Shooter_wheels::RPM est;
+	Negedge_trigger shooter;
 
 	public:
 	Wheel_sim();

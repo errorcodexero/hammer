@@ -3,46 +3,37 @@
 
 #include<sstream>
 #include<iostream>
+#include "main.h"
 
 template<typename T>
-void print_diff(std::ostream& o,std::string s,T a,T b){
+void print_diff(std::ostream& o,std::string s,T &a,T b){
 	if(a!=b){
 		o<<s<<"From "<<a<<" to "<<b<<"\n";
+		a=b;
 	}
 }
 
 template<typename T>
-void print_diff(std::ostream& o,T a,T b){
+void print_diff(std::ostream& o,T &a,T b){
 	print_diff(o,"",a,b);
 }
 
 template<typename T>
-void print_diff_approx(std::ostream& o,T a,T b){
+void print_diff_approx(std::ostream& o,T &a,T b){
 	if(!approx_equal(a,b)){
 		o<<"From "<<a<<" to "<<b<<"\n";
+		a=b;
 	}
 }
 
-class Gyro_tracker;
-namespace Toplevel{
-	class Status;
-	class Estimator;
-}
-class Main;
-class Driver_station_output;
-class Robot_outputs;
-class Jaguar_input;
-class Robot_inputs;
-
-void print_diff(std::ostream&,unsigned char,unsigned char);
-void print_diff(std::ostream&,Gyro_tracker const&,Gyro_tracker const&);
-void print_diff(std::ostream&,Toplevel::Status const&,Toplevel::Status const&);
-void print_diff(std::ostream&,Toplevel::Estimator const&,Toplevel::Estimator const&);
-void print_diff(std::ostream&,Main const&,Main const&);
-void print_diff(std::ostream&,Driver_station_output const&,Driver_station_output const&);
-void print_diff(std::ostream&,Robot_outputs const&,Robot_outputs const&);
-void print_diff(std::ostream&,std::string const&,Jaguar_input const&,Jaguar_input const&);
-void print_diff(std::ostream&,Robot_inputs const&,Robot_inputs const&);
+void print_diff(std::ostream&,unsigned char&,unsigned char);
+void print_diff(std::ostream&,Gyro_tracker&,Gyro_tracker const&);
+void print_diff(std::ostream&,Toplevel::Status&,Toplevel::Status const&);
+void print_diff(std::ostream&,Main&,Main const&);
+void print_diff(std::ostream&,Driver_station_output&,Driver_station_output const&);
+void print_diff(std::ostream&,Robot_outputs&,Robot_outputs const&);
+void print_diff(std::ostream&,std::string const&,Jaguar_input&,Jaguar_input const&);
+void print_diff(std::ostream&,Robot_inputs&,Robot_inputs const&);
 
 template<typename T>
 struct Monitor{
@@ -54,6 +45,19 @@ struct Monitor{
 		data=t;
 		return ss.str();
 	}
+};
+
+template<>
+struct Monitor<Toplevel::Estimator>{
+	Toplevel::Status status;
+	std::string update(Toplevel::Estimator);
+};
+
+template<>
+struct Monitor<Main>{
+	Main data;
+	Monitor<Toplevel::Estimator> est;
+	std::string update(Main);
 };
 
 #endif

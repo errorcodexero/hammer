@@ -30,7 +30,7 @@ namespace Shooter_wheels{
 
 	bool approx_equal(Status a,Status b){
 		//this threshold is totally arbitrary.
-		static const double THRESHOLD=140;
+		static const double THRESHOLD=240;
 		return fabs(a.top-b.top)<THRESHOLD && fabs(a.bottom-b.bottom)<THRESHOLD;
 	}
 }

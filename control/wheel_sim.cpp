@@ -90,7 +90,11 @@ double output_torque(RPM rpm,double power_portion){
 }
 
 //returns RPM
-double step(double initial /*in rpms*/,Time stepsize,double power_portion,bool shooting){
+double step(double initial /*in rpms*/,Time stepsize,double power_portion,bool shoot_end){
+	if(shoot_end){
+		return initial/4;
+	}
+
 	assert(fabs(power_portion)<=1);//take this out when actually running on the robot, or at least make the range larger.
 	power_portion=clip(power_portion);
 	//power_portion-=portion_used_as_drag(initial);
@@ -98,10 +102,6 @@ double step(double initial /*in rpms*/,Time stepsize,double power_portion,bool s
 	//if(power_portion<0) torque*=-1;//this could be done in a nicer way.
 	double torque=output_torque(initial,power_portion);
 
-	if(shooting){
-		//this is basically just a guess.
-		torque-=output_torque(0,1)*2;
-	}
 	//cout<<"torque="<<torque<<"\n";
 
 	static const double G=9.8; //kg/N conversion
@@ -137,7 +137,7 @@ void Wheel_sim::update(Time now,double power,bool shooting){
 	}
 	Time step_size=now-last;
 	//cout<<"step="<<step_size<<"\n";
-	est=step(est,step_size,power,shooting);
+	est=step(est,step_size,power,shooter(shooting));
 	last=now;
 }
 

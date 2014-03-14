@@ -81,6 +81,8 @@ Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x
 		case Control_status::A2_MOVE:
 			r.direction.y=-1;
 			break;
+		case Control_status::A2_TO_COLLECT:
+			r.direction.y=.4;
 		default:
 			//otherwise leave at the default, which is 0.
 			break;

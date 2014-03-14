@@ -79,7 +79,7 @@ Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x
 	switch(control_status){
 		case Control_status::AUTO_COLLECT:
 		case Control_status::A2_MOVE:
-			r.direction.y=-.7;
+			r.direction.y=-1;
 			break;
 		case Control_status::A2_TO_COLLECT:
 			r.direction.y=.5;
@@ -432,7 +432,7 @@ Control_status::Control_status next(
 			return SHOOT_HIGH;
 		case A2_MOVE:
 			if(autonomous_mode){
-				return (since_switch>3)?DRIVE_WO_BALL:A2_MOVE;
+				return (since_switch>1.5)?DRIVE_WO_BALL:A2_MOVE;
 			}
 			return DRIVE_WO_BALL;
 		case AUTO_SPIN_UP:

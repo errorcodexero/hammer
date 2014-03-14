@@ -118,8 +118,8 @@ namespace Toplevel{
 			case Control_status::AUTO_FIRE2: return Toplevel::SHOOT_HIGH;		
 			case Control_status::A2_SPIN_UP: return Toplevel::SHOOT_HIGH_PREP;
 			case Control_status::A2_FIRE: return Toplevel::SHOOT_HIGH;
-			case Control_status::A2_TO_COLLECT: return Toplevel::COLLECT_SPIN_UP;
-			case Control_status::A2_COLLECT: return Toplevel::COLLECT_SPIN_UP;
+			case Control_status::A2_TO_COLLECT: return Toplevel::COLLECT;
+			case Control_status::A2_COLLECT: return Toplevel::COLLECT;
 			case Control_status::A2_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP;
 			case Control_status::A2_FIRE2: return Toplevel::SHOOT_HIGH;
 			case Control_status::A2_MOVE: return Toplevel::DRIVE_WO_BALL;

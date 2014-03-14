@@ -407,7 +407,7 @@ Control_status::Control_status next(
 			if(autonomous_mode){
 				return took_shot?A2_TO_COLLECT:A2_FIRE;
 			}
-			return A2_FIRE;
+			return SHOOT_HIGH;
 		case A2_TO_COLLECT:
 			if(autonomous_mode){
 				return ready_to_collect?A2_COLLECT:A2_TO_COLLECT;
@@ -427,12 +427,12 @@ Control_status::Control_status next(
 			if(autonomous_mode){
 				return took_shot?A2_MOVE:A2_FIRE2;
 			}
-			return A2_FIRE2;
+			return SHOOT_HIGH;
 		case A2_MOVE:
 			if(autonomous_mode){
 				return (since_switch>3)?DRIVE_WO_BALL:A2_MOVE;
 			}
-			return A2_MOVE;
+			return DRIVE_WO_BALL;
 		case AUTO_SPIN_UP:
 			if(autonomous_mode){
 				return ready_to_shoot?AUTO_FIRE:AUTO_SPIN_UP;
@@ -658,8 +658,8 @@ void check_auto_modes_end(){
 	for(auto control_status:Control_status::all()){
 		if(teleop(control_status)) continue;
 		auto n=next(control_status,Toplevel::Status(),Joystick_data(),Panel(),0,0,0,wheelcalib());
+		cout<<control_status<<"	"<<n<<endl;
 		assert(teleop(n));
-		//cout<<control_status<<" "<<n<<"\n";
 	}
 }
 

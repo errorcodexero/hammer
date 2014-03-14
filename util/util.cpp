@@ -5,6 +5,10 @@
 
 using namespace std;
 
+#ifdef _WRS_KERNEL
+int isblank(int){ return 0; }
+#endif
+
 //probably want to decouple the deadzones from the rest of this.
 Pwm_output pwm_convert(double p){
 //going to emulate this so that we don't need to recalibrate stuff.

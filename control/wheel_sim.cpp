@@ -90,7 +90,7 @@ double output_torque(RPM rpm,double power_portion){
 }
 
 //returns RPM
-double step(double initial /*in rpms*/,Time stepsize,double power_portion){
+double step(double initial /*in rpms*/,Time stepsize,double power_portion,bool shooting){
 	assert(fabs(power_portion)<=1);//take this out when actually running on the robot, or at least make the range larger.
 	power_portion=clip(power_portion);
 	//power_portion-=portion_used_as_drag(initial);
@@ -98,6 +98,10 @@ double step(double initial /*in rpms*/,Time stepsize,double power_portion){
 	//if(power_portion<0) torque*=-1;//this could be done in a nicer way.
 	double torque=output_torque(initial,power_portion);
 
+	if(shooting){
+		//this is basically just a guess.
+		torque-=output_torque(0,1)*2;
+	}
 	//cout<<"torque="<<torque<<"\n";
 
 	static const double G=9.8; //kg/N conversion
@@ -127,13 +131,13 @@ double step(double initial /*in rpms*/,Time stepsize,double power_portion){
 
 Wheel_sim::Wheel_sim():last(-1),est(0){}
 
-void Wheel_sim::update(Time now,double power){
+void Wheel_sim::update(Time now,double power,bool shooting){
 	if(last==-1){
 		last=now;
 	}
 	Time step_size=now-last;
 	//cout<<"step="<<step_size<<"\n";
-	est=step(est,step_size,power);
+	est=step(est,step_size,power,shooting);
 	last=now;
 }
 
@@ -145,7 +149,7 @@ ostream& operator<<(ostream& o,Wheel_sim a){
 	return o<<")";
 }
 
-void Shooter_sim::update(Time t,Shooter_wheels::Output a){
+void Shooter_sim::update(Time t,Shooter_wheels::Output a,bool shooting){
 	//for now we're assuming that the motor that's in PID mode has the same output as the one in voltage mode.  This is incorrect, but much simpler than the alternatives.
 	//top.update(t,a.top[Shooter_wheels::Output::OPEN_LOOP].voltage);
 	//bottom.update(t,a.bottom[Shooter_wheels::Output::OPEN_LOOP].voltage);
@@ -154,8 +158,8 @@ void Shooter_sim::update(Time t,Shooter_wheels::Output a){
 	bool top_on=a.top[Shooter_wheels::Output::FEEDBACK].speed>top.estimate();
 	bool bottom_on=a.bottom[Shooter_wheels::Output::FEEDBACK].speed>bottom.estimate();
 	//cout<<"Bang!:"<<top_on<<bottom_on<<"\n";
-	top.update(t,top_on);
-	bottom.update(t,bottom_on);
+	top.update(t,top_on,shooting);
+	bottom.update(t,bottom_on,shooting);
 }
 
 Shooter_wheels::Status Shooter_sim::estimate()const{
@@ -190,7 +194,7 @@ void sim_test(){
 	Time STEPSIZE=.1;
 	for(Time t=0;t<105;t+=STEPSIZE){
 		cout<<t<<"\t"<<rpm<<"\n";
-		rpm=step(rpm,STEPSIZE,0);
+		rpm=step(rpm,STEPSIZE,0,0);
 	}
 }
 
@@ -205,7 +209,7 @@ void shooter_sim_test(){
 	cout<<c<<"\n";
 	for(Time t=0;t<5;t+=.1){
 		s.update(
-			t,c
+			t,c,0
 		);
 		cout<<s<<"\n";
 	}

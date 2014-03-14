@@ -11,7 +11,7 @@ class Wheel_sim{
 
 	public:
 	Wheel_sim();
-	void update(Time,double power);
+	void update(Time,double power,bool shooting);
 	Shooter_wheels::RPM estimate()const;
 
 	friend std::ostream& operator<<(std::ostream&,Wheel_sim);
@@ -22,7 +22,7 @@ class Shooter_sim{
 	Wheel_sim top,bottom;
 
 	public:
-	void update(Time,Shooter_wheels::Output);
+	void update(Time,Shooter_wheels::Output,bool shooting);
 	Shooter_wheels::Status estimate()const;
 
 	friend std::ostream& operator<<(std::ostream&,Shooter_sim);

@@ -595,7 +595,7 @@ void auto_test(){
 		//in.jaguar[JAG_BOTTOM_OPEN_LOOP]=
 		in.jaguar[JAG_BOTTOM_FEEDBACK]=jag_at_speed(shooter_sim.estimate().bottom);
 		auto out_now=m(in);
-		shooter_sim.update(in.now,shooter_output(out_now));
+		shooter_sim.update(in.now,shooter_output(out_now),out_now.solenoid[4]);
 		string change;
 		change+=inputs.update(in);
 		change+=state.update(m);

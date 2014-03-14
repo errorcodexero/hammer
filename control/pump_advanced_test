@@ -1,4 +1,4 @@
-g++ -Wall -Werror -DPUMP_ADVANCED_TEST pump_advanced.cpp pump.cpp \
+g++ -Wall -Werror -std=c++0x -DPUMP_ADVANCED_TEST pump_advanced.cpp pump.cpp \
 	ejector.cpp \
 	injector.cpp \
 	injector_arms.cpp \

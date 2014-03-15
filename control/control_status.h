@@ -3,6 +3,7 @@
 
 #include <iosfwd>
 #include<vector>
+#include "../util/maybe.h"
 
 namespace Control_status{
 	enum Control_status{
@@ -32,6 +33,7 @@ namespace Control_status{
 	};
 	std::ostream& operator<<(std::ostream&,Control_status);
 	std::vector<Control_status> all();
+	Maybe<Control_status> parse(std::string const&);
 	bool autonomous(Control_status);
 	bool teleop(Control_status);
 }

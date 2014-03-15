@@ -1,6 +1,7 @@
 #include "ejector.h"
 #include<iostream>
 #include<cassert>
+#include "../util/util.h"
 
 using namespace std;
 
@@ -116,6 +117,19 @@ namespace Ejector{
 		}
 	}
 
+	vector<Estimator::Location> locations(){
+		vector<Estimator::Location> r;
+		r|=Estimator::GOING_UP;
+		r|=Estimator::UP;
+		r|=Estimator::GOING_DOWN;
+		r|=Estimator::DOWN;
+		return r;
+	}
+
+	Maybe<Estimator::Location> parse_location(string const& s){
+		return parse_enum(locations(),s);
+	}
+
 	bool operator!=(Estimator,Estimator){
 		assert(0);
 	}
@@ -155,14 +169,14 @@ int main(){
 	assert(e.status()==RECOVERY);
 	e.update(0,OUTPUT_UP);
 	assert(e.status()==SHOOTING);
-	static const vector<Estimator::Location> LOCATIONS{Estimator::GOING_UP,Estimator::UP,Estimator::GOING_DOWN,Estimator::DOWN};
 	static const vector<Status> STATUS_LIST{IDLE,SHOOTING,RECOVERY};
 	static const vector<Goal> GOALS{START,WAIT,X};
 	cout<<"Control outputs:\n";
-	for(auto location:LOCATIONS){
+	for(auto location:locations()){
 		for(auto goal:GOALS){
 			cout<<location<<"\t"<<goal<<"\t"<<control(location,goal)<<"\n";
 		}
+		assert(location==parse_location(as_string(location)));
 	}
 	cout<<"Ready states:\n";
 	for(auto status:STATUS_LIST){

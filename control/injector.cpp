@@ -159,6 +159,21 @@ namespace Injector{
 		}
 	}
 
+	vector<Estimator::Location> locations(){
+		vector<Estimator::Location> r;
+		r|=Estimator::GOING_UP;
+		r|=Estimator::UP;
+		r|=Estimator::GOING_DOWN;
+		r|=Estimator::DOWN_VENT;
+		r|=Estimator::DOWN_IDLE;
+		r|=Estimator::X;
+		return r;
+	}
+
+	Maybe<Estimator::Location> parse_location(string const& s){
+		return parse_enum(locations(),s);
+	}
+
 	bool operator==(Estimator a,Estimator b){
 		return a.location==b.location && a.timer==b.timer;
 	}
@@ -208,7 +223,6 @@ int main(){
 	assert(e.status()==RECOVERY);
 	e.update(0,OUTPUT_UP);
 	assert(e.status()==SHOOTING);
-	static const vector<Estimator::Location> LOCATIONS{Estimator::GOING_UP,Estimator::UP,Estimator::GOING_DOWN,Estimator::DOWN_VENT,Estimator::DOWN_IDLE,Estimator::X};
 	//This doesn't actually est all transitions
 	Status last=e.status();
 	for(unsigned i=0;i<100;i++){
@@ -225,10 +239,12 @@ int main(){
 	static const vector<Status> STATUS_LIST{IDLE,SHOOTING,RECOVERY};
 	static const vector<Goal> GOALS{START,WAIT,X};
 	cout<<"Control outputs:\n";
-	for(auto location:LOCATIONS){
+	for(auto location:locations()){
 		for(auto goal:GOALS){
 			cout<<location<<"\t"<<goal<<"\t"<<control(location,goal)<<"\n";
 		}
+
+		assert(location==parse_location(as_string(location)));
 	}
 	cout<<"Ready states:\n";
 	for(auto status:STATUS_LIST){
@@ -238,7 +254,7 @@ int main(){
 	}
 	cout<<"State transitions:\n";
 	static const vector<Output> OUTPUTS{OUTPUT_UP,OUTPUT_DOWN,OUTPUT_VENT};
-	for(auto location:LOCATIONS){
+	for(auto location:locations()){
 		for(auto out:OUTPUTS){
 			for(float elapsed:{0,3}){
 				cout<<location<<" "<<out<<" "<<elapsed<<" "<<next(location,elapsed,out)<<"\n";

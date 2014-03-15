@@ -34,6 +34,7 @@ namespace Injector{
 	bool operator!=(Estimator,Estimator);
 	std::ostream& operator<<(std::ostream&,Estimator::Location);
 	std::ostream& operator<<(std::ostream&,Estimator);
+	Maybe<Estimator::Location> parse_location(std::string const&);
 
 	Status location_to_status(Estimator::Location);
 	Output control(Estimator::Location,Goal);

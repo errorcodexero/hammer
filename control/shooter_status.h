@@ -2,6 +2,7 @@
 #define SHOOTER_STATUS_H
 
 #include<iosfwd>
+#include "../util/maybe.h"
 
 namespace Shooter_wheels{
 	typedef int RPM;
@@ -17,6 +18,7 @@ namespace Shooter_wheels{
 	Status& operator-=(Status&,Status);
 	std::ostream& operator<<(std::ostream&,Status);
 	bool approx_equal(Status,Status);
+	Maybe<Status> parse_status(std::string const&);
 }
 
 #endif

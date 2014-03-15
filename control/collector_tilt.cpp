@@ -1,6 +1,7 @@
 #include "collector_tilt.h"
 #include<iostream>
 #include<cassert>
+#include "../util/util.h"
 
 //this is very similar to the injector arms.
 
@@ -39,6 +40,20 @@ namespace Collector_tilt{
 			#undef X
 			default: assert(0);
 		}
+	}
+
+	vector<Status> status_list(){
+		vector<Status> r;
+		r|=STATUS_UP;
+		r|=STATUS_DOWN;
+		r|=STATUS_RAISING;
+		r|=STATUS_LOWERING;
+		r|=STATUS_UNKNOWN;
+		return r;
+	}
+
+	Maybe<Status> parse_status(std::string const& s){
+		return parse_enum(status_list(),s);
 	}
 
 	Estimator::Estimator():est(STATUS_UP){}
@@ -168,12 +183,12 @@ int main(){
 	for(auto goal:GOALS){
 		cout<<goal<<":"<<control(goal)<<"\n";
 	}
-	static const vector<Status> STATUS_LIST{STATUS_UP,STATUS_DOWN,STATUS_RAISING,STATUS_LOWERING,STATUS_UNKNOWN};
 	cout<<"\n";
-	for(auto status:STATUS_LIST){
+	for(auto status:status_list()){
 		for(auto goal:GOALS){
 			cout<<status<<" "<<goal<<" "<<ready(status,goal)<<"\n";
 		}
+		assert(status==parse_status(as_string(status)));
 	}
 
 	static const vector<Output> OUTPUTS{OUTPUT_UP,OUTPUT_DOWN,OUTPUT_NEITHER};

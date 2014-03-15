@@ -1,6 +1,7 @@
 #include "control_status.h"
 #include<iostream>
 #include<cassert>
+#include "../util/util.h"
 
 using namespace std;
 
@@ -78,6 +79,10 @@ namespace Control_status{
 		return r;
 	}
 
+	Maybe<Control_status> parse(string const& s){
+		return parse_enum<Control_status>(all(),s);
+	}
+
 	bool autonomous(Control_status s){
 		return s==AUTO_SPIN_UP || s==AUTO_FIRE || s==AUTO_TO_COLLECT || s==AUTO_COLLECT || s==AUTO_SPIN_UP2 || s==AUTO_FIRE2 || 
 			s==A2_SPIN_UP || s==A2_FIRE || s==A2_TO_COLLECT || s==A2_COLLECT || s==A2_SPIN_UP2 || s==A2_FIRE2 || s==A2_MOVE;
@@ -101,6 +106,8 @@ int main(){
 		if(autonomous(a)) x++;
 		if(teleop(a)) x++;
 		assert(x==1);
+
+		assert(a==Control_status::parse(as_string(a)));
 	}
 }
 #endif

@@ -12,6 +12,7 @@ namespace Injector_arms{
 
 	enum Status{STATUS_OPEN,STATUS_CLOSED,STATUS_OPENING,STATUS_CLOSING};
 	std::ostream& operator<<(std::ostream&,Status);
+	Maybe<Status> parse_status(std::string const&);
 
 	class Estimator{
 		Status est;

@@ -1,6 +1,7 @@
 #include "injector_arms.h"
 #include<iostream>
 #include<cassert>
+#include "../util/util.h"
 
 using namespace std;
 
@@ -36,6 +37,19 @@ namespace Injector_arms{
 			#undef X
 			default: assert(false);
 		}
+	}
+
+	vector<Status> status_options(){
+		vector<Status> r;
+		r|=STATUS_OPEN;
+		r|=STATUS_CLOSED;
+		r|=STATUS_OPENING;
+		r|=STATUS_CLOSING;
+		return r;
+	}
+
+	Maybe<Status> parse_status(string const& s){
+		return parse_enum(status_options(),s);
 	}
 
 	Estimator::Estimator():est(STATUS_CLOSING){} //may want to have it start thinking it's closed
@@ -138,12 +152,13 @@ int main(){
 	assert(e.estimate()==Injector_arms::STATUS_CLOSED);
 
 	using namespace Injector_arms;
-	static const vector<Status> STATUS_OPTIONS{STATUS_OPEN,STATUS_CLOSED,STATUS_OPENING,STATUS_CLOSING};
 	static const vector<Goal> GOALS{GOAL_OPEN,GOAL_CLOSE,GOAL_X};
-	for(auto status:STATUS_OPTIONS){
+	for(auto status:status_options()){
 		for(auto goal:GOALS){
 			cout<<status<<"\t"<<goal<<"\t"<<control(status,goal)<<"\t"<<ready(status,goal)<<"\n";
 		}
+
+		assert(status==parse_status(as_string(status)));
 	}
 }
 #endif

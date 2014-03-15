@@ -135,22 +135,25 @@ void log_line(ostream& o,Robot_inputs in,Main m,Robot_outputs out){
 	#define X(name) o<<","<<name;
 	X(in.robot_mode.autonomous)
 	X(in.robot_mode.enabled)
-	for(unsigned i=0;i<Joystick_data::AXES;i++){
+	/*for(unsigned i=0;i<Joystick_data::AXES;i++){
 		X(in.joystick[0].axis[i])
 	}
 	for(unsigned i=0;i<Joystick_data::BUTTONS;i++){
 		X(in.joystick[0].button[i])
-	}
+	}*/
+	X(in.joystick[0])
 	X(in.digital_io[0]) //pressure switch
 	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
 		X(in.jaguar[i].speed)
 	}
-	for(unsigned i=0;i<Driver_station_input::ANALOG_INPUTS;i++){
+	/*for(unsigned i=0;i<Driver_station_input::ANALOG_INPUTS;i++){
 		X(in.driver_station.analog[i])
 	}
 	for(unsigned i=0;i<Driver_station_input::DIGITAL_INPUTS;i++){
 		X(in.driver_station.digital[i])
-	}
+	}*/
+	X(in.driver_station)
+
 	//going to not put in the interpreted version of this in case need to diagnose a noise problem or something.  
 	
 	//put in the state stuff here...
@@ -166,7 +169,7 @@ void log_line(ostream& o,Robot_inputs in,Main m,Robot_outputs out){
 	//skip orientation
 
 	//X(m.wheel_calibration) -> this might be good to do
-	#define Y(n) X(m.wheel_calibration.calib.n.top) X(m.wheel_calibration.calib.n.bottom)
+	#define Y(n) X(m.wheel_calibration.calib.n)
 	Y(highgoal)
 	Y(lowgoal)
 	Y(overtruss)
@@ -189,6 +192,17 @@ void log_line(ostream& o,Robot_inputs in,Main m,Robot_outputs out){
 	#undef X
 	o<<"\n";
 }
+
+struct Log_entry{
+	Time time;
+	Robot_mode robot_mode;
+	Joystick_data driver_joystick;
+	bool pressure_switch;
+	Jaguar_output jaguar[Robot_outputs::CAN_JAGUARS];
+	Driver_station_input driver_station;
+	Control_status::Control_status control_status;
+	//driver station stuff.
+};
 
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
@@ -665,7 +679,18 @@ void check_auto_modes_end(){
 	}
 }
 
+void log_line_test(){
+	stringstream ss;
+	Robot_inputs in;
+	Main m;
+	Robot_outputs out;
+	log_line(ss,in,m,out);
+	cout<<ss.str()<<"\n";
+	exit(1);
+}
+
 int main(){
+	//log_line_test();
 	check_auto_modes_end();
 	/*Main m;
 	cout<<m<<"\n";

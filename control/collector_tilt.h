@@ -13,6 +13,7 @@ namespace Collector_tilt{
 
 	enum Status{STATUS_UP,STATUS_DOWN,STATUS_RAISING,STATUS_LOWERING,STATUS_UNKNOWN};
 	std::ostream& operator<<(std::ostream&,Status);
+	Maybe<Status> parse_status(std::string const&);
 
 	class Estimator{
 		Status est;

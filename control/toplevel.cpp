@@ -142,9 +142,9 @@ namespace Toplevel{
 
 	Estimator::Estimator():pump(Pump::NOT_FULL), orientation(0){}
 
-	void Estimator::update(Time time,bool enabled,Output out,Pump::Status pump_status, float orientation1,Shooter_wheels::Status wheels_in){
+	void Estimator::update(Time time,bool enabled,Output out,Pump::Status pump_status, float orientation1,Shooter_wheels::Status wheels_in,bool downsensor){
 		collector_tilt.update(time,enabled?out.collector_tilt:Collector_tilt::OUTPUT_NEITHER);
-		injector.update(time,enabled?out.injector:Injector::OUTPUT_VENT);
+		injector.update(time,enabled?out.injector:Injector::OUTPUT_VENT,downsensor);
 		injector_arms.update(time,enabled?out.injector_arms:Injector_arms::OUTPUT_OPEN);
 		ejector.update(time,enabled?out.ejector:Ejector::OUTPUT_DOWN);
 		shooter_wheels=wheels_in;
@@ -270,8 +270,8 @@ int main(){
 	cout<<est<<"\n";
 	cout<<est.estimate()<<"\n";
 	Pump::Status ps=Pump::FULL;
-	est.update(0,1,Output(),ps,0,Shooter_wheels::Status());
-	est.update(10,0,Output(),ps,0,Shooter_wheels::Status());
+	est.update(0,1,Output(),ps,0,Shooter_wheels::Status(),0);
+	est.update(10,0,Output(),ps,0,Shooter_wheels::Status(),0);
 	cout<<est.estimate()<<"\n";
 	/*
 	if we choose one of the modes and use all the built-in controls then we should after some time get to a status where we're ready.  

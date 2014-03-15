@@ -137,7 +137,7 @@ namespace Shooter_wheels{
 	bool ready(Status status,Goal goal){
 		if(goal.first==Shooter_wheels::STOP || goal.first==Shooter_wheels::X || goal.first==Shooter_wheels::HIGH_GOAL_NONBLOCK) return 1;
 		//this could be refined.
-		return fabs(status.top-goal.second.top)<100 && fabs(status.bottom-goal.second.bottom)<100;
+		return goal.second.top>=status.top&&goal.second.top<=status.top+100&&goal.second.bottom>=status.bottom&&goal.second.bottom<=status.bottom+100;
 	}
 	
 	Goal convert_goal(wheelcalib c,High_level_goal g){
@@ -169,10 +169,10 @@ int main(){
 		//assert(control.ready(goal,target_speed_top(goal,rpmsdefault()),target_speed_bottom(goal,rpmsdefault())));
 		cout<<goal<<"\n";
 	}
-	{
+	/*{
 		auto r=unlink("wheelrpms.txt");
 		assert(r==0);
-	}
+	}*/
 	Calibration_manager c;
 	cout<<c<<"\n";
 	for(auto a:Calibration_target::all()){

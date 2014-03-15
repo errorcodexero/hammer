@@ -43,7 +43,7 @@ namespace Toplevel{
 		o<<"collect:"<<g.collector;
 		o<<" colct_tlt:"<<g.collector_tilt;
 		o<<" inject:"<<g.injector;
-		o<<" inj arm:"<<g.injector_arms;
+		o<<" inj_arm:"<<g.injector_arms;
 		o<<" eject:"<<g.ejector;
 		o<<" shoot:";
 		o<<g.shooter_wheels.first;
@@ -82,12 +82,62 @@ namespace Toplevel{
 		o<<"Status(";
 		o<<"colct_tlt:"<<s.collector_tilt;
 		o<<" inject:"<<s.injector;
-		o<<" inj arm:"<<s.injector_arms;
+		o<<" inj_arm:"<<s.injector_arms;
 		o<<" eject:"<<s.ejector;
 		o<<" shoot:"<<s.shooter_wheels;
 		o<<" pump:"<<s.pump;
 		o<<" orientation:"<<s.orientation;
 		return o<<")";
+	}
+
+	string remove_till_colon(string s){
+		unsigned i=0;
+		while(i<s.size() && s[i]!=':') i++;
+		if(s[i]==':') i++;
+		string r=s.substr(i,s.size());
+		return r;
+	}
+
+	Maybe<Status> parse_status(string const& s){
+		vector<string> v=split(inside_parens(s));
+		if(v.size()!=7) return Maybe<Status>();
+		Status r;
+		//yes, there is a better way to do this; it's called a monad. (or exceptions)
+		#define X(i) remove_till_colon(v[i])
+		{
+			Maybe<Collector_tilt::Status> m=Collector_tilt::parse_status(X(0));
+			if(!m) return Maybe<Status>();
+			r.collector_tilt=*m;
+		}
+		{
+			Maybe<Injector::Estimator::Location> m=Injector::parse_location(X(1));
+			if(!m) return Maybe<Status>();
+			r.injector=*m;
+		}
+		{
+			Maybe<Injector_arms::Status> m=Injector_arms::parse_status(X(2));
+			if(!m) return Maybe<Status>();
+			r.injector_arms=*m;
+		}
+		{
+			Maybe<Ejector::Estimator::Location> m=Ejector::parse_location(X(3));
+			if(!m) return Maybe<Status>();
+			r.ejector=*m;
+		}
+		{
+			cout<<X(4)<<"\n";
+			Maybe<Shooter_wheels::Status> m=Shooter_wheels::parse_status(X(4));
+			if(!m) return Maybe<Status>();
+			m=*Shooter_wheels::parse_status(v[4]);
+		}
+		{
+			Maybe<Pump::Status> m=Pump::parse_status(X(5));
+			if(!m) return Maybe<Status>();
+			r.pump=*m;
+		}
+		r.orientation=atof(X(6));
+		#undef X
+		return Maybe<Status>(r);
 	}
 
 	Estimator::Estimator():pump(Pump::NOT_FULL), orientation(0){}
@@ -192,6 +242,23 @@ namespace Toplevel{
 }
 
 #ifdef TOPLEVEL_TEST
+bool approx_equal(Toplevel::Status a,Toplevel::Status b){
+	#define X(name) if(a.name!=b.name) return 0;
+	X(collector_tilt)
+	X(injector)
+	X(injector_arms)
+	X(ejector)
+	X(shooter_wheels)
+	#undef X
+	return approx_equal(a.orientation,b.orientation);
+}
+
+template<typename T>
+bool approx_equal(T t,Maybe<T> m){
+	if(!m) return 0;
+	return approx_equal(t,*m);
+}
+
 int main(){
 	using namespace Toplevel;
 	Toplevel::Subgoals g;
@@ -209,5 +276,6 @@ int main(){
 	/*
 	if we choose one of the modes and use all the built-in controls then we should after some time get to a status where we're ready.  
 	*/
+	assert(approx_equal(status,parse_status(as_string(status))));
 }
 #endif

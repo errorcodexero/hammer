@@ -5,6 +5,7 @@
 //It may seem a little bit overkill, but this is here basically because there are some fancier things we might want to do later like know when we have at least 60psi.  
 
 #include<iosfwd>
+#include "../util/maybe.h"
 
 namespace Pump{
 	enum Output{ON,OFF};
@@ -12,6 +13,7 @@ namespace Pump{
 
 	enum Status{FULL,NOT_FULL};
 	std::ostream& operator<<(std::ostream&,Status);
+	Maybe<Status> parse_status(std::string const&);
 
 	Output control(Status);
 }

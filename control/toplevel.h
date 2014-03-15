@@ -55,6 +55,7 @@ namespace Toplevel{
 	bool operator==(Status,Status);
 	bool operator!=(Status,Status);
 	std::ostream& operator<<(std::ostream& o,Status);
+	Maybe<Status> parse_status(std::string const&);
 
 	class Estimator{
 		//no estimate for collector

@@ -145,10 +145,15 @@ string inside_parens(string const& s){
 	for(i=0;i<s.size() && s[i]!='(';i++) ;
 	if(i==s.size()) return "";
 	i++;//skip the '('
-	unsigned j;
-	for(j=0;j+i<s.size() && s[i+j]!=')';j++) ;
-	if(i+j<s.size()) return s.substr(i,j);
-	return "";
+//	unsigned j;
+//	for(j=0;j+i<s.size() && s[i+j]!=')';j++) ;
+//	if(i+j<s.size()) return s.substr(i,j);
+//	return "";
+
+	int j=s.size();
+	while(j>=0 && s[j]!=')') j--;
+	if(j<0) return "";
+	return 	s.substr(i,j-i);
 }
 
 #ifdef UTIL_TEST

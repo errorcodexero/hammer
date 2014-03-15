@@ -160,11 +160,12 @@ void log_line(ostream& o,Robot_inputs in,Main m,Robot_outputs out){
 	//skipping any force stuff because I don't think our drivers know how to use it.  Would be detectable via joystic inputs.
 	X(m.control_status)
 	Toplevel::Status e=m.est.estimate();
-	X(e.collector_tilt)
+	X(e)
+	/*X(e.collector_tilt)
 	X(e.injector)
 	X(e.injector_arms)
 	X(e.ejector)
-	X(e.shooter_wheels)
+	X(e.shooter_wheels)*/
 	//skip pump
 	//skip orientation
 
@@ -198,11 +199,42 @@ struct Log_entry{
 	Robot_mode robot_mode;
 	Joystick_data driver_joystick;
 	bool pressure_switch;
-	Jaguar_output jaguar[Robot_outputs::CAN_JAGUARS];
+
+	Jaguar_input jaguar_in[Robot_outputs::CAN_JAGUARS];
 	Driver_station_input driver_station;
 	Control_status::Control_status control_status;
-	//driver station stuff.
+	wheelcalib wheel_calibration;
+
+	Pwm_output pwm[4];
+	Solenoid_output solenoid[Robot_outputs::SOLENOIDS];
+	Relay_output relay[2];
+	Jaguar_output jaguar_out[Robot_outputs::CAN_JAGUARS];
+	bool ready_light;
 };
+
+ostream& operator<<(ostream& o,Log_entry a){
+	o<<"Log_entry(";
+	#define X(name)
+	X(time)
+	X(robot_mode)
+	X(driver_joystick)
+	X(pressure_switch)
+	X(jaguar_in)
+	X(driver_station)
+	X(control_status)
+	X(wheel_calibration)
+	for(unsigned i=0;i<4;i++){
+		X(pwm[i])
+	}
+	for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
+		X(solenoid[i])
+	}
+	for(unsigned i=0;i<2;i++) X(relay[i])
+	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+		assert(0);
+	}
+	return o<<")";
+}
 
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);

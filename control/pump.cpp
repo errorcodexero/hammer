@@ -2,6 +2,7 @@
 #include<iostream>
 #include<cassert>
 #include<vector>
+#include "../util/util.h"
 
 using namespace std;
 
@@ -22,18 +23,27 @@ namespace Pump{
 		assert(0);
 	}
 
+	vector<Pump::Status> status_list(){
+		vector<Pump::Status> r;
+		r|=Pump::FULL;
+		r|=Pump::NOT_FULL;
+		return r;
+	}
+
+	Maybe<Status> parse_status(string const& s){
+		return parse_enum(status_list(),s);
+	}
+
 	Output control(Status s){
 		return (s==FULL)?OFF:ON;
 	}
 }
 
 #ifdef PUMP_TEST
-
 int main(){
-	static const vector<Pump::Status> STATUS_LIST{Pump::FULL,Pump::NOT_FULL};
-	for(unsigned i=0;i<STATUS_LIST.size();i++){
-		auto a=STATUS_LIST[i];
+	for(auto a:Pump::status_list()){
 		cout<<a<<":"<<control(a)<<"\n";
+		assert(a==Pump::parse_status(as_string(a)));
 	}
 }
 #endif

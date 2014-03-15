@@ -10,4 +10,5 @@ g++ -Wall -Werror -std=c++0x -DPANEL2014_TEST panel2014.cpp ../control/fire_cont
 	../util/driver_station_interface.cpp \
 	util.cpp \
 	../util/util.cpp \
+	../control/calibration_target.cpp \
 	-o panel2014 2>&1 && ./panel2014

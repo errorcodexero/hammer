@@ -1,12 +1,11 @@
 #ifndef SHOOTER_WHEELS_H
 #define SHOOTER_WHEELS_H
 
-#include<iosfwd>
-#include<utility>
 #include"shooter_status.h"
 #include"wheelrpms.h"
 #include "../util/jag_interface.h"
-#include "../input/panel2014.h"
+#include "calibration_target.h"
+#include "../util/posedge_trigger.h"
 
 namespace Shooter_wheels{
 	enum High_level_goal{

@@ -28,6 +28,9 @@ rm collector_tilt
 echo now running CONTROL STATUS TEST
 ./control_status_test
 rm control_status
+echo now running CALIBRATION TARGET TEST
+./calibration_target_test
+rm calibration_target
 echo now running EJECTOR TEST
 ./ejector_test
 rm ejector

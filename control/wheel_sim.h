@@ -1,9 +1,8 @@
 #ifndef WHEEL_SIM_H
 #define WHEEL_SIM_H
 
-#include "../util/interface.h"
-#include "shooter_status.h"
 #include "shooter_wheels.h"
+#include "../util/interface.h"
 #include "../util/negedge_trigger.h"
 
 class Wheel_sim{

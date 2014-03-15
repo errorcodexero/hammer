@@ -34,4 +34,5 @@ g++ -Wall -Werror -std=c++0x --short-enums -DMAIN_TEST -I.. main.cpp \
 	wheel_sim.cpp \
 	toplevel_mode.cpp \
 	monitor.cpp \
+	calibration_target.cpp \
 	-o main 2>&1 && ./main

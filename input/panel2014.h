@@ -8,6 +8,7 @@
 #include "../control/injector.h"
 #include "../control/injector_arms.h"
 #include "../control/ejector.h"
+#include "../control/calibration_target.h"
 
 //these will probably be the things that light up.
 struct Mode_buttons{
@@ -16,19 +17,6 @@ struct Mode_buttons{
 	Mode_buttons();
 };
 std::ostream& operator<<(std::ostream&,Mode_buttons);
-
-//maybe this should go in wheelcalib.h or something.
-struct Calibration_target{
-	Fire_control::Target target;
-	bool top;
-	bool direct_mode;
-	
-	Calibration_target();
-	Calibration_target(Fire_control::Target,bool top);
-	
-	static std::vector<Calibration_target> all();
-};
-std::ostream& operator<<(std::ostream&,Calibration_target);
 
 struct Panel{
 	//presets

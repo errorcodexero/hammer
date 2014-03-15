@@ -1,7 +1,6 @@
 #ifndef PUMP_ADVANCED_H
 #define PUMP_ADVANCED_H
 
-#include "../util/interface.h"
 #include "../util/maybe.h"
 #include "collector_tilt.h"
 #include "injector.h"

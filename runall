@@ -71,10 +71,10 @@ echo now running TOPLEVEL MODE TEST
 ./toplevel_mode_test
 rm toplevel_mode
 echo now running SHOOTER WHEELS TEST
-./shooter_wheels_test
+../control/shooter_wheels_test
 rm shooter_wheels
 echo now running SHOOTER STATUS TEST
-./shooter_status
+../control/shooter_status_test
 rm shooter_status
 echo now running WHEEL SIM TEST
 ./wheel_sim_test

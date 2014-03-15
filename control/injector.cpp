@@ -64,10 +64,11 @@ namespace Injector{
 				}
 			case Estimator::GOING_DOWN:
 				if(out==OUTPUT_DOWN){
-					static const Time LOWER_TIME=1; 
+					static const Time MIN_LOWER_TIME=.4288;
+					static const Time MAX_LOWER_TIME=2; 
 					//Chosen based on testing by regulating down the return 
 					//Normal operation should never be as bad as ~0.4288 seconds
-					if(elapsed>LOWER_TIME){
+					if(elapsed>MAX_LOWER_TIME||(elapsed>MIN_LOWER_TIME&&downsensor)){
 						return make_pair(Estimator::DOWN_VENT,0);
 					}
 					return make_pair(Estimator::GOING_DOWN,0);

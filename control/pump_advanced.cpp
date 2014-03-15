@@ -21,19 +21,19 @@ In3 cylinder_volume(Inch bore,Inch stroke){
 
 //use constexpr when available
 In3 injector_volume(){
-	return 2*cylinder_volume(.75,8); //sizes are total guesses
+	return 2*cylinder_volume(1.0625,12); //sizes are total guesses
 }
 
 In3 injector_arms_volume(){
-	return cylinder_volume(.5,3);
+	return cylinder_volume(.75,2.5);
 }
 
 In3 ejector_volume(){
-	return 2*cylinder_volume(.5,3);
+	return 2*cylinder_volume(.75,2);
 }
 
 In3 collector_tilt_volume(){
-	return 2*cylinder_volume(2,4);
+	return 2*cylinder_volume(1.5,3);
 }
 
 In3 tank_volume(){
@@ -196,7 +196,7 @@ namespace Pump_advanced{
 
 		//cout<<"elapsed:"<<elapsed<<"\n";
 
-		static const double PUMP_SPEED=1.8;//psi per second.  This is agrees with the manufactuer's documentation.
+		static const double PUMP_SPEED=1.8;//psi per second.  This is agrees with the manufacturer's documentation.
 		if(pump_out==Pump::ON){
 			psi+=elapsed*PUMP_SPEED;
 		}

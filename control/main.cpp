@@ -11,6 +11,7 @@
 #include "../input/panel2014.h"
 #include "../util/util.h"
 #include "toplevel_mode.h"
+#include <stdlib.h>
 
 using namespace std;
 

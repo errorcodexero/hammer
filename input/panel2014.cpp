@@ -210,12 +210,12 @@ Panel interpret(Driver_station_input d){
 	{
 		double x=d.analog[4];
 		if(x>2 && x<2.35) panel.injector=Injector::OUTPUT_UP;
-		if(x>1.65 && x<2) panel.ejector=Ejector::OUTPUT_UP;
+		if(x>1.75 && x<2) panel.ejector=Ejector::OUTPUT_UP;
 		if(x>2.7 && x<3.10) panel.collector_tilt=Collector_tilt::OUTPUT_UP;
 		if(x>2.35 && x<2.65) panel.collector_tilt=Collector_tilt::OUTPUT_DOWN;
 		if(x>1.35 && x<1.75) panel.collector=ON;
 		if(x>1.05 && x<1.35) panel.collector=REVERSE;
-		if(x>.35 && x<1.75) panel.learn=1;
+		if(x>.35 && x<1) panel.learn=1;
 	}
 	
 	//panel.learn=TBD

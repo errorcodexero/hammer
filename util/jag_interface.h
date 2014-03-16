@@ -6,6 +6,9 @@
 
 struct Jaguar_output{
 	double speed,voltage;
+	float p;
+	float i;
+	float d;
 	bool controlSpeed;
 	//0 = voltage
 	//1 = speed

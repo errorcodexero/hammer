@@ -19,6 +19,10 @@ struct Mode_buttons{
 std::ostream& operator<<(std::ostream&,Mode_buttons);
 
 struct Panel{
+	enum Auto_mode{
+		DO_NOTHING,ONE_BALL,TWO_BALL,MOVE
+	};
+	Auto_mode auto_mode;
 	//presets
 	Mode_buttons mode_buttons;
 	bool fire,pass_now;
@@ -40,6 +44,7 @@ struct Panel{
 	
 	Panel();
 };
+std::ostream& operator<<(std::ostream&,Panel::Auto_mode);
 std::ostream& operator<<(std::ostream&,Panel);
 
 Panel interpret(Driver_station_input);

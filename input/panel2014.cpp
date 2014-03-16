@@ -53,7 +53,7 @@ Panel::Auto_mode automodeconvert(int potin){
 	if(potin==1)return Panel::ONE_BALL;
 	if(potin==2)return Panel::TWO_BALL;
 	if(potin==3)return Panel::MOVE;
-	return Panel::TWO_BALL;
+	return Panel::DO_NOTHING;
 }
 
 Panel::Panel():

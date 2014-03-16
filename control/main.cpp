@@ -306,7 +306,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 
 	r=force(r);
 	
-	r.driver_station.lcd.line[0]="FieldRelative: " + fRel(field_relative.get());//as_string(field_relative.get());
+	r.driver_station.lcd.line[0]=as_string(panel.auto_mode);
 	r.driver_station.lcd.line[1]=as_string(r.jaguar[0]).substr(13, 20);
 	r.driver_station.lcd.line[2]=as_string(r.jaguar[1]).substr(13, 20);
 	r.driver_station.lcd.line[3]=as_string(r.jaguar[2]).substr(13, 20);
@@ -406,9 +406,11 @@ Control_status::Control_status next(
 
 	//if(autonomous_mode && !autonomous(status)){
 	if(autonomous_mode_start){
-		//TODO: Put the code to select which autonomous mode here.
-		//return AUTO_SPIN_UP;
-		return A2_SPIN_UP;
+		if(panel.auto_mode==Panel::DO_NOTHING)return DRIVE_W_BALL;
+		if(panel.auto_mode==Panel::ONE_BALL)return AUTO_SPIN_UP;
+		if(panel.auto_mode==Panel::TWO_BALL)return A2_SPIN_UP;
+		if(panel.auto_mode==Panel::MOVE)return A2_MOVE;
+		return DRIVE_W_BALL;
 	}
 
 	if(!autonomous_mode){

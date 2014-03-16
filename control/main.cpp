@@ -302,7 +302,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	}
 	
         // Turn on camera light in autonomous mode:
-        r.relay[1] = (in.robot_mode.autonomous) ? RELAY_01 : RELAY_00;
+        r.relay[6] = (in.robot_mode.autonomous) ? RELAY_01 : RELAY_00;
 
 	r=force(r);
 	

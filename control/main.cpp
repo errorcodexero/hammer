@@ -629,7 +629,7 @@ Shooter_wheels::Output shooter_output(Robot_outputs out){
 	return r;
 }
 
-void auto_test(){
+void auto_test(double automodeknob){
 	Main m;
 	Monitor<Robot_inputs> inputs;
 	Monitor<Main> state;
@@ -637,6 +637,7 @@ void auto_test(){
 	Shooter_sim shooter_sim;
 	for(unsigned i=0;i<1500;i++){
 		Robot_inputs in;
+		in.driver_station.analog[0]=automodeknob;
 		in.now=i/100.0;
 		in.robot_mode.autonomous=1;
 		in.robot_mode.enabled=1;
@@ -759,7 +760,10 @@ int main(){
 			cout<<control_status<<" "<<Toplevel::to_mode(control_status)<<"\n";
 		}
 	}
-	auto_test();
+	auto_test(.18);
+	auto_test(.51);
+	auto_test(.84);
+	auto_test(1.17);
 	mode_table();
 	mode_diagram();
 }

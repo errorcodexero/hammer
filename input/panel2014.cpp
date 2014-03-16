@@ -37,7 +37,7 @@ Panel::Panel():
 	learn(0)
 {}
 
-ostream& operator<<(ostream& o,Panel p){
+ostream& operator<<(ostream& o,Panel p){	
 	o<<"Panel( ";
 	#define X(name) o<<""#name<<":"<<p.name<<" ";
 //	o<<p.mode_buttons;

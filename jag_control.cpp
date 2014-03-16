@@ -59,8 +59,10 @@ void Jag_control::set(Jaguar_output a,bool enable){
 			return;
 		}
 	}
-	const float kP = 1.000;
-	const float kI = 0.005;
+	//const float kP = 1.000;
+	//const float kI = 0.005;
+	const float kP = .3000;
+	const float kI = 0.003;
 	const float kD = 0.000;
 	if(a.controlSpeed){
 		if(mode!=SPEED){

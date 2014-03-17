@@ -34,6 +34,10 @@ SOURCES   += input/cyborg_joystick.cpp
 #OURCES   += input/joystick_linux.cpp
 SOURCES   += input/panel2014.cpp
 SOURCES   += input/util.cpp
+SOURCES   += input/range_finder.cpp
+SOURCES   += control/calibration_target.cpp
+SOURCES   += control/lcd_scroller.cpp
+SOURCES   += control/monitor.cpp
 SOURCES   += control/injector.cpp
 SOURCES   += control/wheelrpms.cpp
 SOURCES   += control/injector_arms.cpp
@@ -51,6 +55,7 @@ SOURCES   += control/octocanum.cpp
 SOURCES   += control/ejector.cpp
 #OURCES   += control/speedcontrol.cpp
 SOURCES   += control/toplevel.cpp
+SOURCES   += control/toplevel_mode.cpp
 SOURCES   += control/wheel_rpm_interface.cpp
 SOURCES   += control/wheel_sim.cpp
 SOURCES   += control/holonomic.cpp
@@ -115,7 +120,8 @@ deps: $(DEPENDS)
 .PHONY: deploy
 deploy: $(TARGET)
 	@echo '  Deploying $(TARGET)'
-	$(SILENT) /usr/bin/wput --binary ftp://10.14.25.2/ni-rt/system/$(TARGET)
+	$(SILENT) ncftpput 10.14.25.2 /ni-rt/system $(TARGET)
+#	$(SILENT) /usr/bin/wput --binary ftp://10.14.25.2/ni-rt/system/$(TARGET)
 
 .PHONY: undeploy
 undeploy:

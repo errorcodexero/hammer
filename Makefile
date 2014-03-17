@@ -7,7 +7,8 @@ SILENT    = @
 
 WIND_DIR  = /home/tnagler/proj/frc/WindRiver
 WIND_BASE = $(WIND_DIR)/vxworks-6.3
-WPI_LIB_A = $(WIND_BASE)/target/lib/WPILib.a
+#PI_LIB_A = $(WIND_BASE)/target/lib/WPILib.a
+WPI_LIB_A = /home/tnagler/2014/code/team/fourteentwentyfive.wpilib/WPILib.a
 
 DEFINES    =
 DEFINES   += -DCPU=PPC603
@@ -70,8 +71,9 @@ OBJECTS    = $(SOURCES:.cpp=.o)
 DEPENDS    = $(OBJECTS:.o=.deps)
 
 INCLUDES  += -I$(WIND_BASE)/target/h
-INCLUDES  += -I$(WIND_BASE)/target/h/WPILib
 INCLUDES  += -I$(WIND_BASE)/target/h/wrn/coreip
+#NCLUDES  += -I$(WIND_BASE)/target/h/WPILib
+INCLUDES  += -I/home/tnagler/2014/code/team/fourteentwentyfive.wpilib
 INCLUDES  += -I.
 
 CCPPC      = wine $(WIND_DIR)/gnu/3.4.4-vxworks-6.3/x86-win32/bin/ccppc.exe
@@ -121,12 +123,11 @@ deps: $(DEPENDS)
 deploy: $(TARGET)
 	@echo '  Deploying $(TARGET)'
 	$(SILENT) ncftpput 10.14.25.2 /ni-rt/system $(TARGET)
-#	$(SILENT) /usr/bin/wput --binary ftp://10.14.25.2/ni-rt/system/$(TARGET)
 
 .PHONY: undeploy
 undeploy:
 	@echo '  Undeploying $(TARGET)'
-	$(SILENT) /usr/bin/wget --delete-after ftp://10.14.25.2/ni-rt/system/$(TARGET)
+	$(SILENT) /usr/bin/ncftpget -DD ftp://10.14.25.2/ni-rt/system/$(TARGET)
 
 .PHONY: clean
 clean:

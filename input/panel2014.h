@@ -23,9 +23,13 @@ struct Panel{
 		DO_NOTHING,ONE_BALL,TWO_BALL,MOVE
 	};
 	Auto_mode auto_mode;
+	enum PIDselect{
+		P,I,D,NONE
+	};
+	PIDselect pidselect;
 	//presets
 	Mode_buttons mode_buttons;
-	bool fire,pass_now;
+	bool fire,pass_now,pidadjust;
 
 	//shooting override section
 	Calibration_target target;
@@ -45,6 +49,7 @@ struct Panel{
 	Panel();
 };
 std::ostream& operator<<(std::ostream&,Panel::Auto_mode);
+std::ostream& operator<<(std::ostream&,Panel::PIDselect);
 std::ostream& operator<<(std::ostream&,Panel);
 
 Panel interpret(Driver_station_input);

@@ -23,7 +23,7 @@ namespace Injector{
 
 		public:
 		Estimator();
-		void update(Time,Output);
+		void update(Time,Output,bool downsensor);
 		Location estimate()const;
 		Status status()const;
 		void out(std::ostream&)const;

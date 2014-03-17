@@ -39,7 +39,7 @@ namespace Injector{
 
 	Estimator::Estimator():location(GOING_DOWN){} //might want to change this to assume that it starts down.
 
-	pair<Estimator::Location,bool> next(Estimator::Location loc,Time elapsed,Output out){
+	pair<Estimator::Location,bool> next(Estimator::Location loc,Time elapsed,Output out,bool downsensor){
 		switch(loc){
 			case Estimator::GOING_UP:
 				if(out==OUTPUT_DOWN){
@@ -64,10 +64,11 @@ namespace Injector{
 				}
 			case Estimator::GOING_DOWN:
 				if(out==OUTPUT_DOWN){
-					static const Time LOWER_TIME=1; 
+					static const Time MIN_LOWER_TIME=.4288;
+					static const Time MAX_LOWER_TIME=2; 
 					//Chosen based on testing by regulating down the return 
 					//Normal operation should never be as bad as ~0.4288 seconds
-					if(elapsed>LOWER_TIME){
+					if(elapsed>MAX_LOWER_TIME||(elapsed>MIN_LOWER_TIME&&downsensor)){
 						return make_pair(Estimator::DOWN_VENT,0);
 					}
 					return make_pair(Estimator::GOING_DOWN,0);
@@ -111,9 +112,9 @@ namespace Injector{
 		}
 	}
 
-	void Estimator::update(Time time,Output out){
+	void Estimator::update(Time time,Output out,bool downsensor){
 		timer.update(time,0);
-		pair<Location,bool> n=next(location,timer.elapsed(),out);
+		pair<Location,bool> n=next(location,timer.elapsed(),out,downsensor);
 		if(n.second || n.first!=location) timer.update(time,1);
 		location=n.first;
 	}
@@ -221,14 +222,14 @@ int main(){
 	Estimator e;
 	cout<<e<<"\n";
 	assert(e.status()==RECOVERY);
-	e.update(0,OUTPUT_UP);
+	e.update(0,OUTPUT_UP,0);
 	assert(e.status()==SHOOTING);
 	//This doesn't actually est all transitions
 	Status last=e.status();
 	for(unsigned i=0;i<100;i++){
 		Time now=i/10.0;
 		Output out=control(e.estimate(),START);
-		e.update(now,out);
+		e.update(now,out,0);
 		if(e.status()!=last || 1){
 			cout<<"location="<<e.estimate()<<" ";
 			cout<<"status="<<e.status()<<"\n";
@@ -257,7 +258,7 @@ int main(){
 	for(auto location:locations()){
 		for(auto out:OUTPUTS){
 			for(float elapsed:{0,3}){
-				cout<<location<<" "<<out<<" "<<elapsed<<" "<<next(location,elapsed,out)<<"\n";
+				cout<<location<<" "<<out<<" "<<elapsed<<" "<<next(location,elapsed,out,0)<<"\n";
 			}
 		}
 	}

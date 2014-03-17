@@ -11,6 +11,7 @@
 #include "../input/panel2014.h"
 #include "../util/util.h"
 #include "toplevel_mode.h"
+#include <stdlib.h>
 
 using namespace std;
 
@@ -296,15 +297,16 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		Shooter_wheels::Status wheel;
 		wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;
 		wheel.bottom=in.jaguar[JAG_BOTTOM_FEEDBACK].speed;
-		est.update(in.now,in.robot_mode.enabled,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel);
+		bool downsensor=in.digital_io[1]==DI_1;
+		est.update(in.now,in.robot_mode.enabled,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel,downsensor);
 	}
 	
         // Turn on camera light in autonomous mode:
-        r.relay[1] = (in.robot_mode.autonomous) ? RELAY_01 : RELAY_00;
+        r.relay[6] = (in.robot_mode.autonomous) ? RELAY_01 : RELAY_00;
 
 	r=force(r);
 	
-	r.driver_station.lcd.line[0]="FieldRelative: " + fRel(field_relative.get());//as_string(field_relative.get());
+	r.driver_station.lcd.line[0]=as_string(panel.auto_mode);
 	r.driver_station.lcd.line[1]=as_string(r.jaguar[0]).substr(13, 20);
 	r.driver_station.lcd.line[2]=as_string(r.jaguar[1]).substr(13, 20);
 	r.driver_station.lcd.line[3]=as_string(r.jaguar[2]).substr(13, 20);
@@ -404,9 +406,11 @@ Control_status::Control_status next(
 
 	//if(autonomous_mode && !autonomous(status)){
 	if(autonomous_mode_start){
-		//TODO: Put the code to select which autonomous mode here.
-		//return AUTO_SPIN_UP;
-		return A2_SPIN_UP;
+		if(panel.auto_mode==Panel::DO_NOTHING)return DRIVE_W_BALL;
+		if(panel.auto_mode==Panel::ONE_BALL)return AUTO_SPIN_UP;
+		if(panel.auto_mode==Panel::TWO_BALL)return A2_SPIN_UP;
+		if(panel.auto_mode==Panel::MOVE)return A2_MOVE;
+		return DRIVE_W_BALL;
 	}
 
 	if(!autonomous_mode){
@@ -625,7 +629,7 @@ Shooter_wheels::Output shooter_output(Robot_outputs out){
 	return r;
 }
 
-void auto_test(){
+void auto_test(double automodeknob){
 	Main m;
 	Monitor<Robot_inputs> inputs;
 	Monitor<Main> state;
@@ -633,6 +637,7 @@ void auto_test(){
 	Shooter_sim shooter_sim;
 	for(unsigned i=0;i<1500;i++){
 		Robot_inputs in;
+		in.driver_station.analog[0]=automodeknob;
 		in.now=i/100.0;
 		in.robot_mode.autonomous=1;
 		in.robot_mode.enabled=1;
@@ -755,7 +760,10 @@ int main(){
 			cout<<control_status<<" "<<Toplevel::to_mode(control_status)<<"\n";
 		}
 	}
-	auto_test();
+	auto_test(.18);
+	auto_test(.51);
+	auto_test(.84);
+	auto_test(1.17);
 	mode_table();
 	mode_diagram();
 }

@@ -16,6 +16,14 @@ Mode_buttons::Mode_buttons():
 	catch_mode(0)
 {}
 
+ostream& operator<<(ostream& o,Panel::Auto_mode a){
+	if(a==Panel::DO_NOTHING)o<<"Auto-mode:DO_NOTHING";
+	if(a==Panel::ONE_BALL)o<<"Auto-mode:ONE_BALL";
+	if(a==Panel::TWO_BALL)o<<"Auto-mode:TWO_BALL";
+	if(a==Panel::MOVE)o<<"Auto-mode:MOVE";
+	return o;
+}
+	
 ostream& operator<<(ostream& o,Mode_buttons m){
 	o<<"Mode_buttons( ";
 	#define X(name) o<<""#name<<":"<<m.name<<" ";
@@ -31,7 +39,25 @@ ostream& operator<<(ostream& o,Mode_buttons m){
 	return o<<")";
 }
 
+vector<Panel::Auto_mode> automodes(){
+	vector<Panel::Auto_mode> a;
+	a.push_back(Panel::DO_NOTHING);
+	a.push_back(Panel::ONE_BALL);
+	a.push_back(Panel::TWO_BALL);
+	a.push_back(Panel::MOVE);
+	return a;
+}
+
+Panel::Auto_mode automodeconvert(int potin){
+	if(potin==0)return Panel::DO_NOTHING;
+	if(potin==1)return Panel::ONE_BALL;
+	if(potin==2)return Panel::TWO_BALL;
+	if(potin==3)return Panel::MOVE;
+	return Panel::DO_NOTHING;
+}
+
 Panel::Panel():
+	auto_mode(DO_NOTHING),
 	fire(0),
 	speed(0),
 	learn(0)
@@ -53,6 +79,7 @@ ostream& operator<<(ostream& o,Panel p){
 	X(injector)
 	//X(injector_arms)
 	X(ejector)
+	X(auto_mode)
 	#undef X
 	return o<<")";
 }
@@ -158,7 +185,10 @@ Maybe<Ejector::Output> interpret_ejector(int x){
 
 Panel interpret(Driver_station_input d){
 	Panel panel;
-	//all these assignments are just made up.  
+	{
+		int i=interpret_10_turn_pot(d.analog[0]/3.3*5);
+		panel.auto_mode=automodeconvert(i);
+	}
 	{
 		double x=d.analog[3];
 		panel.mode_buttons.drive_wo_ball=x>3.1;
@@ -180,12 +210,12 @@ Panel interpret(Driver_station_input d){
 	{
 		double x=d.analog[4];
 		if(x>2 && x<2.35) panel.injector=Injector::OUTPUT_UP;
-		if(x>1.65 && x<2) panel.ejector=Ejector::OUTPUT_UP;
+		if(x>1.75 && x<2) panel.ejector=Ejector::OUTPUT_UP;
 		if(x>2.7 && x<3.10) panel.collector_tilt=Collector_tilt::OUTPUT_UP;
 		if(x>2.35 && x<2.65) panel.collector_tilt=Collector_tilt::OUTPUT_DOWN;
 		if(x>1.35 && x<1.75) panel.collector=ON;
 		if(x>1.05 && x<1.35) panel.collector=REVERSE;
-		if(x>.35 && x<1.75) panel.learn=1;
+		if(x>.35 && x<1) panel.learn=1;
 	}
 	
 	//panel.learn=TBD
@@ -213,5 +243,6 @@ int main(){
 	for(unsigned i=0;i<50;i++){
 		interpret(driver_station_input_rand());
 	}
+	cout<<automodes()<<endl;
 }
 #endif

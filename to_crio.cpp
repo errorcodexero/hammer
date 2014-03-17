@@ -5,6 +5,73 @@
 #include "dio_control.h"
 #include "jag_control.h"
 
+void SendWOL (void)
+{
+    int udpSocket;
+    if ((udpSocket = socket(AF_INET, SOCK_DGRAM, 0)) == ERROR)
+    {
+        perror("Failed to create a UDP socket!");
+        exit(1);
+    }
+
+    // you need to set this so you can broadcast:
+    int broadcast = 1;
+    if (setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, reinterpret_cast<char*>(&broadcast), sizeof(broadcast)) == ERROR)
+    {
+        perror("setsockopt (SO_BROADCAST)");
+        exit(1);
+    }
+
+    struct sockaddr_in udpClient;
+    udpClient.sin_family      = AF_INET;
+    udpClient.sin_addr.s_addr = INADDR_ANY;
+    udpClient.sin_port        = 0;
+
+    if (bind(udpSocket, (struct sockaddr*) &udpClient, sizeof(udpClient)) == ERROR)
+    {
+        perror("Failed to bind the cRioServer port!");
+        close (udpSocket);
+        exit(1);
+    }
+
+    // build the magic packet:
+    //
+    //     6 * 255 or (0xff)
+    //    16 * MAC Address of target PC
+
+    unsigned char tosend[102];
+    unsigned char mac[6];
+
+    // first 6 bytes of 255:
+    for (int i = 0; i < 6; i++) 
+        tosend[i] = 0xFF;
+
+    // Store mac address of the NUC (ec:a8:6b:fe:fc:e6) :
+    mac[0] = 0xec;
+    mac[1] = 0xa8;
+    mac[2] = 0x6b;
+    mac[3] = 0xfe;
+    mac[4] = 0xfc;
+    mac[5] = 0xe6;
+
+    // append it 16 times to packet:
+    for(int i = 1; i <= 16; i++) 
+        memcpy(&tosend[i * 6], &mac, 6 * sizeof(unsigned char));
+
+    // set server end point (the broadcast addres):
+    struct sockaddr_in udpServer;
+    udpServer.sin_family      = AF_INET;
+    udpServer.sin_addr.s_addr = inet_addr("10.14.25.255");
+    udpServer.sin_port        = htons(9);
+
+    // send the packet:
+    sendto(udpSocket, reinterpret_cast<char*>(&tosend), sizeof(unsigned char) * 102, 0, (struct sockaddr*)&udpServer, sizeof(udpServer));
+
+    cerr << "Sent WOL packet to NUC." << endl;
+    
+    close(udpSocket);
+}
+
 Joystick_data read_joystick(DriverStation& ds,int port){
 	//I don't know what the DriverStation does when port is out of range.
 	Joystick_data r;
@@ -138,6 +205,9 @@ class To_crio
 public:
 	To_crio():error_code(0),skipped(0),lcd(NULL)
 	{
+		// Wake the NUC by sending a Wake-on-LAN magic UDP packet:
+		SendWOL();
+
 		int solenoid_module=find_solenoid_module();
 		for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
 			if(solenoid_module==-1){

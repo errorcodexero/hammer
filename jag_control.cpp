@@ -20,6 +20,10 @@ ostream& operator<<(ostream& o,Jag_control const& j){
 	return o;
 }
 
+bool dipapprox(Jaguar_output a,Jaguar_output b){
+	return fabs(a.P-b.P)<.001&&fabs(a.I-b.I)<.001&&fabs(a.D-b.D)<.001;
+}
+
 void Jag_control::init(int CANBusAddress){
 	assert(!jaguar);//initialization is only allowed once.
 	assert(mode==INIT);
@@ -63,11 +67,11 @@ void Jag_control::set(Jaguar_output a,bool enable){
 	const float kI = 0.005;
 	const float kD = 0.000;
 	if(a.controlSpeed){
-		if(mode!=SPEED){
+		if(mode!=SPEED||pidapprox(out,a)){
 			jaguar->ChangeControlMode(CANJaguar::kSpeed);
 			jaguar->SetSpeedReference(CANJaguar::kSpeedRef_Encoder);
 			jaguar->ConfigEncoderCodesPerRev(1);
-			jaguar->SetPID(kP,kI,kD);
+			jaguar->SetPID(a.P,a.I,a.D);
 			jaguar->EnableControl();
 			jaguar->SetExpiration(2.0);
 			jaguar->Set(a.speed,SYNC_GROUP);

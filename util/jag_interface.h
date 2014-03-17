@@ -5,10 +5,10 @@
 #include "maybe.h"
 
 struct Jaguar_output{
-	double speed,voltage;
 	float p;
 	float i;
 	float d;
+	double speed,voltage;
 	bool controlSpeed;
 	//0 = voltage
 	//1 = speed

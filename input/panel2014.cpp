@@ -23,6 +23,14 @@ ostream& operator<<(ostream& o,Panel::Auto_mode a){
 	if(a==Panel::MOVE)o<<"Auto-mode:MOVE";
 	return o;
 }
+
+ostream& operator<<(ostream& o,Panel::PIDselect a){
+	if(a==Panel::P)o<<"PID:P";
+	if(a==Panel::I)o<<"PID:I";
+	if(a==Panel::D)o<<"PID:D";
+	if(a==Panel::NONE)o<<"PID:NONE";
+	return o;
+}
 	
 ostream& operator<<(ostream& o,Mode_buttons m){
 	o<<"Mode_buttons( ";
@@ -48,6 +56,15 @@ vector<Panel::Auto_mode> automodes(){
 	return a;
 }
 
+vector<Panel::PIDselect> pids(){
+	vector<Panel::PIDselect> a;
+	a.push_back(Panel::P);
+	a.push_back(Panel::I);
+	a.push_back(Panel::D);
+	a.push_back(Panel::NONE);
+	return a;
+}
+
 Panel::Auto_mode automodeconvert(int potin){
 	if(potin==0)return Panel::DO_NOTHING;
 	if(potin==1)return Panel::ONE_BALL;
@@ -56,9 +73,18 @@ Panel::Auto_mode automodeconvert(int potin){
 	return Panel::DO_NOTHING;
 }
 
+Panel::PIDselect PIDconvert(int potin){
+	if(potin==4)return Panel::P;
+	if(potin==5)return Panel::I;
+	if(potin==6)return Panel::D;
+	return Panel::NONE;
+}
+
 Panel::Panel():
 	auto_mode(DO_NOTHING),
+	pidselect(NONE),
 	fire(0),
+	pidadjust(0),
 	speed(0),
 	learn(0)
 {}
@@ -80,6 +106,8 @@ ostream& operator<<(ostream& o,Panel p){
 	//X(injector_arms)
 	X(ejector)
 	X(auto_mode)
+	X(pidselect)
+	X(pidadjust)
 	#undef X
 	return o<<")";
 }
@@ -210,12 +238,13 @@ Panel interpret(Driver_station_input d){
 	{
 		double x=d.analog[4];
 		if(x>2 && x<2.35) panel.injector=Injector::OUTPUT_UP;
-		if(x>1.75 && x<2) panel.ejector=Ejector::OUTPUT_UP;
+		if(x>1.65 && x<2) panel.ejector=Ejector::OUTPUT_UP;
 		if(x>2.7 && x<3.10) panel.collector_tilt=Collector_tilt::OUTPUT_UP;
 		if(x>2.35 && x<2.65) panel.collector_tilt=Collector_tilt::OUTPUT_DOWN;
 		if(x>1.35 && x<1.75) panel.collector=ON;
 		if(x>1.05 && x<1.35) panel.collector=REVERSE;
-		if(x>.35 && x<1) panel.learn=1;
+		if(x>.4 && x<1.75) panel.learn=1;
+		if(x>.2&&x<.4)panel.pidadjust=1;
 	}
 	
 	//panel.learn=TBD
@@ -244,5 +273,6 @@ int main(){
 		interpret(driver_station_input_rand());
 	}
 	cout<<automodes()<<endl;
+	cout<<pids()<<endl;
 }
 #endif

@@ -237,6 +237,30 @@ ostream& operator<<(ostream& o,Log_entry a){
 	return o<<")";
 }
 
+Maybe<Log_entry> parse_log_entry(string s){
+	vector<string> v=split(s,',');
+	Log_entry r;
+	r.time=atof(v.at(0));
+	r.robot_mode.autonomous=atoi(v.at(1).c_str());
+	r.robot_mode.enabled=atoi(v.at(2).c_str());
+	{
+		Maybe<Joystick_data> m=Joystick_data::parse(v.at(3));
+		if(!m) return Maybe<Log_entry>();
+		r.driver_joystick=*m;
+	}
+	assert(0);
+	/*r.pressure_switch=
+	r.jaguar_in=
+	r.driver_station=
+	r.control_status=
+	r.wheel_calibration=
+	r.pwm[i]=
+	r.solenoid[i]=
+	r.relay[i]=
+	r.jaguar[i]=*/
+	return Maybe<Log_entry>(r);
+}
+
 Robot_outputs Main::operator()(Robot_inputs in){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
@@ -736,7 +760,7 @@ int main(){
 	float a;
 	getDistance(2);
 	for(float i = 0.26; i <= 3; i = i+0.5){
-		cout<<i << " \n"; 
+		cout<<i<<" \n"; 
 		getDistance(i);
 	}*/
 	/*cout<<timetowall(2.5,1)<<"\n";

@@ -267,12 +267,13 @@ Driver_station_input driver_station_input_rand(){
 
 int main(){
 	Panel p;
-	cout<<p<<"\n";
-	cout<<interpret(Driver_station_input())<<"\n";
+	//cout<<p<<"\n";
+	//cout<<interpret(Driver_station_input())<<"\n";
 	for(unsigned i=0;i<50;i++){
 		interpret(driver_station_input_rand());
 	}
-	cout<<automodes()<<endl;
-	cout<<pids()<<endl;
+	//cout<<automodes()<<endl;
+	//cout<<pids()<<endl;
+	cout<<Panel()<<endl;
 }
 #endif

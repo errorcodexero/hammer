@@ -7,10 +7,6 @@ using namespace std;
 
 Lcd_scroller::Lcd_scroller():top_line(0){}
 
-string format_string(string s,int top_line){
-	assert(0);
-}
-
 void Lcd_scroller::update(string const& s1,bool up_button,bool down_button){
 	if(up(up_button)){
 		if(top_line>0) top_line--;

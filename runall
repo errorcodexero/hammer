@@ -11,7 +11,7 @@ echo now running INPUT UTIL
 rm util
 cd ../control
 echo now running WHEEL RPMs TEST
-./wheel_rpms_test
+./wheelrpms_test
 rm wheelrpms
 echo now running BIST TEST
 ./bist_test

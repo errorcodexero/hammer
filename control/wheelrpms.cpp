@@ -127,7 +127,7 @@ void writeconfig(wheelcalib input){
 	wheelrpms.close();
 }
 
-#ifdef WHEEL_RPMS_TEST
+#ifdef WHEELRPMS_TEST
 int main(){	
 	wheelcalib rpms;
 	wheelcalib newcrow;

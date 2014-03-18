@@ -102,7 +102,7 @@ namespace Injector_arms{
 		return est;
 	}
 
-	bool operator!=(Estimator a,Estimator b){
+	bool operator!=(Estimator,Estimator){
 		assert(0);
 	}
 

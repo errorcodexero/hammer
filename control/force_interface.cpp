@@ -281,7 +281,7 @@ std::ostream& operator<<(std::ostream& o,Force_interface const& a){
 	return o<<")";
 }
 
-#ifdef TEST_FORCE_INTERFACE
+#ifdef FORCE_INTERFACE_TEST
 #include<cassert>
 
 int main(){

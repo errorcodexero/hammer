@@ -290,7 +290,7 @@ Maybe<Digital_in> parse_digital_in(string s){
 }
 
 Robot_inputs::Robot_inputs():
-	now(0)
+	now(0),orientation(0)
 {
 	for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
 		digital_io[i]=DI_OUTPUT;
@@ -323,7 +323,8 @@ bool operator==(Robot_inputs a,Robot_inputs b){
 			return 0;
 		}
 	}
-	return a.driver_station==b.driver_station;
+	if(a.driver_station!=b.driver_station) return 0;
+	return a.orientation==b.orientation;
 }
 
 bool operator!=(Robot_inputs a,Robot_inputs b){
@@ -351,6 +352,7 @@ ostream& operator<<(ostream& o,Robot_inputs a){
 		o<<a.jaguar[i];
 	}
 	o<<a.driver_station;
+	o<<" orientation:"<<a.orientation;
 	return o<<")";
 }
 

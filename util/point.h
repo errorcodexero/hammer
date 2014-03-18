@@ -2,6 +2,7 @@
 #define POINT_H
 
 #include<iosfwd>
+#include "interface.h"
 
 struct Pt{
 	double x,y;//feet
@@ -17,8 +18,6 @@ Pt& operator+=(Pt&,Pt);
 
 bool approx_equal(double,double);
 bool approx_equal(Pt,Pt);
-
-typedef double Rad;//radians
 
 Pt shift_axes_clockwise(Pt p,Rad theta);
 

@@ -38,7 +38,7 @@ In3 collector_tilt_volume(){
 
 In3 tank_volume(){
 	//am-2477 per the AndyMark website, (.5 L); we should double check that this is what we're using.
-	static const In3 SINGLE_TANK=30.5;
+	static const In3 SINGLE_TANK=66;
 
 	return SINGLE_TANK*3;
 }
@@ -196,7 +196,7 @@ namespace Pump_advanced{
 
 		//cout<<"elapsed:"<<elapsed<<"\n";
 
-		static const double PUMP_SPEED=1.8;//psi per second.  This is agrees with the manufacturer's documentation.
+		static const double PUMP_SPEED=1.8/2;//psi per second.  This is agrees with the manufacturer's documentation.
 		if(pump_out==Pump::ON){
 			psi+=elapsed*PUMP_SPEED;
 		}

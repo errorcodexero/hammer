@@ -307,7 +307,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	r=force(r);
 	
 	r.driver_station.lcd.line[0]=as_string(panel.auto_mode);
-	r.driver_station.lcd.line[1]=as_string(r.jaguar[0]).substr(13, 20);
+	r.driver_station.lcd.line[1]=as_string(r.jaguar[0]).substr(13, 20)+as_string(panel.pidselect);
 	r.driver_station.lcd.line[2]=as_string(r.jaguar[1]).substr(13, 20);
 	r.driver_station.lcd.line[3]=as_string(r.jaguar[2]).substr(13, 20);
 	r.driver_station.lcd.line[4]=as_string(r.jaguar[3]).substr(13, 20);

@@ -322,7 +322,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;
 		wheel.bottom=in.jaguar[JAG_BOTTOM_FEEDBACK].speed;
 		bool downsensor=in.digital_io[1]==DI_1;
-		est.update(in.now,in.robot_mode.enabled,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,gyro.angle(),wheel,downsensor);
+		est.update(in.now,in.robot_mode.enabled,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,in.orientation,wheel,downsensor);
 	}
 	
         // Turn on camera light in autonomous mode:
@@ -331,7 +331,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	r=force(r);
 	
 	r.driver_station.lcd.line[0]=as_string(panel.auto_mode);
-	r.driver_station.lcd.line[1]=as_string(r.jaguar[0]).substr(13, 20);
+	r.driver_station.lcd.line[1]=as_string(r.jaguar[0]).substr(13, 20)+as_string(panel.pidselect);
 	r.driver_station.lcd.line[2]=as_string(r.jaguar[1]).substr(13, 20);
 	r.driver_station.lcd.line[3]=as_string(r.jaguar[2]).substr(13, 20);
 	r.driver_station.lcd.line[4]=as_string(r.jaguar[3]).substr(13, 20);
@@ -760,7 +760,7 @@ int main(){
 	float a;
 	getDistance(2);
 	for(float i = 0.26; i <= 3; i = i+0.5){
-		cout<<i << " \n"; 
+		cout<<i<<" \n"; 
 		getDistance(i);
 	}*/
 	/*cout<<timetowall(2.5,1)<<"\n";

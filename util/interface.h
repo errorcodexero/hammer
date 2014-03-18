@@ -73,6 +73,7 @@ typedef enum{DI_OUTPUT,DI_0,DI_1} Digital_in;
 std::ostream& operator<<(std::ostream&,Digital_in);
 
 typedef float Volt;
+typedef double Rad; //radians, clockwise
 
 struct Robot_inputs{
 	Robot_mode robot_mode;
@@ -88,6 +89,7 @@ struct Robot_inputs{
 
 	Jaguar_input jaguar[Robot_outputs::CAN_JAGUARS];
 	Driver_station_input driver_station;
+	Rad orientation;
 
 	Robot_inputs();
 };

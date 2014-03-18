@@ -97,7 +97,8 @@ int read_joysticks(Robot_inputs &r){
 }
 
 int read_analog(Robot_inputs& r){
-	AnalogModule *am=AnalogModule::GetInstance(1);
+	return 0;
+	/*AnalogModule *am=AnalogModule::GetInstance(1);
 	if(am){
 		for(unsigned i=0;i<r.ANALOG_INPUTS;i++){
 			r.analog[i]=am->GetAverageVoltage(i+1);
@@ -109,7 +110,7 @@ int read_analog(Robot_inputs& r){
 			r.analog[i]=0;
 		}
 		return 64;
-	}
+	}*/
 }
 
 /*DriverStationEnhancedIO &get_driver_station(){
@@ -202,8 +203,9 @@ class To_crio
 	Jag_control jaguar[Robot_outputs::CAN_JAGUARS];
 	DriverStationLCD *lcd;
 	//NetworkTable *table;
+	Gyro *gyro;
 public:
-	To_crio():error_code(0),skipped(0),lcd(NULL)
+	To_crio():error_code(0),skipped(0),lcd(NULL),gyro(NULL)
 	{
 		// Wake the NUC by sending a Wake-on-LAN magic UDP packet:
 		SendWOL();
@@ -235,6 +237,12 @@ public:
 		if(!lcd) error_code|=512;
 
 		//table = NetworkTable::GetTable("crio");
+		gyro=new Gyro(1);
+		if(gyro){
+			gyro->InitGyro();
+		}else{
+			//TODO: Note this somehow.
+		}
 	}
 	
 	int set_solenoid(unsigned i,Solenoid_output v){
@@ -385,6 +393,9 @@ public:
 		}
 		for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
 			in.digital_io[i]=digital_io[i].get();
+		}
+		if(gyro){
+			in.orientation=gyro->getAngle();
 		}
 		run(in);
 

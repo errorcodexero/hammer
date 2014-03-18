@@ -24,7 +24,7 @@ struct Panel{
 	};
 	Auto_mode auto_mode;
 	enum PIDselect{
-		P,I,D,NONE
+		P,I,D,PID_NONE
 	};
 	PIDselect pidselect;
 	//presets

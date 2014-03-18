@@ -6,9 +6,8 @@
 
 using namespace std;
 
-Driver_station_input::Driver_station_input(){
+Driver_station_input::Driver_station_input():digital(0){
 	for(unsigned i=0;i<ANALOG_INPUTS;i++) analog[i]=0;
-	for(unsigned i=0;i<DIGITAL_INPUTS;i++) digital[i]=0;
 }
 
 Maybe<Driver_station_input> Driver_station_input::parse(string const& s){
@@ -132,12 +131,6 @@ Driver_station_output::Lcd format_for_lcd(string const& s){
 		r.line[i]=v[i];
 	}
 	return r;
-}
-
-Driver_station_output::Driver_station_output(){
-	for(unsigned i=0;i<DIGITAL_OUTPUTS;i++){
-		digital[i]=0;
-	}
 }
 
 bool operator==(Driver_station_output a,Driver_station_output b){

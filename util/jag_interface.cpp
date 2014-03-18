@@ -5,11 +5,7 @@
 
 using namespace std;
 
-Jaguar_output::Jaguar_output(){
-	speed = 0;
-	voltage = 0;
-	controlSpeed = false;
-}
+Jaguar_output::Jaguar_output():p(.3),i(.003),d(0),speed(0),voltage(0),controlSpeed(0){}
 
 Jaguar_output Jaguar_output::speedOut(double a){
 	Jaguar_output j;

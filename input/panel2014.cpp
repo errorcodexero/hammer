@@ -112,10 +112,6 @@ ostream& operator<<(ostream& o,Panel p){
 	return o<<")";
 }
 
-int demux27(double analog){
-	assert(0);
-}
-
 Calibration_target interpret_target(double f){
 	/*int x=a+2*b+4*c;
 	switch(x){

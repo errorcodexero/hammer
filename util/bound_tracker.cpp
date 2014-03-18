@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Bound_tracker::Bound_tracker():data(0){}
+Bound_tracker::Bound_tracker():min(strtod("NAN",NULL)),max(strtod("NAN",NULL)),data(0){}
 	
 void Bound_tracker::update(double v){
 	if(data){

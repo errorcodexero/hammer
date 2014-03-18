@@ -158,9 +158,6 @@ Joystick_data::Joystick_data(){
 	for(unsigned i=0;i<AXES;i++){
 		axis[i]=0;
 	}
-	for(unsigned i=0;i<BUTTONS;i++){
-		button[i]=0;
-	}
 }
 
 //int atoi(string s){ return ::atoi(s.c_str()); }

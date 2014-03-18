@@ -17,8 +17,6 @@ struct Driver_station_output{
 		std::string line[HEIGHT];
 	};
 	Lcd lcd;
-
-	Driver_station_output();
 };
 bool operator==(Driver_station_output::Lcd,Driver_station_output::Lcd);
 bool operator!=(Driver_station_output::Lcd,Driver_station_output::Lcd);

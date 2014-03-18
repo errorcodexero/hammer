@@ -131,9 +131,8 @@ namespace Fire_control{
 		if(target == EJECT && goal == OTHER) {throw "error1";}
 		throw "Unknown";
 	}
-
 	
-	Goal next_goal(Goal g,bool ready,bool fired,bool prep_button,bool fire_button,bool fire_when_ready_button){
+	/*Goal next_goal(Goal g,bool ready,bool fired,bool prep_button,bool fire_button,bool fire_when_ready_button){
 		if(fire_button) return FIRE;
 		switch(g){
 			case PREP:
@@ -147,14 +146,14 @@ namespace Fire_control{
 			case DRIVE://why are we in here?
 			default: assert(0);
 		}
-	}
+	}*/
 
-	Control_status::Control_status next(Control_status::Control_status cs,bool ready,bool fired,bool prep_button,bool fire_button,bool fire_when_ready_button){
+	/*Control_status::Control_status next(Control_status::Control_status cs,bool ready,bool fired,bool prep_button,bool fire_button,bool fire_when_ready_button){
 		Target t=target(cs);
 		Goal g=goal(cs);
 		cout<<t<<" "<<g<<"\n";
 		assert(0);
-	}
+	}*/
 
 	vector<Fire_control::Goal> goals(){
 		vector<Fire_control::Goal> r;

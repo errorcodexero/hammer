@@ -215,7 +215,7 @@ struct Log_entry{
 
 ostream& operator<<(ostream& o,Log_entry a){
 	o<<"Log_entry(";
-	#define X(name)
+	#define X(name) o<<""#name<<":"<<a.name<<" ";
 	X(time)
 	X(robot_mode)
 	X(driver_joystick)

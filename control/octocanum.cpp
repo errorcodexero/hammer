@@ -108,7 +108,7 @@ std::ostream& operator<<(std::ostream& o,Octocanum_mode m){
 	}
 }
 
-double portion_done(Octocanum_mode mode,bool goal_traction,Time elapsed){
+double portion_done(Octocanum_mode mode,bool /*goal_traction*/,Time elapsed){
 	switch(mode){
 		case TO_TRACTION: return elapsed/.5;
 		case TO_MECH: return elapsed/.75;

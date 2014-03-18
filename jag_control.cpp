@@ -2,6 +2,7 @@
 #include "WPILib.h"
 #include<iostream>
 #include<cassert>
+#include<math.h>
 
 using namespace std;
 
@@ -20,8 +21,8 @@ ostream& operator<<(ostream& o,Jag_control const& j){
 	return o;
 }
 
-bool dipapprox(Jaguar_output a,Jaguar_output b){
-	return fabs(a.P-b.P)<.001&&fabs(a.I-b.I)<.001&&fabs(a.D-b.D)<.001;
+bool pidapprox(Jaguar_output a,Jaguar_output b){
+	return fabs((a.p-b.p)<.001&&fabs(a.i-b.i)<.001&&fabs(a.d-b.d)<.001);
 }
 
 void Jag_control::init(int CANBusAddress){
@@ -63,15 +64,17 @@ void Jag_control::set(Jaguar_output a,bool enable){
 			return;
 		}
 	}
-	const float kP = 1.000;
-	const float kI = 0.005;
+	//const float kP = 1.000;
+	//const float kI = 0.005;
+	const float kP = .3000;
+	const float kI = 0.003;
 	const float kD = 0.000;
 	if(a.controlSpeed){
 		if(mode!=SPEED||pidapprox(out,a)){
 			jaguar->ChangeControlMode(CANJaguar::kSpeed);
 			jaguar->SetSpeedReference(CANJaguar::kSpeedRef_Encoder);
 			jaguar->ConfigEncoderCodesPerRev(1);
-			jaguar->SetPID(a.P,a.I,a.D);
+			jaguar->SetPID(a.p,a.i,a.d);
 			jaguar->EnableControl();
 			jaguar->SetExpiration(2.0);
 			jaguar->Set(a.speed,SYNC_GROUP);

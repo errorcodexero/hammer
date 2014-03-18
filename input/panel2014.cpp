@@ -28,7 +28,7 @@ ostream& operator<<(ostream& o,Panel::PIDselect a){
 	if(a==Panel::P)o<<"PID:P";
 	if(a==Panel::I)o<<"PID:I";
 	if(a==Panel::D)o<<"PID:D";
-	if(a==Panel::NONE)o<<"PID:NONE";
+	if(a==Panel::PID_NONE)o<<"PID:PID_NONE";
 	return o;
 }
 	
@@ -61,7 +61,7 @@ vector<Panel::PIDselect> pids(){
 	a.push_back(Panel::P);
 	a.push_back(Panel::I);
 	a.push_back(Panel::D);
-	a.push_back(Panel::NONE);
+	a.push_back(Panel::PID_NONE);
 	return a;
 }
 
@@ -77,19 +77,19 @@ Panel::PIDselect PIDconvert(int potin){
 	if(potin==4)return Panel::P;
 	if(potin==5)return Panel::I;
 	if(potin==6)return Panel::D;
-	return Panel::NONE;
+	return Panel::PID_NONE;
 }
 
 Panel::Panel():
 	auto_mode(DO_NOTHING),
-	pidselect(NONE),
+	pidselect(PID_NONE),
 	fire(0),
 	pidadjust(0),
 	speed(0),
 	learn(0)
 {}
 
-ostream& operator<<(ostream& o,Panel p){
+ostream& operator<<(ostream& o,Panel p){	
 	o<<"Panel( ";
 	#define X(name) o<<""#name<<":"<<p.name<<" ";
 //	o<<p.mode_buttons;
@@ -183,7 +183,6 @@ Maybe<Collector_tilt::Output> interpret_collector_tilt(int x){
 		default: assert(0);
 	}
 }
-
 Maybe<Injector::Output> interpret_injector(int x){
 	switch(x){
 		case 0: return Maybe<Injector::Output>();
@@ -215,6 +214,7 @@ Panel interpret(Driver_station_input d){
 	Panel panel;
 	{
 		int i=interpret_10_turn_pot(d.analog[0]/3.3*5);
+		panel.pidselect=PIDconvert(i);
 		panel.auto_mode=automodeconvert(i);
 	}
 	{
@@ -267,12 +267,13 @@ Driver_station_input driver_station_input_rand(){
 
 int main(){
 	Panel p;
-	cout<<p<<"\n";
-	cout<<interpret(Driver_station_input())<<"\n";
+	//cout<<p<<"\n";
+	//cout<<interpret(Driver_station_input())<<"\n";
 	for(unsigned i=0;i<50;i++){
 		interpret(driver_station_input_rand());
 	}
-	cout<<automodes()<<endl;
-	cout<<pids()<<endl;
+	//cout<<automodes()<<endl;
+	//cout<<pids()<<endl;
+	cout<<Panel()<<endl;
 }
 #endif

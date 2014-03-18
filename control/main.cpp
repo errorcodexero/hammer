@@ -736,7 +736,7 @@ int main(){
 	float a;
 	getDistance(2);
 	for(float i = 0.26; i <= 3; i = i+0.5){
-		cout<<i << " \n"; 
+		cout<<i<<" \n"; 
 		getDistance(i);
 	}*/
 	/*cout<<timetowall(2.5,1)<<"\n";

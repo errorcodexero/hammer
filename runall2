@@ -6,12 +6,6 @@ from glob import glob
 
 #output stream -> void
 def makefile(out):
-	print>>out,'H_FILES=*.h */*.h'
-	print>>out,'CXX_FLAGS=-Wall -Wextra -Werror -std=c++0x'
-	print>>out,'.PHONY: clean'
-	print>>out,''
-	test_scripts=filter(lambda x: 'joystick_linux' not in x,glob('*/*_test'))
-
 	def get_base(test_script):
 		return test_script[:-5].split('/')[1]
 
@@ -22,6 +16,13 @@ def makefile(out):
 
 	def get_cppfile(test_script):
 		return get_dir(test_script)+'/'+get_base(test_script)+'.cpp'
+
+	test_scripts=filter(lambda x: 'joystick_linux' not in x,glob('*/*_test'))
+
+	print>>out,'H_FILES=*.h */*.h'
+	print>>out,'CXX_FLAGS=-Wall -Wextra -Werror -std=c++0x'
+	print>>out,'.PHONY: clean'
+	print>>out,''
 
 	print>>out,'all:',
 	for a in test_scripts: print>>out, get_target_name(a),
@@ -67,5 +68,7 @@ def makefile(out):
 
 if __name__=='__main__':
 	makefile(open('t.mk','w'))
-	import os
-	os.system('make -f t.mk -j && make -f t.mk clean')
+	import os,sys
+	r=os.system('make -f t.mk && make -f t.mk clean')
+	assert r&0xff==0
+	sys.exit(r>>8)

@@ -268,12 +268,12 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	Joystick_data gunner_joystick=in.joystick[1];
 	Joystick_data main_joystick=in.joystick[0];
 	force.update(
-		main_joystick.button[0],
-		main_joystick.button[4],
-		main_joystick.button[5],
-		main_joystick.button[6],
-		main_joystick.button[1],
-		main_joystick.button[2]
+		main_joystick.button[Gamepad_button::A],
+		main_joystick.button[Gamepad_button::LB],
+		main_joystick.button[Gamepad_button::RB],
+		main_joystick.button[Gamepad_button::BACK],
+		main_joystick.button[Gamepad_button::B],
+		main_joystick.button[Gamepad_button::X]
 	);
 
 

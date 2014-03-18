@@ -22,7 +22,7 @@ ostream& operator<<(ostream& o,Jag_control const& j){
 }
 
 bool pidapprox(Jaguar_output a,Jaguar_output b){
-	return fabs((a.p-b.p)<.001&&fabs(a.i-b.i)<.001&&fabs(a.d-b.d)<.001);
+	return fabs(a.p-b.p)<.001&&fabs(a.i-b.i)<.001&&fabs(a.d-b.d)<.001;
 }
 
 void Jag_control::init(int CANBusAddress){
@@ -70,7 +70,7 @@ void Jag_control::set(Jaguar_output a,bool enable){
 	const float kI = 0.003;
 	const float kD = 0.000;*/
 	if(a.controlSpeed){
-		if(mode!=SPEED||pidapprox(out,a)){
+		if(mode!=SPEED|| !pidapprox(out,a)){
 			jaguar->ChangeControlMode(CANJaguar::kSpeed);
 			jaguar->SetSpeedReference(CANJaguar::kSpeedRef_Encoder);
 			jaguar->ConfigEncoderCodesPerRev(1);
@@ -81,10 +81,11 @@ void Jag_control::set(Jaguar_output a,bool enable){
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 			jaguar->SetSafetyEnabled(true);
 			mode=SPEED;
-		}else if(a!=out || since_query==1){
+			out=a;
+		}else if(a.speed!=out.speed || since_query==1){
 			jaguar->Set(a.speed,SYNC_GROUP);
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
-			out=a;
+			out.speed=a.speed;
 		}
 	}else{
 		if(mode!=VOLTAGE){

@@ -23,11 +23,19 @@ Jaguar_output Jaguar_output::voltageOut(double a){
 
 Maybe<Jaguar_output> Jaguar_output::parse(std::string const& s){
 	Jaguar_output r;
-	vector<string> v=split(inside_parens(s),'=');
-	if(v.size()!=2) return Maybe<Jaguar_output>();
+	string s2=inside_parens(s);
+	vector<string> v=split(s2,'=');
 	if(v[0]=="speed"){
-		r=speedOut(atof(v[1]));
+		vector<string> v2=split(s2);
+		r=speedOut(0);
+		#define X(name,index) r.name=atof(split(v2.at(index),'=').at(1));
+		X(speed,0)
+		X(p,1)
+		X(i,2)
+		X(d,3)
+		#undef X
 	}else if(v[0]=="voltage"){
+		if(v.size()!=2) return Maybe<Jaguar_output>();
 		r=voltageOut(atof(v[1]));
 	}else{
 		return Maybe<Jaguar_output>();
@@ -36,6 +44,11 @@ Maybe<Jaguar_output> Jaguar_output::parse(std::string const& s){
 }
 
 bool operator==(Jaguar_output a,Jaguar_output b){
+	#define X(n) if(a.n!=b.n) return 0;
+	X(p)
+	X(i)
+	X(d)
+	#undef X
 	return a.speed==b.speed && a.voltage==b.voltage && a.controlSpeed==b.controlSpeed;
 }
 
@@ -46,11 +59,16 @@ bool operator!=(Jaguar_output a,Jaguar_output b){
 ostream& operator<<(ostream& o,Jaguar_output a){
 	o<<"Jaguar_output(";
 	if(a.controlSpeed){
-		o<<"speed="<<a.speed<<")";
-	} else{
-		o<<"voltage="<<a.voltage<<")";
+		o<<"speed="<<a.speed;
+		#define X(n) o<<" "#n<<"="<<a.n;
+		X(p)
+		X(i)
+		X(d)
+		#undef X
+	}else{
+		o<<"voltage="<<a.voltage;
 	}
-	return o;
+	return o<<")";
 }
 
 Jaguar_input::Jaguar_input():speed(0),current(0){}
@@ -105,6 +123,7 @@ int main(){
 	a.speed=2.33;
 	assert(a==Jaguar_input::parse(as_string(a)));
 	b=Jaguar_output::speedOut(3);
+	b.p=.444;
 	assert(b==Jaguar_output::parse(as_string(b)));
 }
 #endif

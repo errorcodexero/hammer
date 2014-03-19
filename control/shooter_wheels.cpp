@@ -33,7 +33,17 @@ namespace Shooter_wheels{
 		}
 		return o<<")";
 	}
-	
+
+	Goal::Goal(){}
+
+	Goal::Goal(High_level_goal a,Status b,PID_coefficients c):high_level(a),speed(b),pid(c){}
+
+	ostream& operator<<(ostream& o,Goal g){
+		o<<"Shooter_wheels::Goal(";
+		o<<g.high_level<<" "<<g.speed<<" "<<g.pid;
+		return o<<")";
+	}	
+
 	Calibration_manager::Calibration_manager(){
 		calib = readconfig();
 		//this could be done in a better way!
@@ -58,24 +68,27 @@ namespace Shooter_wheels{
 		}
 	}
 	
-	wheelcalib Calibration_manager::update(bool learn_button,double adjust_wheel,Calibration_target t){
-		wheelcalib r=calib;
-		double adjustment=((adjust_wheel/3.3)-.5)*2*100;
-		//cout<<"adjustment:"<<adjustment<<"\n";
-		find_rpm(r,t)+=adjustment;
-		if(learn(learn_button)){
-			//write changes to the file
-			calib=r;
-			writeconfig(r);
-			cerr<<"Learning now!\r\n";
+	std::pair<wheelcalib,PID_coefficients> Calibration_manager::update(bool learn_button,double adjust_wheel,Calibration_target t,Panel::PIDselect /*pidselect*/,bool /*pidadjust*/){
+		wheelcalib w=calib;
+		{
+			double adjustment=((adjust_wheel/3.3)-.5)*2*100;
+			//cout<<"adjustment:"<<adjustment<<"\n";
+			find_rpm(w,t)+=adjustment;
+			if(learn(learn_button)){
+				//write changes to the file
+				calib=w;
+				writeconfig(w);
+				cerr<<"Learning now!\r\n";
+			}
+			//cerr<<"direct_mode:"<<t.direct_mode<<"\r\n";
+			if(t.direct_mode){
+				double a2=adjust_wheel/3.3*4000;
+				w.highgoal.bottom=a2;
+				w.highgoal.top=a2-1250;
+			}
 		}
-		//cerr<<"direct_mode:"<<t.direct_mode<<"\r\n";
-		if(t.direct_mode){
-			double a2=adjust_wheel/3.3*4000;
-			r.highgoal.bottom=a2;
-			r.highgoal.top=a2-1250;
-		}
-		return r;
+		PID_coefficients pid;//TODO: Make this adjust.
+		return make_pair(w,pid);
 	}
 	
 	RPM target_speed_top(High_level_goal g,wheelcalib c){
@@ -123,10 +136,10 @@ namespace Shooter_wheels{
 		Output r;
 		//Jaguar_output top=Jaguar_output::voltageOut(.25),bottom=Jaguar_output::voltageOut(.6);
 		bool all_open_loop=0;
-		r.top[Output::FEEDBACK]=all_open_loop?open_loop(status.top,goal.second.top):Jaguar_output::speedOut(goal.second.top);
-		r.top[Output::OPEN_LOOP]=open_loop(status.top,goal.second.top);
-		r.bottom[Output::FEEDBACK]=all_open_loop?open_loop(status.bottom,goal.second.bottom):Jaguar_output::speedOut(goal.second.bottom);
-		r.bottom[Output::OPEN_LOOP]=open_loop(status.bottom,goal.second.bottom);
+		r.top[Output::FEEDBACK]=all_open_loop?open_loop(status.top,goal.speed.top):Jaguar_output::speedOut(goal.speed.top);
+		r.top[Output::OPEN_LOOP]=open_loop(status.top,goal.speed.top);
+		r.bottom[Output::FEEDBACK]=all_open_loop?open_loop(status.bottom,goal.speed.bottom):Jaguar_output::speedOut(goal.speed.bottom);
+		r.bottom[Output::OPEN_LOOP]=open_loop(status.bottom,goal.speed.bottom);
 		return r;
 	}
 
@@ -135,23 +148,26 @@ namespace Shooter_wheels{
 	}
 	
 	bool ready(Status status,Goal goal){
-		if(goal.first==Shooter_wheels::STOP || goal.first==Shooter_wheels::X || goal.first==Shooter_wheels::HIGH_GOAL_NONBLOCK) return 1;
+		if(goal.high_level==Shooter_wheels::STOP || goal.high_level==Shooter_wheels::X || goal.high_level==Shooter_wheels::HIGH_GOAL_NONBLOCK) return 1;
 		//this could be refined.
-		return goal.second.top>=status.top&&goal.second.top<=status.top+100&&goal.second.bottom>=status.bottom&&goal.second.bottom<=status.bottom+100;
+		return goal.speed.top>=status.top&&goal.speed.top<=status.top+100&&goal.speed.bottom>=status.bottom&&goal.speed.bottom<=status.bottom+100;
 	}
 	
-	Goal convert_goal(wheelcalib c,High_level_goal g){
+	//Goal convert_goal(wheelcalib /*c*/,PID_coefficients /*pid*/,High_level_goal /*g*/){
+	Goal convert_goal(Calibration cal,High_level_goal g){
+		wheelcalib c=cal.first;
+		PID_coefficients pid=cal.second;
 		switch(g){
 			case TRUSS:
-				return make_pair(g,c.overtruss); //Previously 1200
+				return Goal(g,c.overtruss,pid); //Previously 1200
 			case HIGH_GOAL:
 			case HIGH_GOAL_NONBLOCK:
-				return make_pair(g,c.highgoal); //Previously 3000
+				return Goal(g,c.highgoal,pid); //Previously 3000
 			case PASS:
-				return make_pair(g,c.lowgoal); //Previously 2200
+				return Goal(g,c.lowgoal,pid); //Previously 2200
 			case STOP:
 			case X:
-				return make_pair(g,Shooter_wheels::Status());
+				return Goal(g,Shooter_wheels::Status(),pid);
 			default: assert(0);
 		}
 	}
@@ -179,8 +195,8 @@ int main(){
 		cout<<"-----------------------\n";
 		for(double d:vector<double>{0,1.5,3.3}){
 			cout<<a<<"\n";
-			c.update(0,d,a);
-			cout<<c.update(1,d,a)-rpmsdefault()<<"\n";
+			c.update(0,d,a,Panel::P,0);
+			cout<<c.update(1,d,a,Panel::P,0).first-rpmsdefault()<<"\n";
 		}
 	}
 	

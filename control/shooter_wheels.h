@@ -6,6 +6,7 @@
 #include "../util/jag_interface.h"
 #include "calibration_target.h"
 #include "../util/posedge_trigger.h"
+#include "../input/panel2014.h"
 
 namespace Shooter_wheels{
 	enum High_level_goal{
@@ -20,21 +21,34 @@ namespace Shooter_wheels{
 	};
 	std::ostream& operator<<(std::ostream& o,Output);
 	
-	typedef std::pair<High_level_goal,Status> Goal;
+	struct Goal{
+		High_level_goal high_level;
+		Status speed;
+		PID_coefficients pid;
+
+		Goal();
+		Goal(High_level_goal,Status,PID_coefficients);
+	};
+	std::ostream& operator<<(std::ostream&,Goal);
 	Output control(Goal);
+
+	typedef std::pair<wheelcalib,PID_coefficients> Calibration;
 
 	struct Calibration_manager{
 		wheelcalib calib;
 		Posedge_trigger learn;
 		
+		PID_coefficients pid;
+		Posedge_trigger pidadjust;
+
 		Calibration_manager();
 		
 		//adjust wheel in 0-3.3
-		wheelcalib update(bool learn,double adjust_wheel,Calibration_target);
+		Calibration update(bool learn,double adjust_wheel,Calibration_target,Panel::PIDselect,bool pid_adjust);
 	};
 	std::ostream& operator<<(std::ostream&,Calibration_manager);
 	
-	Goal convert_goal(wheelcalib,High_level_goal);
+	Goal convert_goal(Calibration,High_level_goal);
 	Output control(Status,Goal);
 	bool ready(Status,Goal);
 

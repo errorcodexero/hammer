@@ -46,8 +46,8 @@ namespace Toplevel{
 		o<<" inj_arm:"<<g.injector_arms;
 		o<<" eject:"<<g.ejector;
 		o<<" shoot:";
-		o<<g.shooter_wheels.first;
-		o<<g.shooter_wheels.second;
+		o<<g.shooter_wheels;
+		//o<<g.shooter_wheels.second;
 		//o<<g.shooter_wheels; not sure why this line doesn't work.
 		o<<" drive:"<<g.drive;
 		return o<<")";

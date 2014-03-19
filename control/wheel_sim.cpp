@@ -204,7 +204,7 @@ void shooter_sim_test(){
 	calib.highgoal.top=0;
 	auto c=Shooter_wheels::control(
 		Shooter_wheels::Status(),
-		convert_goal(calib,Shooter_wheels::HIGH_GOAL)
+		convert_goal(make_pair(calib,PID_coefficients()),Shooter_wheels::HIGH_GOAL)
 	);
 	cout<<c<<"\n";
 	for(Time t=0;t<5;t+=.1){

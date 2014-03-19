@@ -5,7 +5,24 @@
 
 using namespace std;
 
-Jaguar_output::Jaguar_output():p(.3),i(.003),d(0),speed(0),voltage(0),controlSpeed(0){}
+PID_coefficients::PID_coefficients():p(.3),i(.003),d(0){}
+
+bool operator==(PID_coefficients a,PID_coefficients b){
+	#define X(n) if(a.n!=b.n) return 0;
+	X(p) X(i) X(d)
+	#undef X
+	return 1;
+}
+
+bool operator!=(PID_coefficients a,PID_coefficients b){
+	return !(a==b);
+}
+
+ostream& operator<<(ostream& o,PID_coefficients p){
+	return o<<"PID_constants("<<p.p<<" "<<p.i<<" "<<p.d<<")";
+}
+
+Jaguar_output::Jaguar_output():speed(0),voltage(0),controlSpeed(0){}
 
 Jaguar_output Jaguar_output::speedOut(double a){
 	Jaguar_output j;
@@ -30,9 +47,9 @@ Maybe<Jaguar_output> Jaguar_output::parse(std::string const& s){
 		r=speedOut(0);
 		#define X(name,index) r.name=atof(split(v2.at(index),'=').at(1));
 		X(speed,0)
-		X(p,1)
-		X(i,2)
-		X(d,3)
+		X(pid.p,1)
+		X(pid.i,2)
+		X(pid.d,3)
 		#undef X
 	}else if(v[0]=="voltage"){
 		if(v.size()!=2) return Maybe<Jaguar_output>();
@@ -45,9 +62,7 @@ Maybe<Jaguar_output> Jaguar_output::parse(std::string const& s){
 
 bool operator==(Jaguar_output a,Jaguar_output b){
 	#define X(n) if(a.n!=b.n) return 0;
-	X(p)
-	X(i)
-	X(d)
+	X(pid)
 	#undef X
 	return a.speed==b.speed && a.voltage==b.voltage && a.controlSpeed==b.controlSpeed;
 }
@@ -61,9 +76,9 @@ ostream& operator<<(ostream& o,Jaguar_output a){
 	if(a.controlSpeed){
 		o<<"speed="<<a.speed;
 		#define X(n) o<<" "#n<<"="<<a.n;
-		X(p)
-		X(i)
-		X(d)
+		X(pid.p)
+		X(pid.i)
+		X(pid.d)
 		#undef X
 	}else{
 		o<<"voltage="<<a.voltage;
@@ -123,7 +138,8 @@ int main(){
 	a.speed=2.33;
 	assert(a==Jaguar_input::parse(as_string(a)));
 	b=Jaguar_output::speedOut(3);
-	b.p=.444;
+	b.pid.p=.444;
 	assert(b==Jaguar_output::parse(as_string(b)));
+	cout<<PID_coefficients()<<"\n";
 }
 #endif

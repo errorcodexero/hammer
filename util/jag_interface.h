@@ -4,10 +4,17 @@
 #include<iosfwd>
 #include "maybe.h"
 
+struct PID_coefficients{
+	float p,i,d;
+
+	PID_coefficients();
+};
+bool operator==(PID_coefficients,PID_coefficients);
+bool operator!=(PID_coefficients,PID_coefficients);
+std::ostream& operator<<(std::ostream&,PID_coefficients);
+
 struct Jaguar_output{
-	float p;
-	float i;
-	float d;
+	PID_coefficients pid;
 	double speed,voltage;
 	bool controlSpeed;
 	//0 = voltage

@@ -62,7 +62,7 @@ Robot_outputs convert_output(Toplevel::Output a){
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
 Main::Main():control_status(Control_status::DRIVE_W_BALL),autonomous_start(0){}
 
-Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch,wheelcalib);
+Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch,Shooter_wheels::Calibration);
 
 Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
 	double throttle = .7+.3*fabs(joy_throttle);
@@ -281,7 +281,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	bool tanks_full=(in.digital_io[0]==DI_1);
 
 	Panel panel=interpret(in.driver_station);	
-	wheelcalib calib=wheel_calibration.update(panel.learn,panel.speed,panel.target);
+	Shooter_wheels::Calibration calib=wheel_calibration.update(panel.learn,panel.speed,panel.target,panel.pidselect,panel.pidadjust);
 	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	Toplevel::Status toplevel_status=est.estimate();
 	Control_status::Control_status control_status_next=next(
@@ -325,8 +325,8 @@ Robot_outputs Main::operator()(Robot_inputs in){
 		est.update(in.now,in.robot_mode.enabled,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,in.orientation,wheel,downsensor);
 	}
 	
-        // Turn on camera light in autonomous mode:
-        r.relay[6] = (in.robot_mode.autonomous) ? RELAY_01 : RELAY_00;
+	// Turn on camera light in autonomous mode:
+	r.relay[1]=r.relay[6]=(in.robot_mode.autonomous) ? RELAY_01 : RELAY_00;
 
 	r=force(r);
 	
@@ -424,7 +424,7 @@ Control_status::Control_status next(
 	bool autonomous_mode,
 	bool autonomous_mode_start,
 	Time since_switch,
-	wheelcalib calib
+	Shooter_wheels::Calibration calib
 ){
 	using namespace Control_status;
 
@@ -734,7 +734,7 @@ void mode_diagram(){
 void check_auto_modes_end(){
 	for(auto control_status:Control_status::all()){
 		if(teleop(control_status)) continue;
-		auto n=next(control_status,Toplevel::Status(),Joystick_data(),Panel(),0,0,0,wheelcalib());
+		auto n=next(control_status,Toplevel::Status(),Joystick_data(),Panel(),0,0,0,Shooter_wheels::Calibration());
 		cout<<control_status<<"	"<<n<<endl;
 		assert(teleop(n));
 	}

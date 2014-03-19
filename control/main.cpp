@@ -261,7 +261,7 @@ Maybe<Log_entry> parse_log_entry(string s){
 	return Maybe<Log_entry>(r);
 }
 
-Robot_outputs Main::operator()(Robot_inputs in){
+Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
 	since_switch.update(in.now,0);
@@ -286,13 +286,14 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	Toplevel::Status toplevel_status=est.estimate();
 	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
 	since_auto_start.update(in.now,autonomous_start_now);
+	static const Time AUTONOMOUS_MODE_LENGTH=10;
 	Control_status::Control_status control_status_next=next(
 		control_status,toplevel_status,gunner_joystick,panel,
 		in.robot_mode.autonomous,
 		autonomous_start_now,
 		since_switch.elapsed(),
 		calib,
-		10-since_auto_start.elapsed()
+		AUTONOMOUS_MODE_LENGTH-since_auto_start.elapsed()
 	);
 	if(control_status_next!=control_status){
 		since_switch.update(in.now,1);
@@ -682,7 +683,8 @@ Shooter_wheels::Output shooter_output(Robot_outputs out){
 	return r;
 }
 
-void auto_test(double automodeknob){
+vector<Control_status::Control_status> auto_test(ostream& o,double automodeknob){
+	vector<Control_status::Control_status> v;
 	Main m;
 	Monitor<Robot_inputs> inputs;
 	Monitor<Main> state;
@@ -698,17 +700,20 @@ void auto_test(double automodeknob){
 		in.jaguar[JAG_TOP_FEEDBACK]=jag_at_speed(shooter_sim.estimate().top);
 		//in.jaguar[JAG_BOTTOM_OPEN_LOOP]=
 		in.jaguar[JAG_BOTTOM_FEEDBACK]=jag_at_speed(shooter_sim.estimate().bottom);
-		auto out_now=m(in);
+		stringstream ss;
+		auto out_now=m(in,ss);
 		shooter_sim.update(in.now,shooter_output(out_now),out_now.solenoid[4]);
 		string change;
 		change+=inputs.update(in);
 		change+=state.update(m);
 		change+=outputs.update(out_now);
 		if(change.size()){
-			cout<<"Now="<<in.now<<"\n";
-			cout<<change<<"\n";
+			o<<"Now="<<in.now<<"\n";
+			o<<change<<"\n";
 		}
+		v.push_back(m.control_status);
 	}
+	return v;
 }
 
 void mode_table(){
@@ -779,6 +784,17 @@ void log_line_test(){
 	exit(1);
 }
 
+template<typename T>
+vector<T> uniq(vector<T> v){
+	vector<T> r;
+	for(auto a:v){
+		if( !(r.size() && r[r.size()-1]==a) ){
+			r|=a;
+		}
+	}
+	return r;
+}
+
 int main(){
 	//log_line_test();
 	check_auto_modes_end();
@@ -813,10 +829,14 @@ int main(){
 			cout<<control_status<<" "<<Toplevel::to_mode(control_status)<<"\n";
 		}
 	}
-	auto_test(.18);
-	auto_test(.51);
-	auto_test(.84);
-	auto_test(1.17);
+	auto a=auto_test(cout,.18);
+	auto b=auto_test(cout,.51);
+	auto c=auto_test(cout,.84);
+	auto d=auto_test(cout,1.17);
+	cout<<uniq(a)<<"\n";
+	cout<<uniq(b)<<"\n";
+	cout<<uniq(c)<<"\n";
+	cout<<uniq(d)<<"\n";
 	mode_table();
 	mode_diagram();
 }

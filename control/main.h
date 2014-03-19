@@ -28,7 +28,7 @@ struct Main{
 	Shooter_wheels::Calibration_manager wheel_calibration;
 	
 	Main();
-	Robot_outputs operator()(Robot_inputs);
+	Robot_outputs operator()(Robot_inputs,std::ostream& = std::cerr);
 };
 
 bool operator==(Main,Main);

@@ -29,15 +29,15 @@ static const int JAG_BOTTOM_FEEDBACK=3;
 static const int JAG_TOP_OPEN_LOOP=0;
 static const int JAG_BOTTOM_OPEN_LOOP=2;
 
-Robot_outputs convert_output(Toplevel::Output a){
+Robot_outputs convert_output(Toplevel::Output a, bool automode){
 	Robot_outputs r;
 	r.pwm[0]=pwm_convert(a.drive.a);
 	r.pwm[1]=pwm_convert(a.drive.b);
 	r.pwm[2]=pwm_convert(a.drive.c);
 	r.pwm[3]=convert_output(a.collector);
 	
-	r.relay[0]=(a.pump==Pump::ON)?RELAY_10:RELAY_00;
-
+	r.relay[0]=(a.pump==Pump::ON && !automode)?RELAY_10:RELAY_00;
+	
 	r.solenoid[0]=(a.collector_tilt==Collector_tilt::OUTPUT_DOWN);
 	r.solenoid[1]=(a.collector_tilt==Collector_tilt::OUTPUT_UP);
 	r.solenoid[2]=r.solenoid[3]=(a.injector==Injector::OUTPUT_DOWN);
@@ -316,7 +316,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	if(gunner_joystick.button[Gamepad_button::START]){
 		high_level_outputs.collector=REVERSE;
 	}
-	Robot_outputs r=convert_output(high_level_outputs);
+	Robot_outputs r=convert_output(high_level_outputs, in.robot_mode.autonomous);
 	{
 		Shooter_wheels::Status wheel;
 		wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;
@@ -327,6 +327,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	
 	// Turn on camera light in autonomous mode:
 	r.relay[1]=r.relay[6]=(in.robot_mode.autonomous) ? RELAY_01 : RELAY_00;
+	
 
 	r=force(r);
 	
@@ -478,12 +479,12 @@ Control_status::Control_status next(
 			if(autonomous_mode){
 				return ready_to_shoot?A2_FIRE:A2_SPIN_UP;
 			}
-			return SHOOT_HIGH_PREP;
+			return TRUSS_TOSS_PREP;
 		case A2_FIRE:
 			if(autonomous_mode){
 				return took_shot?A2_TO_COLLECT:A2_FIRE;
 			}
-			return SHOOT_HIGH;
+			return TRUSS_TOSS;
 		case A2_TO_COLLECT:
 			if(autonomous_mode){
 				return ready_to_collect?A2_COLLECT:A2_TO_COLLECT;
@@ -491,19 +492,19 @@ Control_status::Control_status next(
 			return COLLECT;
 		case A2_COLLECT:
 			if(autonomous_mode){
-				return (since_switch>2.4)?A2_SPIN_UP2:A2_COLLECT;
+				return (since_switch>1.4)?A2_SPIN_UP2:A2_COLLECT;
 			}
 			return COLLECT;
 		case A2_SPIN_UP2:
 			if(autonomous_mode){
 				return ready_to_shoot?A2_FIRE2:A2_SPIN_UP2;
 			}
-			return SHOOT_HIGH_PREP;
+			return TRUSS_TOSS_PREP;
 		case A2_FIRE2:
 			if(autonomous_mode){
 				return took_shot?A2_MOVE:A2_FIRE2;
 			}
-			return SHOOT_HIGH;
+			return TRUSS_TOSS;
 		case A2_MOVE:
 			if(autonomous_mode){
 				return (since_switch>1.5)?DRIVE_WO_BALL:A2_MOVE;
@@ -513,12 +514,12 @@ Control_status::Control_status next(
 			if(autonomous_mode){
 				return ready_to_shoot?AUTO_FIRE:AUTO_SPIN_UP;
 			}
-			return SHOOT_HIGH_PREP;
+			return TRUSS_TOSS_PREP;
 		case AUTO_FIRE:
 			if(autonomous_mode){
 				return took_shot?AUTO_TO_COLLECT:AUTO_FIRE;
 			}
-			return SHOOT_HIGH;
+			return TRUSS_TOSS;
 		case AUTO_TO_COLLECT:
 			if(autonomous_mode){
 				return ready_to_collect?AUTO_COLLECT:AUTO_TO_COLLECT;
@@ -534,12 +535,12 @@ Control_status::Control_status next(
 			if(autonomous_mode){
 				return ready_to_shoot?AUTO_FIRE2:AUTO_SPIN_UP2;
 			}
-			return SHOOT_HIGH_PREP;
+			return TRUSS_TOSS_PREP;
 		case AUTO_FIRE2:
 			if(autonomous_mode){
 				return took_shot?DRIVE_WO_BALL:AUTO_FIRE2;
 			}
-			return SHOOT_HIGH;
+			return TRUSS_TOSS;
 		case DRIVE_W_BALL:
 		case DRIVE_WO_BALL:
 			return status;

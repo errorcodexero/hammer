@@ -239,7 +239,7 @@ public:
 		//table = NetworkTable::GetTable("crio");
 		gyro=new Gyro(1);
 		if(gyro){
-			gyro->InitGyro();
+			//gyro->InitGyro();
 		}else{
 			//TODO: Note this somehow.
 		}
@@ -395,7 +395,7 @@ public:
 			in.digital_io[i]=digital_io[i].get();
 		}
 		if(gyro){
-			in.orientation=gyro->getAngle();
+			in.orientation=gyro->GetAngle();
 		}
 		run(in);
 

@@ -128,7 +128,7 @@ namespace Shooter_wheels{
 
 	Jaguar_output open_loop(RPM status,RPM goal){
 		if(goal>free_speed()) goal=free_speed();
-		if(status>.8*goal&&goal>1000) return Jaguar_output::voltageOut((goal/62.5+4.199)/100);
+		if(status>0.95*goal&&goal>1000) return Jaguar_output::voltageOut((goal/62.5+4.199)/100);
 		return Jaguar_output::voltageOut(goal>1000);
 	} 
 	
@@ -150,7 +150,7 @@ namespace Shooter_wheels{
 	bool ready(Status status,Goal goal){
 		if(goal.high_level==Shooter_wheels::STOP || goal.high_level==Shooter_wheels::X || goal.high_level==Shooter_wheels::HIGH_GOAL_NONBLOCK) return 1;
 		//this could be refined.
-		return goal.speed.top>=status.top&&goal.speed.top<=status.top+100&&goal.speed.bottom>=status.bottom&&goal.speed.bottom<=status.bottom+100;
+		return goal.speed.top>=status.top-50&&goal.speed.top<=status.top+100&&goal.speed.bottom>=status.bottom&&goal.speed.bottom<=status.bottom+100;
 	}
 	
 	//Goal convert_goal(wheelcalib /*c*/,PID_coefficients /*pid*/,High_level_goal /*g*/){
@@ -159,7 +159,7 @@ namespace Shooter_wheels{
 		PID_coefficients pid=cal.second;
 		switch(g){
 			case TRUSS:
-				return Goal(g,c.overtruss,pid); //Previously 1200
+				return Goal(g,c.lowgoal,pid); //Previously 1200 //PassLong Button uses lowgoal speeds
 			case HIGH_GOAL:
 			case HIGH_GOAL_NONBLOCK:
 				return Goal(g,c.highgoal,pid); //Previously 3000

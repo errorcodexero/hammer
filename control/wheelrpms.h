@@ -11,6 +11,8 @@ struct wheelcalib{
 	Shooter_wheels::Status passing;
 };
 
+bool operator==(wheelcalib,wheelcalib);
+bool operator!=(wheelcalib,wheelcalib);
 wheelcalib operator-(wheelcalib,wheelcalib);
 std::ostream& operator<<(std::ostream&,wheelcalib);
 

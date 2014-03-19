@@ -10,6 +10,18 @@
 
 using namespace std;
 
+bool operator==(wheelcalib a,wheelcalib b){
+	#define X(name) if(a.name!=b.name) return 0;
+	X(highgoal)
+	X(lowgoal)
+	X(overtruss)
+	X(passing)
+	#undef X
+	return 1;
+}
+
+bool operator!=(wheelcalib a,wheelcalib b){ return !(a==b); }
+
 wheelcalib operator-(wheelcalib a,wheelcalib b){
 	#define X(name) a.name-=b.name;
 	X(highgoal)

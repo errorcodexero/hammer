@@ -68,7 +68,7 @@ namespace Shooter_wheels{
 		}
 	}
 	
-	std::pair<wheelcalib,PID_coefficients> Calibration_manager::update(bool learn_button,double adjust_wheel,Calibration_target t,Panel::PIDselect /*pidselect*/,bool /*pidadjust*/){
+	Calibration Calibration_manager::update(bool learn_button,double adjust_wheel,Calibration_target t,Panel::PIDselect /*pidselect*/,bool /*pidadjust*/){
 		wheelcalib w=calib;
 		{
 			double adjustment=((adjust_wheel/3.3)-.5)*2*100;
@@ -89,6 +89,16 @@ namespace Shooter_wheels{
 		}
 		PID_coefficients pid;//TODO: Make this adjust.
 		return make_pair(w,pid);
+	}
+
+	bool operator==(Calibration_manager a,Calibration_manager b){
+		#define X(name) if(a.name!=b.name) return 0;
+		X(calib)
+		X(learn)
+		X(pid)
+		X(pidadjust)
+		#undef X
+		return 1;
 	}
 	
 	RPM target_speed_top(High_level_goal g,wheelcalib c){

@@ -62,7 +62,7 @@ Robot_outputs convert_output(Toplevel::Output a){
 //todo: at some point, might want to make this whatever is right to start autonomous mode.
 Main::Main():control_status(Control_status::DRIVE_W_BALL),autonomous_start(0){}
 
-Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch,Shooter_wheels::Calibration);
+Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch,Shooter_wheels::Calibration,Time autonomous_mode_left);
 
 Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
 	double throttle = .7+.3*fabs(joy_throttle);
@@ -284,12 +284,15 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	Shooter_wheels::Calibration calib=wheel_calibration.update(panel.learn,panel.speed,panel.target,panel.pidselect,panel.pidadjust);
 	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	Toplevel::Status toplevel_status=est.estimate();
+	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
+	since_auto_start.update(in.now,autonomous_start_now);
 	Control_status::Control_status control_status_next=next(
 		control_status,toplevel_status,gunner_joystick,panel,
 		in.robot_mode.autonomous,
-		autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled),
+		autonomous_start_now,
 		since_switch.elapsed(),
-		calib
+		calib,
+		10-since_auto_start.elapsed()
 	);
 	if(control_status_next!=control_status){
 		since_switch.update(in.now,1);
@@ -378,7 +381,18 @@ Robot_outputs Main::operator()(Robot_inputs in){
 }
 
 bool operator==(Main a,Main b){
-	return a.force==b.force && a.perf==b.perf && a.gyro==b.gyro && a.est==b.est && a.control_status==b.control_status && a.since_switch==b.since_switch && a.ball_collecter==b.ball_collecter && a.print_button==b.print_button && a.field_relative==b.field_relative;
+	return a.force==b.force && 
+		a.perf==b.perf && 
+		a.gyro==b.gyro && 
+		a.est==b.est && 
+		a.control_status==b.control_status && 
+		a.since_switch==b.since_switch && 
+		a.since_auto_start==b.since_auto_start &&
+		a.ball_collecter==b.ball_collecter && 
+		a.print_button==b.print_button && 
+		a.field_relative==b.field_relative && 
+		a.autonomous_start==b.autonomous_start && 
+		a.wheel_calibration==b.wheel_calibration;
 }
 
 bool operator!=(Main a,Main b){
@@ -393,6 +407,7 @@ ostream& operator<<(ostream& o,Main m){
 	o<<m.est;
 	o<<m.control_status;
 	o<<m.since_switch;
+	//since_auto_start
 	o<<m.wheel_calibration;
 	//o<<m.control;
 	//ball collector
@@ -425,7 +440,8 @@ Control_status::Control_status next(
 	bool autonomous_mode,
 	bool autonomous_mode_start,
 	Time since_switch,
-	Shooter_wheels::Calibration calib
+	Shooter_wheels::Calibration calib,
+	Time autonomous_time_left
 ){
 	using namespace Control_status;
 
@@ -474,40 +490,52 @@ Control_status::Control_status next(
 	bool ready_to_collect=ready(part_status,subgoals(Toplevel::COLLECT,Drive_goal(),calib));
 	bool took_shot=location_to_status(part_status.injector)==Injector::RECOVERY;
 	bool have_collected_question = false;
+
+	static const Time AUTO_DRIVE_TIME=1.5;
+	bool auto_almost_done=AUTO_DRIVE_TIME>=autonomous_time_left;
+
 	switch(status){
 		case A2_SPIN_UP:
 			if(autonomous_mode){
+				if(auto_almost_done) return A2_FIRE2;
 				return ready_to_shoot?A2_FIRE:A2_SPIN_UP;
 			}
 			return TRUSS_TOSS_PREP;
 		case A2_FIRE:
 			if(autonomous_mode){
+				if(auto_almost_done) return A2_FIRE2;
 				return took_shot?A2_TO_COLLECT:A2_FIRE;
 			}
 			return TRUSS_TOSS;
 		case A2_TO_COLLECT:
 			if(autonomous_mode){
+				if(auto_almost_done) return A2_MOVE;
 				return ready_to_collect?A2_COLLECT:A2_TO_COLLECT;
 			}
 			return COLLECT;
 		case A2_COLLECT:
 			if(autonomous_mode){
+				if(auto_almost_done) return A2_MOVE;
 				return (since_switch>1.4)?A2_SPIN_UP2:A2_COLLECT;
 			}
 			return COLLECT;
 		case A2_SPIN_UP2:
 			if(autonomous_mode){
+				if(auto_almost_done){
+					return (part_status.collector_tilt==Collector_tilt::STATUS_UP)?A2_FIRE2:A2_MOVE;
+				}
 				return ready_to_shoot?A2_FIRE2:A2_SPIN_UP2;
 			}
 			return TRUSS_TOSS_PREP;
 		case A2_FIRE2:
 			if(autonomous_mode){
+				if(auto_almost_done) return A2_MOVE;
 				return took_shot?A2_MOVE:A2_FIRE2;
 			}
 			return TRUSS_TOSS;
 		case A2_MOVE:
 			if(autonomous_mode){
-				return (since_switch>1.5)?DRIVE_WO_BALL:A2_MOVE;
+				return (since_switch>AUTO_DRIVE_TIME)?DRIVE_WO_BALL:A2_MOVE;
 			}
 			return DRIVE_WO_BALL;
 		case AUTO_SPIN_UP:
@@ -528,7 +556,7 @@ Control_status::Control_status next(
 		case AUTO_COLLECT:
 			if(autonomous_mode){
 				//this is a very non-scientific way of driving, and not really the right way to do this.
-				return (since_switch>2.4)?/*AUTO_SPIN_UP2*/DRIVE_WO_BALL:AUTO_COLLECT;
+				return (since_switch>AUTO_DRIVE_TIME)?/*AUTO_SPIN_UP2*/DRIVE_WO_BALL:AUTO_COLLECT;
 			}
 			return COLLECT;
 		case AUTO_SPIN_UP2:
@@ -735,7 +763,7 @@ void mode_diagram(){
 void check_auto_modes_end(){
 	for(auto control_status:Control_status::all()){
 		if(teleop(control_status)) continue;
-		auto n=next(control_status,Toplevel::Status(),Joystick_data(),Panel(),0,0,0,Shooter_wheels::Calibration());
+		auto n=next(control_status,Toplevel::Status(),Joystick_data(),Panel(),0,0,0,Shooter_wheels::Calibration(),10);
 		cout<<control_status<<"	"<<n<<endl;
 		assert(teleop(n));
 	}

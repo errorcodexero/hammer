@@ -46,6 +46,7 @@ namespace Shooter_wheels{
 		//adjust wheel in 0-3.3
 		Calibration update(bool learn,double adjust_wheel,Calibration_target,Panel::PIDselect,bool pid_adjust);
 	};
+	bool operator==(Calibration_manager,Calibration_manager);
 	std::ostream& operator<<(std::ostream&,Calibration_manager);
 	
 	Goal convert_goal(Calibration,High_level_goal);

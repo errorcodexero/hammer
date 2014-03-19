@@ -17,7 +17,7 @@ struct Main{
 	Toplevel::Estimator est;
 
 	Control_status::Control_status control_status;
-	Countup_timer since_switch;
+	Countup_timer since_switch,since_auto_start;
 
 	Posedge_toggle ball_collecter;
 	Posedge_trigger print_button;

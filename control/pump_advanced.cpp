@@ -197,7 +197,7 @@ namespace Pump_advanced{
 		//cout<<"elapsed:"<<elapsed<<"\n";
 
 		static const double PUMP_SPEED=1.8/2;//psi per second.  This is agrees with the manufacturer's documentation.
-		if(pump_out==Pump::ON){
+		if(pump_out==Pump::OUTPUT_ON){
 			psi+=elapsed*PUMP_SPEED;
 		}
 
@@ -237,7 +237,7 @@ namespace Pump_advanced{
 	}
 
 	Pump::Output control(PSI psi){
-		return (psi>=120)?Pump::OFF:Pump::ON;
+		return (psi>=120)?Pump::OUTPUT_OFF:Pump::OUTPUT_ON;
 	}
 }
 

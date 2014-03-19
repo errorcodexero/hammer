@@ -35,6 +35,7 @@ namespace Toplevel{
 		Injector_arms::Goal injector_arms;
 		Ejector::Goal ejector;
 		Shooter_wheels::Goal shooter_wheels;
+		Pump::Goal pump;
 		Drive_goal drive;
 		//pump omitted because it currently only has one goal.
 	};

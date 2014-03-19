@@ -8,14 +8,17 @@
 #include "../util/maybe.h"
 
 namespace Pump{
-	enum Output{ON,OFF};
+	enum Goal{GOAL_AUTO,GOAL_OFF};
+	std::ostream& operator<<(std::ostream&,Goal);
+
+	enum Output{OUTPUT_ON,OUTPUT_OFF};
 	std::ostream& operator<<(std::ostream&,Output);
 
 	enum Status{FULL,NOT_FULL};
 	std::ostream& operator<<(std::ostream&,Status);
 	Maybe<Status> parse_status(std::string const&);
 
-	Output control(Status);
+	Output control(Status,Goal);
 }
 
 #endif

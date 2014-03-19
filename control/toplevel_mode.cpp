@@ -21,6 +21,8 @@ namespace Toplevel{
 		X(EJECT)
 		X(CATCH)
 		//X(SHOOT_LOW)
+		X(SHOOT_HIGH_PREP_NO_PUMP)
+		X(SHOOT_HIGH_NO_PUMP)
 		#undef X
 		assert(0);
 	}
@@ -44,6 +46,7 @@ namespace Toplevel{
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_OPEN;
 				r.shooter_wheels=convert_goal(calib,Shooter_wheels::HIGH_GOAL_NONBLOCK);
+				r.pump=Pump::GOAL_OFF;//to make the spin up faster.
 				break;
 			case COLLECT:
 				r.collector=ON;
@@ -53,11 +56,16 @@ namespace Toplevel{
 				break;
 			case SHOOT_HIGH_PREP:
 			case SHOOT_HIGH:
+			case SHOOT_HIGH_PREP_NO_PUMP:
+			case SHOOT_HIGH_NO_PUMP:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
 				r.shooter_wheels=convert_goal(calib,Shooter_wheels::HIGH_GOAL);
-				if(m==SHOOT_HIGH){
+				if(m==SHOOT_HIGH || m==SHOOT_HIGH_NO_PUMP){
 					r.injector=Injector::START;
+				}
+				if(m==SHOOT_HIGH_PREP_NO_PUMP || m==SHOOT_HIGH_NO_PUMP){
+					r.pump=Pump::GOAL_OFF;
 				}
 				break;
 			case TRUSS_TOSS_PREP:
@@ -116,12 +124,12 @@ namespace Toplevel{
 			case Control_status::AUTO_COLLECT: return Toplevel::COLLECT;
 			case Control_status::AUTO_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP;
 			case Control_status::AUTO_FIRE2: return Toplevel::SHOOT_HIGH;		
-			case Control_status::A2_SPIN_UP: return Toplevel::SHOOT_HIGH_PREP;
-			case Control_status::A2_FIRE: return Toplevel::SHOOT_HIGH;
+			case Control_status::A2_SPIN_UP: return Toplevel::SHOOT_HIGH_PREP_NO_PUMP;
+			case Control_status::A2_FIRE: return Toplevel::SHOOT_HIGH_NO_PUMP;
 			case Control_status::A2_TO_COLLECT: return Toplevel::COLLECT_SPIN_UP;
 			case Control_status::A2_COLLECT: return Toplevel::COLLECT_SPIN_UP;
-			case Control_status::A2_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP;
-			case Control_status::A2_FIRE2: return Toplevel::SHOOT_HIGH;
+			case Control_status::A2_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP_NO_PUMP;
+			case Control_status::A2_FIRE2: return Toplevel::SHOOT_HIGH_NO_PUMP;
 			case Control_status::A2_MOVE: return Toplevel::DRIVE_WO_BALL;
 			case Control_status::DRIVE_W_BALL: return Toplevel::DRIVE_W_BALL;
 			case Control_status::DRIVE_WO_BALL: return Toplevel::DRIVE_WO_BALL;
@@ -174,6 +182,8 @@ namespace Toplevel{
 		PASS_PREP,PASS,
 		EJECT_PREP,EJECT,
 		CATCH, //SHOOT_LOW
+		SHOOT_HIGH_PREP_NO_PUMP,
+		SHOOT_HIGH_NO_PUMP
 	};
 }
 

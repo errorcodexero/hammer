@@ -29,14 +29,14 @@ static const int JAG_BOTTOM_FEEDBACK=3;
 static const int JAG_TOP_OPEN_LOOP=0;
 static const int JAG_BOTTOM_OPEN_LOOP=2;
 
-Robot_outputs convert_output(Toplevel::Output a, bool automode){
+Robot_outputs convert_output(Toplevel::Output a){
 	Robot_outputs r;
 	r.pwm[0]=pwm_convert(a.drive.a);
 	r.pwm[1]=pwm_convert(a.drive.b);
 	r.pwm[2]=pwm_convert(a.drive.c);
 	r.pwm[3]=convert_output(a.collector);
 	
-	r.relay[0]=(a.pump==Pump::ON && !automode)?RELAY_10:RELAY_00;
+	r.relay[0]=(a.pump==Pump::OUTPUT_ON)?RELAY_10:RELAY_00;
 	
 	r.solenoid[0]=(a.collector_tilt==Collector_tilt::OUTPUT_DOWN);
 	r.solenoid[1]=(a.collector_tilt==Collector_tilt::OUTPUT_UP);
@@ -316,7 +316,7 @@ Robot_outputs Main::operator()(Robot_inputs in){
 	if(gunner_joystick.button[Gamepad_button::START]){
 		high_level_outputs.collector=REVERSE;
 	}
-	Robot_outputs r=convert_output(high_level_outputs, in.robot_mode.autonomous);
+	Robot_outputs r=convert_output(high_level_outputs);
 	{
 		Shooter_wheels::Status wheel;
 		wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;

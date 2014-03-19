@@ -13,7 +13,7 @@ namespace Toplevel{
 		injector(Injector::OUTPUT_DOWN),
 		injector_arms(Injector_arms::OUTPUT_CLOSE),
 		ejector(Ejector::OUTPUT_DOWN),
-		pump(Pump::ON)
+		pump(Pump::OUTPUT_ON)
 	{}
 
 	ostream& operator<<(ostream& o,Output g){
@@ -34,8 +34,9 @@ namespace Toplevel{
 		collector_tilt(Collector_tilt::GOAL_UP),
 		injector(Injector::WAIT),
 		injector_arms(Injector_arms::GOAL_X),
-		ejector(Ejector::WAIT)
+		ejector(Ejector::WAIT),
 		//shooter_wheels(Shooter_wheels:)
+		pump(Pump::GOAL_AUTO)
 	{}
 
 	ostream& operator<<(ostream& o,Subgoals g){
@@ -49,6 +50,7 @@ namespace Toplevel{
 		o<<g.shooter_wheels;
 		//o<<g.shooter_wheels.second;
 		//o<<g.shooter_wheels; not sure why this line doesn't work.
+		o<<" pump:"<<g.pump;
 		o<<" drive:"<<g.drive;
 		return o<<")";
 	}
@@ -208,7 +210,7 @@ namespace Toplevel{
 		r.injector_arms=Injector_arms::control(status.injector_arms,g.injector_arms);
 		r.ejector=Ejector::control(status.ejector,g.ejector);
 		r.shooter_wheels=control(status.shooter_wheels,g.shooter_wheels);
-		r.pump=Pump::control(status.pump);
+		r.pump=Pump::control(status.pump,g.pump);
 		r.drive=::control(g.drive, status.orientation);
 		return r;
 	}

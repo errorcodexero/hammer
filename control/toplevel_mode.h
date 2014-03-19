@@ -15,6 +15,8 @@ namespace Toplevel{
 		EJECT_PREP,EJECT,
 		CATCH, //SHOOT_LOW
 		COLLECT_SPIN_UP,
+		SHOOT_HIGH_PREP_NO_PUMP,
+		SHOOT_HIGH_NO_PUMP
 	};
 	std::ostream& operator<<(std::ostream& o,Mode);
 

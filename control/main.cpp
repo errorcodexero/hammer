@@ -329,8 +329,8 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 		est.update(in.now,in.robot_mode.enabled,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,in.orientation,wheel,downsensor);
 	}
 	
-	// Turn on camera light in autonomous mode:
-	r.relay[1]=r.relay[6]=(in.robot_mode.autonomous) ? RELAY_01 : RELAY_00;
+	// Turn on camera light in autonomous mode (kForward):
+	r.relay[1]=r.relay[6]=(in.robot_mode.autonomous) ? RELAY_10 : RELAY_00;
 	
 
 	r=force(r);

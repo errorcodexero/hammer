@@ -169,7 +169,7 @@ namespace Shooter_wheels{
 		PID_coefficients pid=cal.second;
 		switch(g){
 			case TRUSS:
-				return Goal(g,c.lowgoal,pid); //Previously 1200 //PassLong Button uses lowgoal speeds
+				return Goal(g,c.overtruss,pid); //Previously 1200 //PassLong Button uses lowgoal speeds
 			case HIGH_GOAL:
 			case HIGH_GOAL_NONBLOCK:
 				return Goal(g,c.highgoal,pid); //Previously 3000

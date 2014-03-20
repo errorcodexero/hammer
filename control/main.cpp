@@ -362,7 +362,8 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 			ss<<"Gyro Value:"<<gyro.angle();
 			*/
 			ss<<in.driver_station<<"\r\n";
-			ss<<"\n"<<"Field Relative?:"<<field_relative.get()<<"\n";
+			ss<<"Field Relative?:"<<field_relative.get()<<"\n";
+			ss<<"Gyro ="<<in.orientation<<"\n";
 			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
 			//cerr<<subgoals_now<<high_level_outputs<<"\n";
 		}

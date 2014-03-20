@@ -56,24 +56,24 @@ namespace Toplevel{
 				break;
 			case SHOOT_HIGH_PREP:
 			case SHOOT_HIGH:
-			case SHOOT_HIGH_PREP_NO_PUMP:
-			case SHOOT_HIGH_NO_PUMP:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
 				r.shooter_wheels=convert_goal(calib,Shooter_wheels::HIGH_GOAL);
-				if(m==SHOOT_HIGH || m==SHOOT_HIGH_NO_PUMP){
+				if(m==SHOOT_HIGH){
 					r.injector=Injector::START;
 				}
-				if(m==SHOOT_HIGH_PREP_NO_PUMP || m==SHOOT_HIGH_NO_PUMP){
-					r.pump=Pump::GOAL_OFF;
-				}
 				break;
+			case SHOOT_HIGH_PREP_NO_PUMP:
+			case SHOOT_HIGH_NO_PUMP:
 			case TRUSS_TOSS_PREP:
 			case TRUSS_TOSS:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
 				r.shooter_wheels=convert_goal(calib,Shooter_wheels::TRUSS);
-				if(m==TRUSS_TOSS) r.injector=Injector::START;
+				if(m==TRUSS_TOSS || m==SHOOT_HIGH_NO_PUMP) r.injector=Injector::START;
+				if(m==SHOOT_HIGH_PREP_NO_PUMP || m==SHOOT_HIGH_NO_PUMP){
+									r.pump=Pump::GOAL_OFF;
+				}
 				break;
 			case PASS_PREP:
 			case PASS:

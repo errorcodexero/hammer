@@ -219,7 +219,7 @@ Panel interpret(Driver_station_input d){
 		panel.mode_buttons.drive_w_ball=(x<2.9 && x>2.6);
 		panel.mode_buttons.collect=(x<2.35 && x>2.05);
 		panel.mode_buttons.shoot_high=!d.digital[0];
-		panel.mode_buttons.pass=(x<1.8 && x>1.5);
+		panel.mode_buttons.truss_toss=(x<1.8 && x>1.5);
 		panel.mode_buttons.eject=(x<1.25 && x>.95);
 		panel.pass_now=(x<.7 && x>.4);
 	}

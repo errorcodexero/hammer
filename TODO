@@ -25,4 +25,5 @@ Ejector:
 	-Make second eject mode work (AUSTIN)
 AutoMode:
 	-lights for auto on the robot test
-	
+Shooter:
+	-Add down sensor to simulation

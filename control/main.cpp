@@ -500,7 +500,7 @@ Control_status::Control_status next(
 		case A2_SPIN_UP:
 			if(autonomous_mode){
 				if(auto_almost_done) return A2_FIRE2;
-				return ready_to_shoot?A2_FIRE:A2_SPIN_UP;
+				return ready_to_truss_toss?A2_FIRE:A2_SPIN_UP;
 			}
 			return TRUSS_TOSS_PREP;
 		case A2_FIRE:
@@ -526,7 +526,7 @@ Control_status::Control_status next(
 				if(auto_almost_done){
 					return (part_status.collector_tilt==Collector_tilt::STATUS_UP)?A2_FIRE2:A2_MOVE;
 				}
-				return ready_to_shoot?A2_FIRE2:A2_SPIN_UP2;
+				return ready_to_truss_toss?A2_FIRE2:A2_SPIN_UP2;
 			}
 			return TRUSS_TOSS_PREP;
 		case A2_FIRE2:

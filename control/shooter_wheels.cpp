@@ -34,7 +34,7 @@ namespace Shooter_wheels{
 		return o<<")";
 	}
 
-	Goal::Goal(){}
+	Goal::Goal():high_level(X){}
 
 	Goal::Goal(High_level_goal a,Status b,PID_coefficients c):high_level(a),speed(b),pid(c){}
 

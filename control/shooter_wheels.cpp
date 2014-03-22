@@ -105,9 +105,9 @@ namespace Shooter_wheels{
 		//this stuff eventually should come out of a config file.
 		switch(g){
 			case TRUSS:
-				return c.overtruss.top; //Previously 1200
+				return 1825;//c.overtruss.top; //Previously 1200
 			case HIGH_GOAL:
-				return c.highgoal.top; //Previously 1200
+				return 2900;//c.highgoal.top; //Previously 1200
 			case PASS:
 				return c.highgoal.top; //Previously 2200
 			case STOP:

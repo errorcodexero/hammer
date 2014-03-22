@@ -81,9 +81,10 @@ Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x
 		case Control_status::AUTO_COLLECT:
 		case Control_status::A2_MOVE:
 			r.direction.y=-1;
+			r.direction.theta = -0.1;
 			break;
 		case Control_status::A2_TO_COLLECT:
-			r.direction.y=.5;
+			r.direction.y=.4;
 		default:
 			//otherwise leave at the default, which is 0.
 			break;
@@ -450,7 +451,7 @@ Control_status::Control_status next(
 	//if(autonomous_mode && !autonomous(status)){
 	if(autonomous_mode_start){
 		if(panel.auto_mode==Panel::DO_NOTHING)return DRIVE_W_BALL;
-		if(panel.auto_mode==Panel::ONE_BALL)return AUTO_SPIN_UP;
+		if(panel.auto_mode==Panel::ONE_BALL)return A2_SPIN_UP;
 		if(panel.auto_mode==Panel::TWO_BALL)return A2_SPIN_UP;
 		if(panel.auto_mode==Panel::MOVE)return A2_MOVE;
 		return DRIVE_W_BALL;
@@ -518,7 +519,7 @@ Control_status::Control_status next(
 		case A2_COLLECT:
 			if(autonomous_mode){
 				if(auto_almost_done) return A2_MOVE;
-				return (since_switch>1.4)?A2_SPIN_UP2:A2_COLLECT;
+				return (since_switch>1.8)?A2_SPIN_UP2:A2_COLLECT;
 			}
 			return COLLECT;
 		case A2_SPIN_UP2:

@@ -58,7 +58,13 @@ Drive_motors holonomic_mix(double x,double y,double theta,double orientation,boo
 	else {
 		p=Pt(x,y,theta);
 	}
-	//cerr<<"FRel? "<<fieldRelative<<"\n"<<"Ori= "<<orientation<<"\n";
+	static int i = 0;
+	if(i==0){
+		cerr<<"Joy.x= "<<x<<" "<<"Joy.y= "<<y<<" "<<"Joystick.theta= "<<theta<<"\n";
+		cerr<<"P.x= "<<p.x<<" "<<"P.y= "<<p.y<<" "<<"P.theta= "<<p.theta<<"\n";	
+	}
+	i=(i+1)%500;
+	
 	return maximizeSpeed(func_inner(p.x,p.y,p.theta));
 }
 

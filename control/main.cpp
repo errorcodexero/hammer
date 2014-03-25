@@ -65,14 +65,20 @@ Main::Main():control_status(Control_status::DRIVE_W_BALL),autonomous_start(0){}
 Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,Panel,bool autonomous_mode,bool autonomous_mode_start,Time since_switch,Shooter_wheels::Calibration,Time autonomous_mode_left);
 
 Drive_goal teleop_drive_goal(double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
-	double throttle = .7+.3*fabs(joy_throttle);
+	double throttle = .7+.3*fabs(joy_throttle); //Robot always drives at 70% power when throttle is not engaged //Adds the final 30% as a percentage of the throttle
 	joy_x = clip(joy_x) * throttle;
 	joy_y = -clip(joy_y) * throttle;//Invert Y
-	joy_theta = clip(joy_theta) * 0.75;
+	joy_theta = clip(joy_theta) * 0.75; //Twist is only ever goes at 75% speed and is unaffected by throttle
 	return Drive_goal(Pt(joy_x,joy_y,joy_theta),field_relative);
 }
 
-Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x,double joy_y,double joy_theta,double joy_throttle,bool field_relative){
+Drive_goal drive_goal(Control_status::Control_status control_status,
+		double joy_x,
+		double joy_y,
+		double joy_theta,
+		double joy_throttle,
+		bool field_relative)
+{
 	if(teleop(control_status)){
 		return teleop_drive_goal(joy_x,joy_y,joy_theta,joy_throttle,field_relative);
 	}
@@ -80,8 +86,8 @@ Drive_goal drive_goal(Control_status::Control_status control_status,double joy_x
 	switch(control_status){
 		case Control_status::AUTO_COLLECT:
 		case Control_status::A2_MOVE:
-			r.direction.y=-1;
-			r.direction.theta = -0.1;
+			r.direction.y=-1; //Full power backwards
+			r.direction.theta = -0.1; //Slight twist to coutner the natrual twist from Holonomic drive base
 			break;
 		case Control_status::A2_TO_COLLECT:
 			r.direction.y=.4;
@@ -285,6 +291,8 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 	Shooter_wheels::Calibration calib=wheel_calibration.update(panel.learn,panel.speed,panel.target,panel.pidselect,panel.pidadjust);
 	//Control_status::Control_status next(Control_status::Control_status status,Toplevel::Status part_status,Joystick_data j,bool autonomous_mode,Time since_switch){
 	Toplevel::Status toplevel_status=est.estimate();
+	
+	//Autonomous 
 	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
 	since_auto_start.update(in.now,autonomous_start_now);
 	static const Time AUTONOMOUS_MODE_LENGTH=10;
@@ -358,17 +366,13 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 			stringstream ss;
 			ss<<in<<"\r\n";//<<*this<<"\r\n";
 			ss<<panel<<"\r\n";
-			/*
-			ss<<"Gyro Voltage"<<in.analog[0]<<" "<<"Update"<<gyro.center<<"\r\n";
-			ss<<"Gyro Value:"<<gyro.angle();
-			*/
 			ss<<in.driver_station<<"\r\n";
 			ss<<"Field Relative?:"<<field_relative.get()<<"\n";
 			ss<<"Gyro ="<<in.orientation<<"\n";
 			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
 			//cerr<<subgoals_now<<high_level_outputs<<"\n";
 		}
-		i=(i+1)%100;
+		i=(i+1)%500;
 	}
 	//cerr<<subgoals_now<<"\r\n";
 	//cerr<<toplevel_status<<"\r\n\r\n";

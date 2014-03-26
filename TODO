@@ -27,3 +27,7 @@ AutoMode:
 	-lights for auto on the robot test
 Shooter:
 	-Add down sensor to simulation
+To be tested:
+	-Spin up shooter and see if the shoot button glows when wheels come up to speed
+		~Has been noted as not happening, possibly the wheels are just beneath up to speed
+		~Possible error to autonomous.

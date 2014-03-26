@@ -2,6 +2,7 @@
 #include<iostream>
 #include<math.h>
 #include<cassert>
+#include"util.h"
 
 using namespace std;
 

@@ -8,6 +8,10 @@
 #include<sstream>
 #include "interface.h"
 
+#ifndef M_PI
+#define M_PI 3.1415
+#endif
+
 Pwm_output pwm_convert(double);
 
 int write_file(std::string const& filename,std::string const& contents);

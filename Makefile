@@ -1,7 +1,7 @@
 # -*- mode:Makefile -*-
 
-## Note: setenv WIND_BASE in the shell before 'make':
-## setenv WIND_BASE /home/tnagler/proj/frc/WindRiver/vxworks-6.3
+## Note: env var WIND_BASE is needed by the compiler
+export WIND_BASE:="/home/tnagler/proj/frc/WindRiver/vxworks-6.3"
 
 SILENT    = @
 

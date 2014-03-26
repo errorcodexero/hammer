@@ -337,9 +337,24 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 		bool downsensor=in.digital_io[1]==DI_1;
 		est.update(in.now,in.robot_mode.enabled,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,in.orientation,wheel,downsensor);
 	}
-	
+
+        // Print out wheel RPMs:
+        static int rpm_update_cnt = 0;
+	if (rpm_update_cnt == 20)
+        {
+            rpm_update_cnt = 0;
+            cerr << "top wheel rpm = " << in.jaguar[JAG_TOP_FEEDBACK].speed
+                 << "bottom wheel rpm = " << in.jaguar[JAG_BOTTOM_FEEDBACK].speed
+                 << endl;
+        }
+        else
+        {
+            rpm_update_cnt++;
+        }
+
 	// Turn on camera light in autonomous mode (kForward):
-	r.relay[1]=r.relay[6]=(in.robot_mode.autonomous) ? RELAY_10 : RELAY_00;
+        bool ledOn = in.robot_mode.autonomous || main_joystick.button[Gamepad_button::X];
+	r.relay[1] = r.relay[6] = (ledOn) ? RELAY_10 : RELAY_00;
 	
 
 	r=force(r);
@@ -369,7 +384,7 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 			ss<<in.driver_station<<"\r\n";
 			ss<<"Field Relative?:"<<field_relative.get()<<"\n";
 			ss<<"Gyro ="<<in.orientation<<"\n";
-			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
+//T:			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
 			//cerr<<subgoals_now<<high_level_outputs<<"\n";
 		}
 		i=(i+1)%500;

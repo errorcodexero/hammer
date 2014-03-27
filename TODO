@@ -6,6 +6,9 @@ Shooter wheels:
 	-Speed calibration
 	-Add fallback systems
 	-dynamic PID constant (Adrian)
+	-Remap some of the buttons to have high shot/auto shot/truss shot buttons
+	-See whether the hard coding for the auto shot is still in & if so remove it
+	-Figure out where we would need to add code if we wanted to do a staggered startup time for the different wheels
 Drivebase:
 	-Complete location estimate code (DYLAN)
 	-Calibrate and improve gyro (Austin)
@@ -27,7 +30,3 @@ AutoMode:
 	-lights for auto on the robot test
 Shooter:
 	-Add down sensor to simulation
-To be tested:
-	-Spin up shooter and see if the shoot button glows when wheels come up to speed
-		~Has been noted as not happening, possibly the wheels are just beneath up to speed
-		~Possible error to autonomous.

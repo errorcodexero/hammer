@@ -353,7 +353,8 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
         }
 
 	// Turn on camera light in autonomous mode (kForward):
-        bool ledOn = in.robot_mode.autonomous || main_joystick.button[Gamepad_button::X];
+	light.update ( main_joystick.button[Gamepad_button::X] );
+	bool ledOn = in.robot_mode.autonomous || light.get();
 	r.relay[1] = r.relay[6] = (ledOn) ? RELAY_10 : RELAY_00;
 	
 

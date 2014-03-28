@@ -24,7 +24,10 @@ struct Main{
 
 	Posedge_toggle field_relative;
 	Posedge_trigger autonomous_start;
-	
+
+	// Keeps track of light status
+	Posedge_toggle light;
+		
 	Shooter_wheels::Calibration_manager wheel_calibration;
 	
 	Main();

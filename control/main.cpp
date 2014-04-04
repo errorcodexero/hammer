@@ -340,17 +340,17 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 
         // Print out wheel RPMs:
         static int rpm_update_cnt = 0;
-	if (rpm_update_cnt == 20)
+/*	if (rpm_update_cnt == 100)
         {
             rpm_update_cnt = 0;
             cerr << "top wheel rpm = " << in.jaguar[JAG_TOP_FEEDBACK].speed
-                 << "bottom wheel rpm = " << in.jaguar[JAG_BOTTOM_FEEDBACK].speed
+                 << "	bottom wheel rpm = " << in.jaguar[JAG_BOTTOM_FEEDBACK].speed
                  << endl;
         }
         else
         {
             rpm_update_cnt++;
-        }
+        }*/
 
 	// Turn on camera light in autonomous mode (kForward):
 	light.update ( main_joystick.button[Gamepad_button::X] );
@@ -385,7 +385,7 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 			ss<<in.driver_station<<"\r\n";
 			ss<<"Field Relative?:"<<field_relative.get()<<"\n";
 			ss<<"Gyro ="<<in.orientation<<"\n";
-//T:			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
+			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
 			//cerr<<subgoals_now<<high_level_outputs<<"\n";
 		}
 		i=(i+1)%500;
@@ -443,14 +443,14 @@ ostream& operator<<(ostream& o,Main m){
 Fire_control::Target to_target(Joystick_section j,Mode_buttons mode_buttons){
 	switch(j){
 		case JOY_LEFT: return Fire_control::TRUSS;
-		case JOY_RIGHT: return Fire_control::PASS;
+		case JOY_RIGHT: return Fire_control::AUTO_SHOT;
 		case JOY_UP: return Fire_control::HIGH;
 		case JOY_DOWN: return Fire_control::EJECT;
 		default: break;
 	}
 	if(mode_buttons.truss_toss) return Fire_control::TRUSS;
 	if(mode_buttons.shoot_high) return Fire_control::HIGH;
-	if(mode_buttons.pass) return Fire_control::PASS;
+	if(mode_buttons.auto_shot) return Fire_control::AUTO_SHOT;
 	if(mode_buttons.eject) return Fire_control::EJECT;
 	return Fire_control::NO_TARGET;
 }
@@ -492,9 +492,9 @@ Control_status::Control_status next(
 			if(Fire_control::target(status)!=target && !autonomous_mode){
 				switch(target){
 					case Fire_control::TRUSS: return TRUSS_TOSS_PREP;
-					case Fire_control::PASS: return PASS_PREP;
 					case Fire_control::HIGH: return SHOOT_HIGH_PREP;
 					case Fire_control::EJECT: return EJECT_PREP;
+					case Fire_control::AUTO_SHOT:return AUTO_SHOT_PREP;
 					default: break;
 				}
 			}
@@ -509,8 +509,8 @@ Control_status::Control_status next(
 
 	bool ready_to_shoot=ready(part_status,subgoals(Toplevel::SHOOT_HIGH_PREP,Drive_goal(),calib));
 	bool ready_to_truss_toss=ready(part_status,subgoals(Toplevel::TRUSS_TOSS_PREP,Drive_goal(),calib));
-	bool ready_to_pass=ready(part_status,subgoals(Toplevel::PASS_PREP,Drive_goal(),calib));
 	bool ready_to_collect=ready(part_status,subgoals(Toplevel::COLLECT,Drive_goal(),calib));
+	bool ready_to_auto_shot=ready(part_status,subgoals(Toplevel::AUTO_SHOT_PREP,Drive_goal(),calib));
 	bool took_shot=location_to_status(part_status.injector)==Injector::RECOVERY;
 	bool have_collected_question = false;
 
@@ -521,7 +521,7 @@ Control_status::Control_status next(
 		case A2_SPIN_UP:
 			if(autonomous_mode){
 				if(auto_almost_done) return A2_FIRE2;
-				return ready_to_truss_toss?A2_FIRE:A2_SPIN_UP;
+				return ready_to_auto_shot?A2_FIRE:A2_SPIN_UP;
 			}
 			return TRUSS_TOSS_PREP;
 		case A2_FIRE:
@@ -547,7 +547,7 @@ Control_status::Control_status next(
 				if(auto_almost_done){
 					return (part_status.collector_tilt==Collector_tilt::STATUS_UP)?A2_FIRE2:A2_MOVE;
 				}
-				return ready_to_truss_toss?A2_FIRE2:A2_SPIN_UP2;
+				return ready_to_auto_shot?A2_FIRE2:A2_SPIN_UP2;
 			}
 			return TRUSS_TOSS_PREP;
 		case A2_FIRE2:
@@ -563,7 +563,7 @@ Control_status::Control_status next(
 			return DRIVE_WO_BALL;
 		case AUTO_SPIN_UP:
 			if(autonomous_mode){
-				return ready_to_shoot?AUTO_FIRE:AUTO_SPIN_UP;
+				return ready_to_auto_shot?AUTO_FIRE:AUTO_SPIN_UP;
 			}
 			return TRUSS_TOSS_PREP;
 		case AUTO_FIRE:
@@ -584,7 +584,7 @@ Control_status::Control_status next(
 			return COLLECT;
 		case AUTO_SPIN_UP2:
 			if(autonomous_mode){
-				return ready_to_shoot?AUTO_FIRE2:AUTO_SPIN_UP2;
+				return ready_to_auto_shot?AUTO_FIRE2:AUTO_SPIN_UP2;
 			}
 			return TRUSS_TOSS_PREP;
 		case AUTO_FIRE2:
@@ -631,23 +631,6 @@ Control_status::Control_status next(
 				return TRUSS_TOSS_PREP;
 			}
 			return ready_to_truss_toss?TRUSS_TOSS:TRUSS_TOSS_WHEN_READY;
-		case PASS_PREP: 
-			if(fire_now){
-				return PASS;
-			}
-			if(fire_when_ready){
-				return PASS_WHEN_READY;
-			}
-			return PASS_PREP;
-		case PASS: return took_shot?DRIVE_WO_BALL:PASS;
-		case PASS_WHEN_READY: 
-			if(fire_now){
-				return PASS;
-			}
-			if(!fire_when_ready){
-				return PASS_PREP;
-			}
-			return ready_to_pass?PASS:PASS_WHEN_READY;
 		case EJECT_PREP: 
 			if(fire_now){
 				return EJECT;
@@ -662,6 +645,23 @@ Control_status::Control_status next(
 			bool ready_to_eject=(location_to_status(part_status.ejector)==Ejector::IDLE);
 			return ready_to_eject?EJECT:EJECT_WHEN_READY;
 		}
+		case AUTO_SHOT_PREP: 
+					if(fire_now){
+						return AUTO_SHOT;
+					}
+					if(fire_when_ready){
+						return AUTO_SHOT_WHEN_READY;
+					}
+					return AUTO_SHOT_PREP;
+				case AUTO_SHOT: return took_shot?DRIVE_WO_BALL:AUTO_SHOT;
+				case AUTO_SHOT_WHEN_READY: 
+					if(fire_now){
+						return AUTO_SHOT;
+					}
+					if(!fire_when_ready){
+						return AUTO_SHOT_PREP;
+					}
+					return ready_to_auto_shot?AUTO_SHOT:AUTO_SHOT_WHEN_READY;
 		case CATCH: return status;
 		default:
 			assert(0);

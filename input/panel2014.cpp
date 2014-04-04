@@ -11,9 +11,9 @@ Mode_buttons::Mode_buttons():
 	collect(0),
 	shoot_high(0),
 	truss_toss(0),
-	pass(0),
 	eject(0),
-	catch_mode(0)
+	catch_mode(0),
+	auto_shot(0)
 {}
 
 ostream& operator<<(ostream& o,Panel::Auto_mode a){
@@ -40,9 +40,9 @@ ostream& operator<<(ostream& o,Mode_buttons m){
 	X(collect)
 	X(shoot_high)
 	X(truss_toss)
-	X(pass)
 	X(eject)
 	X(catch_mode)
+	X(auto_shot)
 	#undef X
 	return o<<")";
 }
@@ -92,7 +92,7 @@ Panel::Panel():
 ostream& operator<<(ostream& o,Panel p){	
 	o<<"Panel( ";
 	#define X(name) o<<""#name<<":"<<p.name<<" ";
-//	o<<p.mode_buttons;
+	o<<p.mode_buttons;
 	X(fire)
 	X(pass_now)
 	X(target)
@@ -138,7 +138,7 @@ Calibration_target interpret_target(double f){
 			r.target=Fire_control::TRUSS;
 			break;
 		case 2:
-			r.target=Fire_control::PASS;
+			r.target=Fire_control::AUTO_SHOT;
 			break;
 		//case 9:
 		default:
@@ -220,8 +220,9 @@ Panel interpret(Driver_station_input d){
 		panel.mode_buttons.collect=(x<2.35 && x>2.05);
 		panel.mode_buttons.shoot_high=!d.digital[0];
 		panel.mode_buttons.truss_toss=(x<1.8 && x>1.5);
+		panel.mode_buttons.auto_shot=(x<.6&&x>.4);
 		panel.mode_buttons.eject=(x<1.25 && x>.95);
-		panel.pass_now=(x<.7 && x>.4);
+		panel.pass_now=(x<.7&&x>.4);
 	}
 	panel.mode_buttons.catch_mode=!d.digital[2];
 
@@ -239,7 +240,7 @@ Panel interpret(Driver_station_input d){
 		if(x>2.35 && x<2.65) panel.collector_tilt=Collector_tilt::OUTPUT_DOWN;
 		if(x>1.35 && x<1.75) panel.collector=ON;
 		if(x>1.05 && x<1.35) panel.collector=REVERSE;
-		if(x>.4 && x<1.75) panel.learn=1;
+		if(x>.4 && x<1) panel.learn=1;
 		if(x>.2&&x<.4)panel.pidadjust=1;
 	}
 	

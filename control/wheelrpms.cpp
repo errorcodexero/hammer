@@ -59,7 +59,7 @@ string postequalstr(string s){
 void configfile(){
 	ofstream wheelrpms;
 	wheelrpms.open("wheelrpms.txt");
-	wheelrpms<<"Shooter Wheel RPMs:"<<endl<<rpmsdefault()<<endl;
+	wheelrpms<<"Shooter Wheel RPMs:"<<endl<<rpmsdefault()<<endl; 
 	wheelrpms.close();
 }
 
@@ -69,7 +69,7 @@ wheelcalib rpmsdefault(){
 	rpms.highgoal=Shooter_wheels::Status(1200,2500);
 	rpms.lowgoal=Shooter_wheels::Status(1150,1300);
 	rpms.overtruss=Shooter_wheels::Status(1825,2900);
-	rpms.passing=Shooter_wheels::Status(1100,1100);
+	rpms.passing=Shooter_wheels::Status(1500,1300);
 	return rpms;
 }
 

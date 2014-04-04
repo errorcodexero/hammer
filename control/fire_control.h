@@ -6,7 +6,7 @@
 #include "control_status.h"
 
 namespace Fire_control{
-	enum Target{NO_TARGET,HIGH,TRUSS,PASS,EJECT};
+	enum Target{NO_TARGET,HIGH,TRUSS,EJECT,AUTO_SHOT};
 	std::ostream& operator<<(std::ostream&,Target);
 	std::vector<Target> targets();
 	Target target(Control_status::Control_status);

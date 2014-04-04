@@ -10,8 +10,8 @@ namespace Fire_control{
 		X(NO_TARGET)
 		X(HIGH)
 		X(TRUSS)
-		X(PASS)
 		X(EJECT)
+		X(AUTO_SHOT)
 		#undef X
 		assert(0);
 	}
@@ -47,14 +47,14 @@ namespace Fire_control{
 			case Control_status::TRUSS_TOSS:
 			case Control_status::TRUSS_TOSS_WHEN_READY:
 				return TRUSS;
-			case Control_status::PASS_PREP:
-			case Control_status::PASS:
-			case Control_status::PASS_WHEN_READY:
-				return PASS;
 			case Control_status::EJECT_PREP:
 			case Control_status::EJECT:
 			case Control_status::EJECT_WHEN_READY:
 				return EJECT;
+			case Control_status::AUTO_SHOT_PREP:
+			case Control_status::AUTO_SHOT:
+			case Control_status::AUTO_SHOT_WHEN_READY:
+				return AUTO_SHOT;
 			case Control_status::CATCH: return NO_TARGET;
 			default: assert(0);
 		}
@@ -97,12 +97,12 @@ namespace Fire_control{
 			case Control_status::TRUSS_TOSS_PREP: return PREP;
 			case Control_status::TRUSS_TOSS: return FIRE;
 			case Control_status::TRUSS_TOSS_WHEN_READY: return FIRE_WHEN_READY;
-			case Control_status::PASS_PREP: return PREP;
-			case Control_status::PASS: return FIRE;
-			case Control_status::PASS_WHEN_READY: return FIRE_WHEN_READY;
 			case Control_status::EJECT_PREP: return PREP;
 			case Control_status::EJECT: return FIRE;
 			case Control_status::EJECT_WHEN_READY: return FIRE_WHEN_READY;
+			case Control_status::AUTO_SHOT_PREP:return PREP;
+			case Control_status::AUTO_SHOT: return FIRE;
+			case Control_status::AUTO_SHOT_WHEN_READY: return FIRE_WHEN_READY;
 			case Control_status::CATCH: return OTHER;
 			default: assert(0);
 		}
@@ -111,24 +111,24 @@ namespace Fire_control{
 	Control_status::Control_status generate_status(Target target,Goal goal){
 		if(target == HIGH && goal == PREP){return Control_status::SHOOT_HIGH_PREP;}
 		if(target == TRUSS && goal == PREP) {return Control_status::TRUSS_TOSS_PREP;}
-		if(target == PASS && goal == PREP) {return Control_status::PASS_PREP;}
 		if(target == EJECT && goal == PREP) {return Control_status::EJECT_PREP;}
+		if(target == AUTO_SHOT && goal == PREP) {return Control_status::AUTO_SHOT_PREP;}
 		if(target == HIGH && goal == FIRE) {return Control_status::SHOOT_HIGH;}
 		if(target == TRUSS && goal == FIRE) {return Control_status::TRUSS_TOSS;}
-		if(target == PASS && goal == FIRE) {return Control_status::PASS;}
 		if(target == EJECT && goal == FIRE) {return Control_status::EJECT;}
+		if(target == AUTO_SHOT && goal == FIRE) {return Control_status::AUTO_SHOT;}
 		if(target == HIGH && goal == FIRE_WHEN_READY) {return Control_status::SHOOT_HIGH_WHEN_READY;}
 		if(target == TRUSS && goal == FIRE_WHEN_READY) {return Control_status::TRUSS_TOSS_WHEN_READY;}
-		if(target == PASS && goal == FIRE_WHEN_READY) {return Control_status::PASS_WHEN_READY;}
 		if(target == EJECT && goal == FIRE_WHEN_READY) {return Control_status::EJECT_WHEN_READY;}
+		if(target == AUTO_SHOT && goal == FIRE_WHEN_READY) {return Control_status::AUTO_SHOT_WHEN_READY;}
 		if(target == HIGH && goal == DRIVE) {throw "error1";}
 		if(target == TRUSS && goal == DRIVE) {throw "error1";}
-		if(target == PASS&& goal == DRIVE) {throw "error1";}
 		if(target == EJECT && goal == DRIVE) {throw "error1";}
+		if(target == AUTO_SHOT && goal == DRIVE) {throw "error1";}
 		if(target == HIGH && goal == OTHER) {throw "error1";}
-		if(target == PASS && goal == OTHER) {throw "error1";}
 		if(target == TRUSS && goal == OTHER) {throw "error1";}
 		if(target == EJECT && goal == OTHER) {throw "error1";}
+		if(target == AUTO_SHOT && goal == OTHER) {throw "error1";}
 		throw "Unknown";
 	}
 	
@@ -170,8 +170,8 @@ namespace Fire_control{
 		r|=NO_TARGET;
 		r|=HIGH;	
 		r|=TRUSS;
-		r|=PASS;
 		r|=EJECT;
+		r|=AUTO_SHOT;
 		return r;
 	}
 }

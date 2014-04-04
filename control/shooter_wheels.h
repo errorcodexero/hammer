@@ -10,8 +10,9 @@
 
 namespace Shooter_wheels{
 	enum High_level_goal{
-		HIGH_GOAL,TRUSS,PASS,STOP,X,
-		HIGH_GOAL_NONBLOCK //go to the high goal speed but always read 'ready'
+		HIGH_GOAL,TRUSS,STOP,X,AUTO_SHOT,
+		HIGH_GOAL_NONBLOCK, //go to the high goal speed but always read 'ready'
+		AUTO_SHOT_NONBLOCK
 	};
 	std::ostream& operator<<(std::ostream&,High_level_goal);
 	

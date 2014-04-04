@@ -30,17 +30,17 @@ namespace Control_status{
 		X(TRUSS_TOSS_PREP)
 		X(TRUSS_TOSS)
 		X(TRUSS_TOSS_WHEN_READY)
-		X(PASS_PREP)
-		X(PASS)
-		X(PASS_WHEN_READY)
 		X(EJECT_PREP)
 		X(EJECT)
 		X(EJECT_WHEN_READY)
+		X(AUTO_SHOT_PREP)
+		X(AUTO_SHOT)
+		X(AUTO_SHOT_WHEN_READY)
 		X(CATCH)
 		//X(SHOOT_LOW)
 		#undef X
 		assert(0);
-	}
+}
 
 	vector<Control_status> all(){
 		vector<Control_status> r;
@@ -67,12 +67,12 @@ namespace Control_status{
 		X(TRUSS_TOSS_PREP)
 		X(TRUSS_TOSS)
 		X(TRUSS_TOSS_WHEN_READY)
-		X(PASS_PREP)
-		X(PASS)
-		X(PASS_WHEN_READY)
 		X(EJECT_PREP)
 		X(EJECT)
 		X(EJECT_WHEN_READY)
+		X(AUTO_SHOT_PREP)
+		X(AUTO_SHOT)
+		X(AUTO_SHOT_WHEN_READY)
 		X(CATCH)
 		//X(SHOOT_LOW)
 		#undef X
@@ -95,8 +95,8 @@ namespace Control_status{
 		return s==DRIVE_W_BALL || s==DRIVE_WO_BALL || s==COLLECT || 
 			s==SHOOT_HIGH_PREP || s==SHOOT_HIGH || s==SHOOT_HIGH_WHEN_READY || 
 			s==TRUSS_TOSS_PREP || s==TRUSS_TOSS || s==TRUSS_TOSS_WHEN_READY ||
-			s==PASS_PREP || s==PASS || s==PASS_WHEN_READY ||
 			s==EJECT_PREP || s==EJECT || s==EJECT_WHEN_READY ||
+			s==AUTO_SHOT_PREP||s==AUTO_SHOT||s==AUTO_SHOT_WHEN_READY||
 			s==CATCH;
 	}
 }

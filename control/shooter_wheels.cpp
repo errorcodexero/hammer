@@ -14,12 +14,13 @@ namespace Shooter_wheels{
 			#define X1(name) case name: return o<<""#name;
 			X1(HIGH_GOAL)
 			X1(TRUSS)
-			X1(PASS)
 			X1(STOP)
 			X1(X)
+			X1(AUTO_SHOT)
 			X1(HIGH_GOAL_NONBLOCK)
+			X1(AUTO_SHOT_NONBLOCK)
 			#undef X1
-			default: assert(0);
+			default:assert(0);
 		}
 	}
 
@@ -60,11 +61,11 @@ namespace Shooter_wheels{
 		switch(t.target){
 			case Fire_control::HIGH: return find_rpm(in.highgoal,t.top);
 			case Fire_control::TRUSS: return find_rpm(in.overtruss,t.top);
-			case Fire_control::PASS: return find_rpm(in.passing,t.top);
+			case Fire_control::AUTO_SHOT: return find_rpm(in.passing,t.top);
 			case Fire_control::NO_TARGET:
 			case Fire_control::EJECT:
 				return in.lowgoal.bottom;
-			default: assert(0);
+			default:assert(0);
 		}
 	}
 	
@@ -79,6 +80,7 @@ namespace Shooter_wheels{
 				calib=w;
 				writeconfig(w);
 				cerr<<"Learning now!\r\n";
+				cerr<<w<<endl;
 			}
 			//cerr<<"direct_mode:"<<t.direct_mode<<"\r\n";
 			if(t.direct_mode){
@@ -108,12 +110,12 @@ namespace Shooter_wheels{
 				return 1825;//c.overtruss.top; //Previously 1200
 			case HIGH_GOAL:
 				return 2900;//c.highgoal.top; //Previously 1200
-			case PASS:
-				return c.highgoal.top; //Previously 2200
+			case AUTO_SHOT:
+				return c.passing.top; //Previously (FILL IN)
 			case STOP:
 			case X:
 				return 0;
-			default: assert(0);
+			default:assert(0);
 		}
 	}
 
@@ -123,12 +125,12 @@ namespace Shooter_wheels{
 				return c.overtruss.bottom; //Previously 1200
 			case HIGH_GOAL:
 				return c.highgoal.bottom; //Previously 3000
-			case PASS:
-				return c.lowgoal.bottom; //Previously 2200
+			case AUTO_SHOT:
+				return c.passing.bottom; //Previously (FILL IN)
 			case STOP:
 			case X:
 				return 0;
-			default: assert(0);
+			default:assert(0);
 		}
 	}
 	
@@ -173,12 +175,12 @@ namespace Shooter_wheels{
 			case HIGH_GOAL:
 			case HIGH_GOAL_NONBLOCK:
 				return Goal(g,c.highgoal,pid); //Previously 3000
-			case PASS:
-				return Goal(g,c.lowgoal,pid); //Previously 2200
+			case AUTO_SHOT:
+				return Goal(g,c.passing,pid); //Previously 2200
 			case STOP:
 			case X:
 				return Goal(g,Shooter_wheels::Status(),pid);
-			default: assert(0);
+			default:assert(0);
 		}
 	}
 }
@@ -188,25 +190,32 @@ namespace Shooter_wheels{
 
 int main(){
 	using namespace Shooter_wheels;
-
-	static const vector<High_level_goal> GOALS{HIGH_GOAL,TRUSS,PASS,STOP,X,HIGH_GOAL_NONBLOCK};
+	cout<<1<<endl;
+	static const vector<High_level_goal> GOALS{HIGH_GOAL,TRUSS,STOP,X,AUTO_SHOT,AUTO_SHOT_NONBLOCK,HIGH_GOAL_NONBLOCK};
+	cout<<2<<endl;
 	for(auto goal:GOALS){
 		//Control control;
 		//assert(control.ready(goal,target_speed_top(goal,rpmsdefault()),target_speed_bottom(goal,rpmsdefault())));
 		cout<<goal<<"\n";
 	}
+	cout<<3<<endl;
 	/*{
 		auto r=unlink("wheelrpms.txt");
 		assert(r==0);
 	}*/
 	Calibration_manager c;
+	cout<<4<<endl;
 	cout<<c<<"\n";
+	cout<<5<<endl;
 	for(auto a:Calibration_target::all()){
+		cout<<6<<endl;
 		cout<<"-----------------------\n";
 		for(double d:vector<double>{0,1.5,3.3}){
 			cout<<a<<"\n";
+			cout<<7<<endl;
 			c.update(0,d,a,Panel::P,0);
 			cout<<c.update(1,d,a,Panel::P,0).first-rpmsdefault()<<"\n";
+			cout<<8<<endl;
 		}
 	}
 	

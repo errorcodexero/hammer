@@ -15,10 +15,12 @@ namespace Toplevel{
 		X(SHOOT_HIGH)
 		X(TRUSS_TOSS_PREP)
 		X(TRUSS_TOSS)
-		X(PASS_PREP)
-		X(PASS)
+		//X(PASS_PREP)
+		//X(PASS)
 		X(EJECT_PREP)
 		X(EJECT)
+		X(AUTO_SHOT_PREP)
+		X(AUTO_SHOT)
 		X(CATCH)
 		//X(SHOOT_LOW)
 		X(SHOOT_HIGH_PREP_NO_PUMP)
@@ -66,6 +68,15 @@ namespace Toplevel{
 				break;
 			case SHOOT_HIGH_PREP_NO_PUMP:
 			case SHOOT_HIGH_NO_PUMP:
+			case AUTO_SHOT_PREP:
+			case AUTO_SHOT:
+				r.collector_tilt=Collector_tilt::GOAL_UP;
+				r.injector_arms=Injector_arms::GOAL_CLOSE;
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::AUTO_SHOT);
+				if(m==AUTO_SHOT){
+					r.injector=Injector::START;
+				}
+				break;
 			case TRUSS_TOSS_PREP:
 			case TRUSS_TOSS:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
@@ -76,13 +87,13 @@ namespace Toplevel{
 									r.pump=Pump::GOAL_OFF;
 				}
 				break;
-			case PASS_PREP:
+		/*	case PASS_PREP:
 			case PASS:
 				r.collector_tilt=Collector_tilt::GOAL_UP;
 				r.injector_arms=Injector_arms::GOAL_CLOSE;
 				r.shooter_wheels=convert_goal(calib,Shooter_wheels::PASS);
 				if(m==PASS) r.injector=Injector::START;
-				break;
+				break;*/
 			case EJECT_PREP:
 			case EJECT:
                 r.collector_tilt=Collector_tilt::GOAL_UP;//was down, but with the current ejector geometry works better this way.
@@ -112,7 +123,8 @@ namespace Toplevel{
 				if(m==SHOOT_LOW) r.ejector=Ejector::START;
 				break;
 			*/
-			default:assert(0);
+			default:cout<<m<<endl;
+			assert(0);
 		}
 		return r;
 	}
@@ -141,9 +153,9 @@ namespace Toplevel{
 			case Control_status::TRUSS_TOSS_PREP: return Toplevel::TRUSS_TOSS_PREP;
 			case Control_status::TRUSS_TOSS: return Toplevel::TRUSS_TOSS;
 			case Control_status::TRUSS_TOSS_WHEN_READY: return Toplevel::TRUSS_TOSS_PREP;
-			case Control_status::PASS_PREP: return Toplevel::PASS_PREP;
-			case Control_status::PASS: return Toplevel::PASS;
-			case Control_status::PASS_WHEN_READY: return Toplevel::PASS_PREP;
+			case Control_status::AUTO_SHOT_PREP: return Toplevel::AUTO_SHOT_PREP;
+			case Control_status::AUTO_SHOT: return Toplevel::AUTO_SHOT;
+			case Control_status::AUTO_SHOT_WHEN_READY: return Toplevel::AUTO_SHOT_PREP;
 			case Control_status::EJECT_PREP: return Toplevel::EJECT_PREP;
 			case Control_status::EJECT: return Toplevel::EJECT;
 			case Control_status::EJECT_WHEN_READY: return Toplevel::EJECT_PREP;
@@ -180,8 +192,9 @@ namespace Toplevel{
 		COLLECT,
 		SHOOT_HIGH_PREP,SHOOT_HIGH,
 		TRUSS_TOSS_PREP,TRUSS_TOSS,
-		PASS_PREP,PASS,
+		//PASS_PREP,PASS,
 		EJECT_PREP,EJECT,
+		AUTO_SHOT_PREP,AUTO_SHOT,
 		CATCH, //SHOOT_LOW
 		SHOOT_HIGH_PREP_NO_PUMP,
 		SHOOT_HIGH_NO_PUMP

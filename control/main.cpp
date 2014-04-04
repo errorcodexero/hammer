@@ -208,10 +208,12 @@ struct Log_entry{
 	Joystick_data driver_joystick;
 	bool pressure_switch;
 
-	Jaguar_input jaguar_in[Robot_outputs::CAN_JAGUARS];
+	//Jaguar_input jaguar_in[Robot_outputs::CAN_JAGUARS];
+	double jaguar_speed[Robot_outputs::CAN_JAGUARS];
 	Driver_station_input driver_station;
 	Control_status::Control_status control_status;
-	wheelcalib wheel_calibration;
+	Toplevel::Status toplevel_status;
+	//wheelcalib wheel_calibration;
 
 	Pwm_output pwm[4];
 	Solenoid_output solenoid[Robot_outputs::SOLENOIDS];
@@ -227,10 +229,11 @@ ostream& operator<<(ostream& o,Log_entry a){
 	X(robot_mode)
 	X(driver_joystick)
 	X(pressure_switch)
-	X(jaguar_in)
+	X(jaguar_speed)
 	X(driver_station)
 	X(control_status)
-	X(wheel_calibration)
+	X(toplevel_status)
+	//X(wheel_calibration)
 	for(unsigned i=0;i<4;i++){
 		X(pwm[i])
 	}
@@ -246,6 +249,9 @@ ostream& operator<<(ostream& o,Log_entry a){
 
 Maybe<Log_entry> parse_log_entry(string s){
 	vector<string> v=split(s,',');
+	for(unsigned i=0;i<v.size();i++){
+		cout<<i<<":"<<v[i]<<endl;
+	}
 	Log_entry r;
 	r.time=atof(v.at(0));
 	r.robot_mode.autonomous=atoi(v.at(1).c_str());
@@ -255,12 +261,35 @@ Maybe<Log_entry> parse_log_entry(string s){
 		if(!m) return Maybe<Log_entry>();
 		r.driver_joystick=*m;
 	}
+	r.pressure_switch=atoi(v.at(4).c_str());
+	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
+		string s=v.at(5+i);
+		/*Maybe<Jaguar_input> m=Jaguar_input::parse(s);
+		cout<<s<<endl;
+		r.jaguar_in[i]=*m;*/
+		r.jaguar_speed[i]=atof(s.c_str());
+	}
+	{
+		Maybe<Driver_station_input> m=Driver_station_input::parse(v.at(9));
+		if(!m){
+			cout<<v.at(9)<<endl;
+		}
+		r.driver_station=*m;
+	}
+	{
+		Maybe<Control_status::Control_status> m=Control_status::parse(v.at(10));
+		r.control_status=*m;
+	}
+	{
+		stringstream ss;
+		ss<<v.at(11)<<","<<v.at(12);
+		Maybe<Toplevel::Status> m=Toplevel::parse_status(ss.str());
+		if(!m) cout<<v.at(11)<<endl;
+		r.toplevel_status=*m;
+	}
+	cout<<r<<"\n";
 	assert(0);
-	/*r.pressure_switch=
-	r.jaguar_in=
-	r.driver_station=
-	r.control_status=
-	r.wheel_calibration=
+	/*r.wheel_calibration=
 	r.pwm[i]=
 	r.solenoid[i]=
 	r.relay[i]=
@@ -803,6 +832,7 @@ void log_line_test(){
 	Robot_outputs out;
 	log_line(ss,in,m,out);
 	cout<<ss.str()<<"\n";
+	parse_log_entry(ss.str());
 	exit(1);
 }
 

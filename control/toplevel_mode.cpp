@@ -47,15 +47,15 @@ namespace Toplevel{
 				r.collector=ON;
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_OPEN;
-				r.shooter_wheels=convert_goal(calib,Shooter_wheels::HIGH_GOAL_NONBLOCK);
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::AUTO_SHOT_NONBLOCK);
 				r.pump=Pump::GOAL_OFF;//to make the spin up faster.
 				break;
 			case COLLECT:
 				r.collector=ON;
 				r.collector_tilt=Collector_tilt::GOAL_DOWN;
 				r.injector_arms=Injector_arms::GOAL_OPEN;
-				r.shooter_wheels=convert_goal(calib,Shooter_wheels::HIGH_GOAL_NONBLOCK);
-				//r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
+				//r.shooter_wheels=convert_goal(calib,Shooter_wheels::HIGH_GOAL_NONBLOCK);
+				r.shooter_wheels=convert_goal(calib,Shooter_wheels::X);
 				break;
 			case SHOOT_HIGH_PREP:
 			case SHOOT_HIGH:
@@ -137,12 +137,12 @@ namespace Toplevel{
 			case Control_status::AUTO_COLLECT: return Toplevel::COLLECT;
 			case Control_status::AUTO_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP;
 			case Control_status::AUTO_FIRE2: return Toplevel::SHOOT_HIGH;		
-			case Control_status::A2_SPIN_UP: return Toplevel::SHOOT_HIGH_PREP_NO_PUMP;
-			case Control_status::A2_FIRE: return Toplevel::SHOOT_HIGH_NO_PUMP;
+			case Control_status::A2_SPIN_UP: return Toplevel::AUTO_SHOT_PREP;
+			case Control_status::A2_FIRE: return Toplevel::AUTO_SHOT;
 			case Control_status::A2_TO_COLLECT: return Toplevel::COLLECT_SPIN_UP;
-			case Control_status::A2_COLLECT: return Toplevel::COLLECT_SPIN_UP;
-			case Control_status::A2_SPIN_UP2: return Toplevel::SHOOT_HIGH_PREP_NO_PUMP;
-			case Control_status::A2_FIRE2: return Toplevel::SHOOT_HIGH_NO_PUMP;
+			case Control_status::A2_COLLECT: return Toplevel::COLLECT_SPIN_UP; //Eric says worry about this ANOTHER day 
+			case Control_status::A2_SPIN_UP2: return Toplevel::AUTO_SHOT_PREP;
+			case Control_status::A2_FIRE2: return Toplevel::AUTO_SHOT;
 			case Control_status::A2_MOVE: return Toplevel::DRIVE_WO_BALL;
 			case Control_status::DRIVE_W_BALL: return Toplevel::DRIVE_W_BALL;
 			case Control_status::DRIVE_WO_BALL: return Toplevel::DRIVE_WO_BALL;

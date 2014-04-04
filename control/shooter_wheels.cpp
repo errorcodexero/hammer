@@ -150,7 +150,8 @@ namespace Shooter_wheels{
 		bool all_open_loop=0;
 		r.top[Output::FEEDBACK]=all_open_loop?open_loop(status.top,goal.speed.top):Jaguar_output::speedOut(goal.speed.top);
 		r.top[Output::OPEN_LOOP]=open_loop(status.top,goal.speed.top);
-		r.bottom[Output::FEEDBACK]=all_open_loop?open_loop(status.bottom,goal.speed.bottom):Jaguar_output::speedOut(goal.speed.bottom);
+		r.bottom[Output::FEEDBACK]=all_open_loop?open_loop
+				(status.bottom,goal.speed.bottom):Jaguar_output::speedOut(goal.speed.bottom);
 		r.bottom[Output::OPEN_LOOP]=open_loop(status.bottom,goal.speed.bottom);
 		return r;
 	}
@@ -160,7 +161,10 @@ namespace Shooter_wheels{
 	}
 	
 	bool ready(Status status,Goal goal){
-		if(goal.high_level==Shooter_wheels::STOP || goal.high_level==Shooter_wheels::X || goal.high_level==Shooter_wheels::HIGH_GOAL_NONBLOCK) return 1;
+		if(goal.high_level==Shooter_wheels::STOP || 
+				goal.high_level==Shooter_wheels::X || 
+				goal.high_level==Shooter_wheels::HIGH_GOAL_NONBLOCK || 
+				goal.high_level==Shooter_wheels::AUTO_SHOT_NONBLOCK) return 1;
 		//this could be refined.
 		return goal.speed.top>=status.top-50&&goal.speed.top<=status.top+100&&goal.speed.bottom>=status.bottom&&goal.speed.bottom<=status.bottom+100;
 	}
@@ -175,6 +179,7 @@ namespace Shooter_wheels{
 			case HIGH_GOAL:
 			case HIGH_GOAL_NONBLOCK:
 				return Goal(g,c.highgoal,pid); //Previously 3000
+			case AUTO_SHOT_NONBLOCK:
 			case AUTO_SHOT:
 				return Goal(g,c.passing,pid); //Previously 2200
 			case STOP:

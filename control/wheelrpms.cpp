@@ -68,8 +68,8 @@ wheelcalib rpmsdefault(){
 	//Values copied from shooter_wheels.cpp or estimated
 	rpms.highgoal=Shooter_wheels::Status(1200,2500);
 	rpms.lowgoal=Shooter_wheels::Status(1150,1300);
-	rpms.overtruss=Shooter_wheels::Status(1825,2900);
-	rpms.passing=Shooter_wheels::Status(1500,1300);
+	rpms.overtruss=Shooter_wheels::Status(1400,3700);
+	rpms.passing=Shooter_wheels::Status(1825,2900);
 	return rpms;
 }
 

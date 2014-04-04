@@ -368,7 +368,7 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 	}
 
         // Print out wheel RPMs:
-        static int rpm_update_cnt = 0;
+		//static int rpm_update_cnt = 0;
 /*	if (rpm_update_cnt == 100)
         {
             rpm_update_cnt = 0;
@@ -558,7 +558,7 @@ Control_status::Control_status next(
 				if(auto_almost_done) return A2_FIRE2;
 				return took_shot?A2_TO_COLLECT:A2_FIRE;
 			}
-			return TRUSS_TOSS;
+			return AUTO_SHOT;
 		case A2_TO_COLLECT:
 			if(autonomous_mode){
 				if(auto_almost_done) return A2_MOVE;
@@ -578,13 +578,13 @@ Control_status::Control_status next(
 				}
 				return ready_to_auto_shot?A2_FIRE2:A2_SPIN_UP2;
 			}
-			return TRUSS_TOSS_PREP;
+			return AUTO_SHOT_PREP;
 		case A2_FIRE2:
 			if(autonomous_mode){
 				if(auto_almost_done) return A2_MOVE;
 				return took_shot?A2_MOVE:A2_FIRE2;
 			}
-			return TRUSS_TOSS;
+			return AUTO_SHOT;
 		case A2_MOVE:
 			if(autonomous_mode){
 				return (since_switch>AUTO_DRIVE_TIME)?DRIVE_WO_BALL:A2_MOVE;
@@ -675,22 +675,23 @@ Control_status::Control_status next(
 			return ready_to_eject?EJECT:EJECT_WHEN_READY;
 		}
 		case AUTO_SHOT_PREP: 
-					if(fire_now){
-						return AUTO_SHOT;
-					}
-					if(fire_when_ready){
-						return AUTO_SHOT_WHEN_READY;
-					}
-					return AUTO_SHOT_PREP;
-				case AUTO_SHOT: return took_shot?DRIVE_WO_BALL:AUTO_SHOT;
-				case AUTO_SHOT_WHEN_READY: 
-					if(fire_now){
-						return AUTO_SHOT;
-					}
-					if(!fire_when_ready){
-						return AUTO_SHOT_PREP;
-					}
-					return ready_to_auto_shot?AUTO_SHOT:AUTO_SHOT_WHEN_READY;
+			if(fire_now){
+				return AUTO_SHOT;
+			}
+			if(fire_when_ready){
+				return AUTO_SHOT_WHEN_READY;
+			}
+			return AUTO_SHOT_PREP;
+		case AUTO_SHOT: 
+			return took_shot?DRIVE_WO_BALL:AUTO_SHOT;
+		case AUTO_SHOT_WHEN_READY: 
+			if(fire_now){
+				return AUTO_SHOT;
+			}
+			if(!fire_when_ready){
+				return AUTO_SHOT_PREP;
+			}
+			return ready_to_auto_shot?AUTO_SHOT:AUTO_SHOT_WHEN_READY;
 		case CATCH: return status;
 		default:
 			assert(0);

@@ -166,7 +166,10 @@ namespace Shooter_wheels{
 				goal.high_level==Shooter_wheels::HIGH_GOAL_NONBLOCK || 
 				goal.high_level==Shooter_wheels::AUTO_SHOT_NONBLOCK) return 1;
 		//this could be refined.
-		return goal.speed.top>=status.top-50&&goal.speed.top<=status.top+100&&goal.speed.bottom>=status.bottom&&goal.speed.bottom<=status.bottom+100;
+		return goal.speed.top>=status.top-100 &&
+			goal.speed.top<=status.top+100 &&
+			goal.speed.bottom>=status.bottom-25 &&
+			goal.speed.bottom<=status.bottom+100;
 	}
 	
 	//Goal convert_goal(wheelcalib /*c*/,PID_coefficients /*pid*/,High_level_goal /*g*/){

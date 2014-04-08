@@ -3,15 +3,11 @@ Etc:
 	-parsing for log data (Ibrahin)
 	-analysing log data after parsing
 Shooter wheels:
-	-Speed calibration
 	-Add fallback systems
 	-dynamic PID constant (Adrian)
-	-Remap some of the buttons to have high shot/auto shot/truss shot buttons
-	-See whether the hard coding for the auto shot is still in & if so remove it
 	-Figure out where we would need to add code if we wanted to do a staggered startup time for the different wheels
 Drivebase:
 	-Calibrate and improve gyro (Austin)
-	-Log when stuff gets clipped & figure out why it happens
 Vision processing:
 	-Send data over to the other machine that says when auto&teleop modes are
 	-Integrate vision code(THOMAS)
@@ -22,10 +18,7 @@ Vision processing:
 OI:
 	-Make it so that can detect when the Cypress board is present or not
 	-suppress error messages about when the Cypress board is not active
-	-test the rest of the OI override buttons
 Ejector:
-	-Make second eject mode work (AUSTIN)
 AutoMode:
-	-lights for auto on the robot test
 Shooter:
 	-Add down sensor to simulation

@@ -13,12 +13,13 @@ namespace Toplevel{
 		TRUSS_TOSS_PREP,TRUSS_TOSS,
 		//PASS_PREP,PASS,
 		EJECT_PREP,EJECT,
+		AUTO_SHOT_PREP, AUTO_SHOT,
 		CATCH, //SHOOT_LOW
 		COLLECT_SPIN_UP,
 		SHOOT_HIGH_PREP_NO_PUMP,
-		SHOOT_HIGH_NO_PUMP,
+		SHOOT_HIGH_NO_PUMP/*,
 		AUTO_SHOT,
-		AUTO_SHOT_PREP
+		AUTO_SHOT_PREP*/
 	};
 	std::ostream& operator<<(std::ostream& o,Mode);
 

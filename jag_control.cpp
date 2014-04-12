@@ -92,6 +92,7 @@ void Jag_control::set(Jaguar_output a,bool enable){
 			jaguar->ChangeControlMode(CANJaguar::kPercentVbus);
 			jaguar->EnableControl();
 			jaguar->SetExpiration(2.0);
+			jaguar->SetVoltageRampRate(45);
 			jaguar->Set(a.voltage,SYNC_GROUP);
 			CANJaguar::UpdateSyncGroup(SYNC_GROUP);
 			jaguar->SetSafetyEnabled(true);

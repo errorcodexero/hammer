@@ -140,6 +140,11 @@ namespace Shooter_wheels{
 
 	Jaguar_output open_loop(RPM status,RPM goal){
 		if(goal>free_speed()) goal=free_speed();
+		/*
+		if(status>0.10*goal&&goal>1000) return Jaguar_output::voltageOut(0.75*(goal/62.5+4.199)/100); //Until one of us has time to figure 
+		if(status>0.35*goal&&goal>1000) return Jaguar_output::voltageOut(0.79*(goal/62.5+4.199)/100); //A curve to do the this 'right' way
+		if(status>0.60*goal&&goal>1000) return Jaguar_output::voltageOut(0.83*(goal/62.5+4.199)/100); //Just brute force it
+		*/
 		if(status>0.95*goal&&goal>1000) return Jaguar_output::voltageOut((goal/62.5+4.199)/100);
 		return Jaguar_output::voltageOut(goal>1000);
 	} 

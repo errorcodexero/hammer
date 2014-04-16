@@ -41,6 +41,7 @@ public:
 	~Jag_control();
 	
 	void set(Jaguar_output,bool enable);
+	//void setVB(Jaguar_output,bool enable);
 	Jaguar_input get();
 	void output(std::ostream&)const;
 };

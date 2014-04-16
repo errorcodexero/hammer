@@ -145,6 +145,7 @@ namespace Shooter_wheels{
 		if(status>0.35*goal&&goal>1000) return Jaguar_output::voltageOut(0.79*(goal/62.5+4.199)/100); //A curve to do the this 'right' way
 		if(status>0.60*goal&&goal>1000) return Jaguar_output::voltageOut(0.83*(goal/62.5+4.199)/100); //Just brute force it
 		*/
+		//if(status>2000)
 		if(status>0.95*goal&&goal>1000) return Jaguar_output::voltageOut((goal/62.5+4.199)/100);
 		return Jaguar_output::voltageOut(goal>1000);
 	} 

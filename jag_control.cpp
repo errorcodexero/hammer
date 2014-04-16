@@ -104,7 +104,16 @@ void Jag_control::set(Jaguar_output a,bool enable){
 		}
 	}
 }
-
+/*
+void Jag_control::setVB(float a,bool enable){
+	jaguar->ChangeControlMode(CANjaguar::kPercentVbus);
+	jaguar->EnableControl();
+	jaguar->SetExpiration(2.0);
+	jaguar->Set(a,SYNC_GROUP);
+	CANJaguar::UpdateSyncGroup(SYNC_GROUP);
+	jaguar->SetSafetyEnabled(true);
+}
+*/
 Jaguar_input Jag_control::get(){
 	if(since_query>20){
 		in.speed = jaguar -> GetSpeed();

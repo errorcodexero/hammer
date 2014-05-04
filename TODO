@@ -1,7 +1,3 @@
-Etc:
-	-Add logging to the onboard computer
-	-parsing for log data (Ibrahin)
-	-analysing log data after parsing
 Shooter wheels:
 	-Add fallback systems
 	-dynamic PID constant (Adrian)
@@ -9,7 +5,7 @@ Shooter wheels:
 Drivebase:
 	-Calibrate and improve gyro (Austin)
 Vision processing:
-	-Send data over to the other machine that says when auto&teleop modes are
+	-Send data over to the other machine that says when auto&&teleop modes are
 	-Integrate vision code(THOMAS)
 	-Figure out how to talk over ethernet on the robot (TOM/THOMAS)
 	-Make the controls work as if we had the data (DYLAN)
@@ -22,3 +18,7 @@ Ejector:
 AutoMode:
 Shooter:
 	-Add down sensor to simulation
+Misc:
+	-Add logging to the onboard computer
+	-parsing for log data (Ibrahim)
+	-analysing log data after parsing

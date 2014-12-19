@@ -802,7 +802,7 @@ Shooter_wheels::Output shooter_output(Robot_outputs out){
 	r.bottom[Shooter_wheels::Output::OPEN_LOOP]=out.jaguar[JAG_BOTTOM_OPEN_LOOP];
 	return r;
 }
-#if 0
+#ifdef MAIN_TEST
 vector<Control_status::Control_status> auto_test(ostream& o,double automodeknob){
 	vector<Control_status::Control_status> v;
 	Main m;
@@ -836,7 +836,7 @@ vector<Control_status::Control_status> auto_test(ostream& o,double automodeknob)
 	return v;
 }
 
-/*void mode_table(){
+void mode_table(){
 	static ofstream f("control_modes.html");
 	struct Tag{
 		string s;
@@ -892,7 +892,7 @@ void check_auto_modes_end(){
 		cout<<control_status<<"	"<<n<<endl;
 		assert(teleop(n));
 	}
-}*/
+}
 
 void log_line_test(){
 	stringstream ss;

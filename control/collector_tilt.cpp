@@ -1,6 +1,6 @@
 #include "collector_tilt.h"
-#include<iostream>
-#include<cassert>
+#include <iostream>
+#include <cassert>
 #include "../util/util.h"
 
 //this is very similar to the injector arms.

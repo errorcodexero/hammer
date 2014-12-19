@@ -1,8 +1,11 @@
 #include "main.h"
-#include<iostream>
-#include<sstream>
-#include<cassert>
+#include <iostream>
+#include <sstream>
+#include <cassert>
 #include <math.h>
+#include <cmath>
+#include <iomanip>
+#include <vector>
 #include "holonomic.h"
 #include "toplevel.h"
 #include "fire_control.h"
@@ -12,8 +15,35 @@
 #include "../util/util.h"
 #include "toplevel_mode.h"
 #include <stdlib.h>
+#include <string>
+#include <stdio.h>
+#include "high_level.h"
+#include "common.h"
+#include <assert.h>
+#include "encoders.h"
+
+#ifndef M_PI//Defines a variable for pi if the variable does not exist
+#define M_PI 3.141592653589793238462643383
+#endif
 
 using namespace std;
+
+Drivebase_target swerve_goals(float joy_x, float joy_y, float joy_theta){
+	Drivebase_target d;
+	d.mod[0].angle=0;
+	d.mod[0].power=joy_y;
+	if (d.mod[0].power>165)d.mod[0].power=165;
+	if (d.mod[0].power<-165)d.mod[0].power=-165;
+	d.mod[1].angle=0;
+	d.mod[1].power=joy_y-joy_theta;
+	if (d.mod[1].power>165)d.mod[0].power=165;
+	if (d.mod[1].power<-165)d.mod[0].power=-165;
+	d.mod[2].angle=0;
+	d.mod[2].power=joy_y+joy_theta;
+	if (d.mod[2].power>165)d.mod[0].power=165;
+	if (d.mod[2].power<-165)d.mod[0].power=-165;
+	return d;
+}
 
 double convert_output(Collector_mode m){
 	switch(m){
@@ -34,9 +64,9 @@ Robot_outputs convert_output(Toplevel::Output a){
 	r.pwm[0]=pwm_convert(a.drive.a);
 	r.pwm[1]=pwm_convert(a.drive.b);
 	r.pwm[2]=pwm_convert(a.drive.c);
-	r.pwm[3]=convert_output(a.collector);
+	r.pwm[3]=(int)convert_output(a.collector);
 	
-	r.relay[0]=(a.pump==Pump::OUTPUT_ON)?RELAY_10:RELAY_00;
+	r.relay[0]=(a.pump==Pump::OUTPUT_ON)?RELAY_00:RELAY_00;
 	
 	r.solenoid[0]=(a.collector_tilt==Collector_tilt::OUTPUT_DOWN);
 	r.solenoid[1]=(a.collector_tilt==Collector_tilt::OUTPUT_UP);
@@ -47,12 +77,23 @@ Robot_outputs convert_output(Toplevel::Output a){
 
 	//pressure switch
 	r.digital_io[0]=DIO_INPUT;
-
+	
+	r.digital_io[1]=DIO_INPUT;
+	r.digital_io[2]=DIO_INPUT;
+	r.digital_io[3]=DIO_INPUT;
+	r.digital_io[4]=DIO_INPUT;
+	r.digital_io[5]=DIO_INPUT;
+	r.digital_io[6]=DIO_INPUT;
+	r.digital_io[7]=DIO_INPUT;
+	r.digital_io[8]=DIO_INPUT;
+	r.digital_io[9]=DIO_INPUT;
+	r.digital_io[13]=DIO_INPUT;
+	
 	//cerr<<a.shooter_wheels<<"\r\n";
-	r.jaguar[JAG_TOP_FEEDBACK]=a.shooter_wheels.top[Shooter_wheels::Output::FEEDBACK];
-	r.jaguar[JAG_BOTTOM_FEEDBACK]=a.shooter_wheels.bottom[Shooter_wheels::Output::FEEDBACK];
-	r.jaguar[JAG_TOP_OPEN_LOOP]=a.shooter_wheels.top[Shooter_wheels::Output::OPEN_LOOP];
-	r.jaguar[JAG_BOTTOM_OPEN_LOOP]=a.shooter_wheels.bottom[Shooter_wheels::Output::OPEN_LOOP];
+	//r.jaguar[JAG_TOP_FEEDBACK]=a.shooter_wheels.top[Shooter_wheels::Output::FEEDBACK];
+	//r.jaguar[JAG_BOTTOM_FEEDBACK]=a.shooter_wheels.bottom[Shooter_wheels::Output::FEEDBACK];
+	//r.jaguar[JAG_TOP_OPEN_LOOP]=a.shooter_wheels.top[Shooter_wheels::Output::OPEN_LOOP];
+	//r.jaguar[JAG_BOTTOM_OPEN_LOOP]=a.shooter_wheels.bottom[Shooter_wheels::Output::OPEN_LOOP];
 	/*for(unsigned i=0;i<4;i++){
 		cerr<<r.jaguar[i]<<"\r\n";
 	}*/
@@ -250,7 +291,7 @@ ostream& operator<<(ostream& o,Log_entry a){
 Maybe<Log_entry> parse_log_entry(string s){
 	vector<string> v=split(s,',');
 	for(unsigned i=0;i<v.size();i++){
-		cout<<i<<":"<<v[i]<<endl;
+		//cout<<i<<":"<<v[i]<<endl;
 	}
 	Log_entry r;
 	r.time=atof(v.at(0));
@@ -311,10 +352,11 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 		main_joystick.button[Gamepad_button::B],
 		main_joystick.button[Gamepad_button::X]
 	);
-
-
+	
+	get_encoder_states(in);
+	
 	ball_collecter.update(main_joystick.button[5]);
-	bool tanks_full=(in.digital_io[0]==DI_1);
+	bool tanks_full=(in.digital_io[13]==DI_1);
 
 	Panel panel=interpret(in.driver_station);	
 	Shooter_wheels::Calibration calib=wheel_calibration.update(panel.learn,panel.speed,panel.target,panel.pidselect,panel.pidadjust);
@@ -359,10 +401,12 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 		high_level_outputs.collector=REVERSE;
 	}
 	Robot_outputs r=convert_output(high_level_outputs);
+	r.relay[0]=(in.digital_io[13]==DI_1)?RELAY_00:RELAY_10;
+	r.solenoid[0]=in.joystick[1].button[Gamepad_button::A];
 	{
 		Shooter_wheels::Status wheel;
-		wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;
-		wheel.bottom=in.jaguar[JAG_BOTTOM_FEEDBACK].speed;
+		//wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;
+		//wheel.bottom=in.jaguar[JAG_BOTTOM_FEEDBACK].speed;
 		bool downsensor=in.digital_io[1]==DI_1;
 		est.update(in.now,in.robot_mode.enabled,high_level_outputs,tanks_full?Pump::FULL:Pump::NOT_FULL,in.orientation,wheel,downsensor);
 	}
@@ -409,9 +453,9 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 		static int i=0;
 		if(i==0){
 			stringstream ss;
-			ss<<in<<"\r\n";//<<*this<<"\r\n";
-			ss<<panel<<"\r\n";
-			ss<<in.driver_station<<"\r\n";
+			ss<<in<<"\r\n"<<*this<<"\r\n";
+			//ss<<panel<<"\r\n";
+			//ss<<in.driver_station<<"\r\n";
 			ss<<"Field Relative?:"<<field_relative.get()<<"\n";
 			ss<<"Gyro ="<<in.orientation<<"\n";
 			cerr<<ss.str();//putting this all together at once in hope that it'll show up at closer to the same time.  
@@ -419,6 +463,7 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 		}
 		i=(i+1)%500;
 	}
+	
 	//cerr<<subgoals_now<<"\r\n";
 	//cerr<<toplevel_status<<"\r\n\r\n";
 	//cerr<<"Waiting on:"<<not_ready(toplevel_status,subgoals_now)<<"\n";
@@ -715,7 +760,7 @@ bool approx_equal(Main a,Main b){
 	return 1;
 }
 
-#ifdef MAIN_TEST
+
 #include<fstream>
 #include "wheel_sim.h"
 #include "monitor.h"
@@ -734,7 +779,7 @@ Shooter_wheels::Output shooter_output(Robot_outputs out){
 	r.bottom[Shooter_wheels::Output::OPEN_LOOP]=out.jaguar[JAG_BOTTOM_OPEN_LOOP];
 	return r;
 }
-
+#if 0
 vector<Control_status::Control_status> auto_test(ostream& o,double automodeknob){
 	vector<Control_status::Control_status> v;
 	Main m;
@@ -745,7 +790,7 @@ vector<Control_status::Control_status> auto_test(ostream& o,double automodeknob)
 	for(unsigned i=0;i<1500;i++){
 		Robot_inputs in;
 		in.driver_station.analog[0]=automodeknob;
-		in.now=i/100.0;
+		in.now=i/100.0; 
 		in.robot_mode.autonomous=1;
 		in.robot_mode.enabled=1;
 		//in.jaguar[JAG_TOP_OPEN_LOOP]=leave at 0
@@ -768,7 +813,7 @@ vector<Control_status::Control_status> auto_test(ostream& o,double automodeknob)
 	return v;
 }
 
-void mode_table(){
+/*void mode_table(){
 	static ofstream f("control_modes.html");
 	struct Tag{
 		string s;
@@ -824,7 +869,7 @@ void check_auto_modes_end(){
 		cout<<control_status<<"	"<<n<<endl;
 		assert(teleop(n));
 	}
-}
+}*/
 
 void log_line_test(){
 	stringstream ss;
@@ -840,17 +885,22 @@ void log_line_test(){
 template<typename T>
 vector<T> uniq(vector<T> v){
 	vector<T> r;
-	for(auto a:v){
-		if( !(r.size() && r[r.size()-1]==a) ){
-			r|=a;
+	for(int i;i<v.size();i++){
+		if( !(r.size() && r[r.size()-1]==v[i]) ){
+			r|=v[i];
 		}
 	}
 	return r;
 }
 
 int main(){
+	/*Drivebase_goal d;
+	Drivebase_goal d;
+	d=swerve_goals(joy_x,joy_y,joy_theta);
+	cout<<d<<endl;*/
+
 	//log_line_test();
-	check_auto_modes_end();
+	//check_auto_modes_end();
 	/*Main m;
 	cout<<m<<"\n";
 	cout<<m(Robot_inputs())<<"\n";

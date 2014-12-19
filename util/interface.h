@@ -26,10 +26,10 @@ struct Robot_outputs{
 	static const unsigned RELAYS=8;
 	Relay_output relay[RELAYS];
 	
-	static const unsigned DIGITAL_IOS=4;//there are really 14
+	static const unsigned DIGITAL_IOS=14;//there are really 14
 	Digital_out digital_io[DIGITAL_IOS];
 	
-	static const unsigned CAN_JAGUARS=4;
+	static const unsigned CAN_JAGUARS=0;
 	Jaguar_output jaguar[CAN_JAGUARS];
 	
 	//could add in some setup for the analog inputs

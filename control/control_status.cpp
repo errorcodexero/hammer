@@ -1,6 +1,6 @@
 #include "control_status.h"
-#include<iostream>
-#include<cassert>
+#include <iostream>
+#include <cassert>
 #include "../util/util.h"
 
 using namespace std;

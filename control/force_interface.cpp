@@ -54,7 +54,7 @@ int Force_interface::pwm(unsigned location,int value){
 	}else{
 		force.pwm[location]=1;
 		double v=0;
-		double x=.5;
+		double x=.2;
 		if(value==1) v=x;
 		if(value==3) v=-x;
 		force.values.pwm[location]=pwm_convert(v);

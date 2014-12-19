@@ -1,0 +1,10 @@
+Shooter Wheel RPMs:
+High Goal RPMs(Top)	=1190
+High Goal RPMs(Bottom)	=2490
+Low Goal RPMs(Top)	=1150
+Low Goal RPMs(Bottom)	=1260
+Over Truss RPMs(Top)	=1390
+Over Truss RPMs(Bottom)	=3690
+Passing RPMs(Top)	=1815
+Passing RPMs(Bottom)	=2896
+

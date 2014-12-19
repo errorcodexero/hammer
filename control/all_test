@@ -1,0 +1,1 @@
+g++ -Wall -Werror --std=c++11 all.cpp high_level.cpp module.cpp common.cpp 2>&1 && ./a.out 2>&1

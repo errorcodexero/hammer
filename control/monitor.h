@@ -1,8 +1,8 @@
 #ifndef MONITOR_H
 #define MONITOR_H
 
-#include<sstream>
-#include<iostream>
+#include <sstream>
+#include <iostream>
 #include "main.h"
 
 template<typename T>

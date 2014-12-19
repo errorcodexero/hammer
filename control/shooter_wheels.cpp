@@ -74,7 +74,7 @@ namespace Shooter_wheels{
 		{
 			double adjustment=((adjust_wheel/3.3)-.5)*2*100;
 			//cout<<"adjustment:"<<adjustment<<"\n";
-			find_rpm(w,t)+=adjustment;
+			//find_rpm(w,t)+=adjustment;
 			if(learn(learn_button)){
 				//write changes to the file
 				calib=w;
@@ -85,8 +85,8 @@ namespace Shooter_wheels{
 			//cerr<<"direct_mode:"<<t.direct_mode<<"\r\n";
 			if(t.direct_mode){
 				double a2=adjust_wheel/3.3*4000;
-				w.highgoal.bottom=a2;
-				w.highgoal.top=a2-1250;
+				//w.highgoal.bottom=a2;
+				//w.highgoal.top=a2-1250;
 			}
 		}
 		PID_coefficients pid;//TODO: Make this adjust.

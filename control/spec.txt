@@ -1,0 +1,27 @@
+I'm going to start with a very loose idea of the high level code of the swerve drive and then get more specific.  
+
+The idea of the high level program is that there's a function that takes the joystick inputs and turns them into a heading and throttle percentage for each wheel.  Everything else in the program is just to help check that that function is working correctly.  
+
+Some desirable properties of this transformation would include:
+-It must be possible to make the robot go forward
+-It must be possible to make the robot turn
+-The robot must stop when the joysticks are centered
+-Avoid big discontinuities in what the robot does.  (Moving a joystick a small amount shouldn't make it go from stopped to 75% of max speed or something like that)
+
+Here are some other properties that would be nice to have:
+-It should be possible to make the robot go in any direction
+-The controls should be intuitive
+-It would be good if the robot set the angles and speeds to avoid scrubbing (the wheels won't fight each other)
+-It would be good to be able to turn while also driving
+
+I think the first list of properties are things where if they aren't there you'd sit in the pits until you figured them out, and the second list is things that you would expect a good swerve drive to be able to do.  There's more than one way to accomplish these and I'm not sure exactly what order you want to do things but I'll outline a couple different ways to approach the problem.  
+
+You could decide to do it the easiest thing first and then try to make it better later.  If you decided to do that you could start by ignoring the axis of the joystick, making the wheels face forward all the time, turning by having the left wheel go faster or slower than the right, and setting the back wheel to go a speed that's the average of the left and right wheel speeds.  This would probably not be a terrible backup mode to have in case something goes wrong with the encoders.  
+
+Another way to approach the problem is what Calvin was doing.  The x/y/theta of the joystick would be transformed into a point to rotate around, the direction to rotate around it, and a throttle percentage.  Then given that a direction and speed for each wheel would be calculated.  Here are a few pointers on how to do that if you want:
+	How to choose the direction of the point of rotation: make it perpendicular to the direction that the joystick's x/y points
+	How to choose the distance away the point is: for things that are supposed to go straight make it far away to make the circle the robot would go in very large.  If it's supposed to rotate in place it should be someplace under the robot.
+	How to calculate directions for each wheel: Make them tangent to a circle that would be centered at the center of rotation
+	Throttle percentage: this isn't really critical but the wheels should go a speed proportional to how large a circle they're on
+
+There's also a third way that I'm not sure that I can recommend because it relies on having a working simulator.  I don't think Jacob's far enough along for it to work yet, but basically you'd run a search algorithm with the simulator telling you what the outputs did and then you'd just do whatever got you to the destination fastest.  This is also probably the hardest to code well.  

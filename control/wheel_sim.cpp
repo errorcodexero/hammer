@@ -1,3 +1,4 @@
+/*
 #include "wheel_sim.h"
 #include<iostream>
 #include<cassert>
@@ -16,11 +17,11 @@ double portion_of_max_speed(RPM r){
 //estimated basec on some open loop shooting tests.
 static const double BREAK_FREE_POWER=.04199;
 
-/*double portion_used_as_drag(Shooter_wheels::RPM wheel_speed){
+double portion_used_as_drag(Shooter_wheels::RPM wheel_speed){
 	//the drag appears to be mostly linear
 	const double stop_power=.04199;
 	return stop_power+(1-stop_power)*portion_of_max_speed(wheel_speed);
-}*/
+}
 
 double oz_in_to_ft_lb(double d){
 	return d/16/12;
@@ -90,7 +91,7 @@ double output_torque(RPM rpm,double power_portion){
 }
 
 //returns RPM
-double step(double initial /*in rpms*/,Time stepsize,double power_portion,bool shoot_end){
+double step(double initial in rpms,Time stepsize,double power_portion,bool shoot_end){
 	if(shoot_end){
 		return initial/4;
 	}
@@ -100,7 +101,7 @@ double step(double initial /*in rpms*/,Time stepsize,double power_portion,bool s
 	//power_portion-=portion_used_as_drag(initial);
 	//double torque=torque_available(initial)*power_portion;
 	//if(power_portion<0) torque*=-1;//this could be done in a nicer way.
-	double torque=output_torque(initial,power_portion);
+	//double torque=output_torque(initial,power_portion);
 
 	//cout<<"torque="<<torque<<"\n";
 
@@ -120,14 +121,14 @@ double step(double initial /*in rpms*/,Time stepsize,double power_portion,bool s
 }
 
 //rpms->watts
-/*double wheel_energy(double speed){
+double wheel_energy(double speed){
 	return .5*moment_of_inertia()*
-}*/
+}
 
-/*double power_step(double initial,Time stepsize,double power_portion){
+double power_step(double initial,Time stepsize,double power_portion){
 	static const double BANEBOTS_540_POWER=123.49;//watts
 	assert(0);
-}*/
+}
 
 Wheel_sim::Wheel_sim():last(-1),est(0){}
 
@@ -137,7 +138,7 @@ void Wheel_sim::update(Time now,double power,bool shooting){
 	}
 	Time step_size=now-last;
 	//cout<<"step="<<step_size<<"\n";
-	est=step(est,step_size,power,shooter(shooting));
+	//est=step(est,step_size,power,shooter(shooting));
 	last=now;
 }
 
@@ -226,12 +227,13 @@ int main(){
 
 	shooter_sim_test();
 
-	/*Wheel_sim w;
+	Wheel_sim w;
 	for(Time t=0;t<3;t+=.05){
 		cout<<w<<"\n";
 		w.update(t,1);
-	}*/
+	}
 
 	return 0;
 }
 #endif
+*/

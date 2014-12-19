@@ -21,6 +21,7 @@
 #include "common.h"
 #include <assert.h>
 #include "encoders.h"
+#include "scooper_control.h"
 
 #ifndef M_PI//Defines a variable for pi if the variable does not exist
 #define M_PI 3.141592653589793238462643383
@@ -337,7 +338,28 @@ Maybe<Log_entry> parse_log_entry(string s){
 	r.jaguar[i]=*/
 	return Maybe<Log_entry>(r);
 }
+Scooper_control f (bool joystick_buttons_a,bool joystick_buttons_b) {
+	if(joystick_buttons_a==0 && joystick_buttons_b==0){
+		return Scooper_control::STOP;
+	}
+	if(joystick_buttons_a==1 && joystick_buttons_b==0){
+		return Scooper_control::UP;
+	}
+	if(joystick_buttons_a==0 && joystick_buttons_b==1){
+		return Scooper_control::DOWN;
+	}
+	return Scooper_control::STOP;
+}
 
+float pwm_output (Scooper_control l){
+	if(l==Scooper_control::DOWN){
+		return -1;
+	}
+	if(l==Scooper_control::UP){
+		return 1;
+	}
+	return 0;
+}
 Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 	gyro.update(in.now,in.analog[0]);
 	perf.update(in.now);
@@ -403,6 +425,7 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream& cerr){
 	Robot_outputs r=convert_output(high_level_outputs);
 	r.relay[0]=(in.digital_io[13]==DI_1)?RELAY_00:RELAY_10;
 	r.solenoid[0]=in.joystick[1].button[Gamepad_button::A];
+	r.pwm[6]=pwm_output(f(in.joystick[1].button[Gamepad_button::X],in.joystick[1].button[Gamepad_button::B]));
 	{
 		Shooter_wheels::Status wheel;
 		//wheel.top=in.jaguar[JAG_TOP_FEEDBACK].speed;
